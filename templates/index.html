@@ -1,0 +1,188 @@
+
+<!DOCTYPE html>
+<html lang="es">
+
+<head>
+    <meta charset="UTF-8">
+
+    <meta name="viewport"
+          content="width=device-width, initial-scale=1.0">
+
+    <title>NIRP International</title>
+
+    <link rel="stylesheet"
+          href="{{ url_for('static', filename='styles.css') }}">
+
+    <script
+        src="{{ url_for('static', filename='script.js') }}"
+        defer>
+    </script>
+</head>
+
+<body>
+
+    <!-- ANIMACION DE BIENVENIDA -->
+   
+<!-- ANIMACION CON EL LOGO ORIGINAL NIRP -->
+<div class="intro" id="intro">
+
+    <div class="intro-contenido">
+
+        <img
+            class="logo-animado"
+            src="{{ url_for('static', filename='imagenes/logo-nirp.png') }}"
+            alt="Logo original de NIRP International">
+
+    </div>
+
+</div>
+
+
+    <!-- MENU PRINCIPAL -->
+    <header class="encabezado">
+
+        <a class="marca" href="#inicio">
+            <img
+                src="{{ url_for('static', filename='imagenes/logo-nirp.png') }}"
+                alt="Logo NIRP International">
+        </a>
+
+        <button
+            id="menuBoton"
+            class="menu-boton"
+            type="button"
+            aria-label="Abrir menú"
+            aria-controls="menu"
+            aria-expanded="false">
+            ☰
+        </button>
+
+        <nav class="menu" id="menu">
+            <a href="#inicio">Inicio</a>
+            <a href="#variedades">Variedades</a>
+            <a href="#fincas">Fincas</a>
+            <a href="#nosotros">Nosotros</a>
+        </nav>
+
+    </header>
+
+    <main>
+
+        <!-- PORTADA -->
+        <section class="portada" id="inicio">
+
+            <div class="contenido-portada">
+
+                <span>
+                    BIENVENIDOS A NIRP INTERNATIONAL
+                </span>
+
+                <h1>
+                    La belleza de cada rosa
+                    comienza con su origen
+                </h1>
+
+                <p>
+                    Descubre variedades extraordinarias
+                    de rosas y conoce dónde se cultivan.
+                </p>
+
+                <a href="#variedades" class="boton">
+                    Explorar variedades
+                </a>
+
+            </div>
+
+        </section>
+
+       
+<!-- CATALOGO DE VARIEDADES -->
+<section class="seccion" id="variedades">
+
+    <h2>Nuestras variedades</h2>
+
+    <p>
+        Descubre nuestras variedades de rosas.
+    </p>
+
+    <div class="catalogo">
+
+        {% for rosa in variedades %}
+
+        <article class="tarjeta">
+
+            <img
+                src="{{ url_for('static', filename=rosa.imagen) }}"
+                alt="Rosa {{ rosa.nombre }}">
+
+            <h3>{{ rosa.nombre }}</h3>
+
+            <p>Color: {{ rosa.color }}</p>
+
+            <p>Tipo: {{ rosa.tipo }}</p>
+
+            <p>Pétalos: {{ rosa.petalos }}</p>
+            
+<a
+    href="{{ url_for('detalle_variedad', id=rosa.id) }}"
+    class="boton boton-detalle">
+    Ver detalles
+</a>
+
+
+        </article>
+
+        {% endfor %}
+
+    </div>
+
+</section>
+
+    
+
+        <!-- FINCAS -->
+        <section
+            class="seccion seccion-verde"
+            id="fincas">
+
+            <h2>Nuestras fincas</h2>
+
+            <p>
+                Próximamente podrás localizar
+                las variedades utilizando
+                OpenStreetMap.
+            </p>
+
+            <a
+                class="boton"
+                href="https://www.openstreetmap.org/#map=5/4.33/-72.07"
+                target="_blank"
+                rel="noopener noreferrer">
+                Ver mapa
+            </a>
+
+        </section>
+
+        <!-- SOBRE NOSOTROS -->
+        <section class="seccion" id="nosotros">
+
+            <h2>Sobre NIRP International</h2>
+
+            <p>
+                Explora nuestro catálogo de variedades
+                de rosas y las fincas donde se cultivan.
+            </p>
+
+        </section>
+
+    </main>
+
+    <!-- PIE DE PAGINA -->
+    <footer>
+        <p>
+            NIRP International — Inventario de rosas
+        </p>
+    </footer>
+
+</body>
+</html>

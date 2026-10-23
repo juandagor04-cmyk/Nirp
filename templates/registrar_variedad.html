@@ -1,0 +1,91 @@
+
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport"
+          content="width=device-width, initial-scale=1.0">
+
+    <title>Registrar variedad | NIRP International</title>
+
+    <link rel="stylesheet"
+          href="{{ url_for('static', filename='styles.css') }}">
+</head>
+
+<body>
+
+    <header class="encabezado">
+        <a href="{{ url_for('inicio') }}" class="marca">
+            <img
+                src="{{ url_for('static', filename='imagenes/logo-nirp.png') }}"
+                alt="NIRP International">
+        </a>
+
+        <a href="{{ url_for('inicio') }}#variedades"
+           class="boton">
+            Volver al catálogo
+        </a>
+    </header>
+
+    <main class="registro-contenedor">
+
+        <div class="registro-titulo">
+            <span>ADMINISTRACIÓN DE VARIEDADES</span>
+            <h1>Registrar nueva variedad</h1>
+            <p>
+                Completa la información técnica
+                de la rosa.
+            </p>
+        </div>
+
+        <form
+            action="{{ url_for('registrar_variedad') }}"
+            method="POST"
+            class="formulario-rosa">
+
+            <label for="nombre">Nombre comercial *</label>
+            <input type="text" id="nombre"
+                   name="nombre" required>
+
+            <label for="denominacion">Denominación varietal</label>
+            <input type="text" id="denominacion"
+                   name="denominacion">
+
+            <label for="codigo_vbn">Código VBN</label>
+            <input type="text" id="codigo_vbn"
+                   name="codigo_vbn">
+
+            <label for="color">Color *</label>
+            <input type="text" id="color"
+                   name="color" required>
+
+            <label for="tipo">Tipo de flor</label>
+            <input type="text" id="tipo"
+                   name="tipo">
+
+            <label for="petalos">Número de pétalos</label>
+            <input type="number" id="petalos"
+                   name="petalos" min="0">
+
+            <label for="tallo">Largo del tallo</label>
+            <input type="text" id="tallo"
+                   name="tallo">
+
+            <label for="vida_florero">Vida en florero</label>
+            <input type="text" id="vida_florero"
+                   name="vida_florero">
+
+            <button type="submit" class="boton">
+                Registrar variedad
+            </button>
+
+        </form>
+
+    </main>
+
+    <footer>
+        <p>NIRP International — Inventario de rosas</p>
+    </footer>
+
+</body>
+</html>
