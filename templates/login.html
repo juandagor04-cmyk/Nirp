@@ -1,0 +1,153 @@
+
+<!DOCTYPE html>
+<html lang="es">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport"
+          content="width=device-width, initial-scale=1.0">
+
+    <title>Iniciar sesión | NIRP International</title>
+
+    <link rel="stylesheet"
+          href="{{ url_for('static', filename='styles.css') }}">
+</head>
+
+<body class="pagina-login">
+
+    <!-- ENCABEZADO -->
+    <header class="encabezado">
+
+        <a href="{{ url_for('inicio') }}" class="marca">
+            <img
+                src="{{ url_for('static', filename='imagenes/logo-nirp.png') }}"
+                alt="NIRP International">
+        </a>
+
+        <a href="{{ url_for('inicio') }}" class="boton">
+            Volver al inicio
+        </a>
+
+    </header>
+
+    <!-- CONTENIDO PRINCIPAL -->
+    <main class="login-contenedor">
+
+        <section class="login-tarjeta">
+
+            <!-- LOGO -->
+            <img
+                class="login-logo"
+                src="{{ url_for('static', filename='imagenes/logo-nirp.png') }}"
+                alt="Logo NIRP International">
+
+            <span class="login-etiqueta">
+                ACCESO AL SISTEMA
+            </span>
+
+            <h1>Iniciar sesión</h1>
+
+            <p class="login-descripcion">
+                Ingresa tus credenciales para acceder
+                al sistema de inventarios de NIRP International.
+            </p>
+
+            <!-- MENSAJES -->
+            {% with mensajes = get_flashed_messages(with_categories=true) %}
+                {% for categoria, mensaje in mensajes %}
+
+                    <div
+                        class="mensaje mensaje-{{ categoria }}"
+                        role="alert">
+                        {{ mensaje }}
+                    </div>
+
+                {% endfor %}
+            {% endwith %}
+
+            <!-- FORMULARIO DE INICIO DE SESION -->
+            <form
+                method="POST"
+                action="{{ url_for('login') }}"
+                class="formulario-login">
+
+                <input
+                    type="hidden"
+                    name="csrf_token"
+                    value="{{ csrf_token() }}">
+
+                <label for="correo">
+                    Correo electrónico
+                </label>
+
+                <input
+                    type="email"
+                    id="correo"
+                    name="correo"
+                    placeholder="correo@ejemplo.com"
+                    autocomplete="username"
+                    required>
+
+                <label for="password">
+                    Contraseña
+                </label>
+
+                <input
+                    type="password"
+                    id="password"
+                    name="password"
+                    placeholder="Ingresa tu contraseña"
+                    autocomplete="current-password"
+                    required>
+
+                <button
+                    type="submit"
+                    class="boton login-boton">
+                    Ingresar al sistema
+                </button>
+
+            </form>
+
+            <!-- REGISTRARSE -->
+            <div class="opcion-registrarse"
+                 style="display:block !important;
+                        visibility:visible !important;
+                        opacity:1 !important;
+                        margin-top:25px;
+                        padding-top:22px;
+                        border-top:1px solid #dce8dd;
+                        text-align:center;">
+
+                <p style="margin-bottom:14px;color:#526b58;">
+                    ¿No tienes una cuenta?
+                </p>
+
+                <a
+                    href="{{ url_for('registro') }}"
+                    style="display:block;
+                           padding:15px;
+                           background:#ffffff;
+                           color:#21833e;
+                           border:2px solid #21833e;
+                           border-radius:12px;
+                           font-weight:700;
+                           font-size:16px;
+                           text-decoration:none;">
+                    Registrarse
+                </a>
+
+            </div>
+
+        </section>
+
+    </main>
+
+    <!-- PIE DE PAGINA -->
+    <footer>
+        <p>
+            NIRP International — Sistema de inventarios
+        </p>
+    </footer>
+
+</body>
+</html>

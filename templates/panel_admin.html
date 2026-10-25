@@ -1,0 +1,93 @@
+
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport"
+          content="width=device-width, initial-scale=1.0">
+
+    <title>Panel de administración | NIRP International</title>
+
+    <link rel="stylesheet"
+          href="{{ url_for('static', filename='styles.css') }}">
+</head>
+
+<body>
+
+    <header class="encabezado">
+
+        <a class="marca" href="{{ url_for('inicio') }}">
+            <img
+                src="{{ url_for('static', filename='imagenes/logo-nirp.png') }}"
+                alt="NIRP International">
+        </a>
+
+        <a href="{{ url_for('inicio') }}" class="boton">
+            Volver al inicio
+        </a>
+
+    </header>
+
+    <main class="panel-admin">
+
+        <div class="panel-encabezado">
+            <span>GESTIÓN INTERNA</span>
+            <h1>Panel de administración</h1>
+            <p>
+                Gestiona las variedades y los inventarios
+                de las fincas de NIRP International.
+            </p>
+        </div>
+
+        <div class="panel-opciones">
+
+            <article class="panel-tarjeta">
+                <div class="panel-icono">🌹</div>
+                <h2>Registro de variedades</h2>
+                <p>Crear una rosa nueva.</p>
+
+                <a href="{{ url_for('registrar_variedad') }}"
+                   class="boton">
+                    Registrar variedad
+                </a>
+            </article>
+
+            <article class="panel-tarjeta">
+                <div class="panel-icono">📋</div>
+                <h2>Variedades registradas</h2>
+                <p>Consultar y gestionar fichas técnicas.</p>
+
+                <a href="{{ url_for('catalogo') }}"
+                   class="boton">
+                    Ver variedades
+                </a>
+            </article>
+
+            <article class="panel-tarjeta">
+                <div class="panel-icono">📍</div>
+                <h2>Registro en fincas</h2>
+                <p>Asignar rosas existentes a una finca.</p>
+                <span class="panel-proximamente">
+                    Próximamente
+                </span>
+            </article>
+
+            <article class="panel-tarjeta">
+                <div class="panel-icono">🏡</div>
+                <h2>Inventario de fincas</h2>
+                <p>Consultar fincas, bloques y parcelas.</p>
+                <span class="panel-proximamente">
+                    Próximamente
+                </span>
+            </article>
+
+        </div>
+
+    </main>
+
+    <footer>
+        <p>NIRP International — Administración de inventarios</p>
+    </footer>
+
+</body>
+</html>

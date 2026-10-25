@@ -8,7 +8,7 @@
     <meta name="viewport"
           content="width=device-width, initial-scale=1.0">
 
-    <title>NIRP International</title>
+    <title>NIRP International | Inicio</title>
 
     <link rel="stylesheet"
           href="{{ url_for('static', filename='styles.css') }}">
@@ -21,31 +21,39 @@
 
 <body>
 
-    <!-- ANIMACION DE BIENVENIDA -->
-   
-<!-- ANIMACION CON EL LOGO ORIGINAL NIRP -->
-<div class="intro" id="intro">
+    <!-- ===================================
+         ANIMACION DEL LOGO ORIGINAL
+    =================================== -->
 
-    <div class="intro-contenido">
+    <div class="intro" id="intro">
 
-        <img
-            class="logo-animado"
-            src="{{ url_for('static', filename='imagenes/logo-nirp.png') }}"
-            alt="Logo original de NIRP International">
+        <div class="intro-contenido">
+
+            <img
+                class="logo-animado"
+                src="{{ url_for('static', filename='imagenes/logo-nirp.png') }}"
+                alt="Logo NIRP International">
+
+        </div>
 
     </div>
 
-</div>
 
+    <!-- ===================================
+         MENU PRINCIPAL
+    =================================== -->
 
-    <!-- MENU PRINCIPAL -->
     <header class="encabezado">
 
         <a class="marca" href="#inicio">
+
             <img
                 src="{{ url_for('static', filename='imagenes/logo-nirp.png') }}"
-                alt="Logo NIRP International">
+                alt="NIRP International">
+
         </a>
+
+        <!-- MENU PARA CELULARES -->
 
         <button
             id="menuBoton"
@@ -57,18 +65,70 @@
             ☰
         </button>
 
+
+        <!-- OPCIONES DEL MENU -->
+
         <nav class="menu" id="menu">
-            <a href="#inicio">Inicio</a>
-            <a href="#variedades">Variedades</a>
-            <a href="#fincas">Fincas</a>
-            <a href="#nosotros">Nosotros</a>
+
+            <a href="#inicio">
+                Inicio
+            </a>
+
+            <a href="{{ url_for('catalogo') }}">
+                Variedades
+            </a>
+
+            <a href="#fincas">
+                Fincas
+            </a>
+
+            <a href="#nosotros">
+                Nosotros
+            </a>
+
+
+            <!-- USUARIO ADMINISTRADOR -->
+
+            {% if session.get('rol') == 'admin' %}
+
+                <a href="{{ url_for('panel_admin') }}">
+                    Panel de administración
+                </a>
+
+
+            <!-- USUARIO CLIENTE -->
+
+            {% elif session.get('usuario_id') %}
+
+                <span class="menu-pendiente">
+                    Mi cuenta
+                </span>
+
+
+            <!-- VISITANTE SIN SESION -->
+
+            {% else %}
+
+                <a href="{{ url_for('login') }}">
+                    Iniciar sesión
+                </a>
+
+            {% endif %}
+
         </nav>
 
     </header>
 
+
+    <!-- ===================================
+         CONTENIDO PRINCIPAL
+    =================================== -->
+
     <main>
 
+
         <!-- PORTADA -->
+
         <section class="portada" id="inicio">
 
             <div class="contenido-portada">
@@ -87,7 +147,9 @@
                     de rosas y conoce dónde se cultivan.
                 </p>
 
-                <a href="#variedades" class="boton">
+                <a
+                    href="{{ url_for('catalogo') }}"
+                    class="boton">
                     Explorar variedades
                 </a>
 
@@ -95,93 +157,104 @@
 
         </section>
 
-       
-<!-- CATALOGO DE VARIEDADES -->
-<section class="seccion" id="variedades">
 
-    <h2>Nuestras variedades</h2>
+        <!-- ===================================
+             PRESENTACION DEL CATALOGO
+        =================================== -->
 
-    <p>
-        Descubre nuestras variedades de rosas.
-    </p>
+        <section class="seccion">
 
-    <div class="catalogo">
+            <h2>
+                Conoce nuestras variedades
+            </h2>
 
-        {% for rosa in variedades %}
-
-        <article class="tarjeta">
-
-            <img
-                src="{{ url_for('static', filename=rosa.imagen) }}"
-                alt="Rosa {{ rosa.nombre }}">
-
-            <h3>{{ rosa.nombre }}</h3>
-
-            <p>Color: {{ rosa.color }}</p>
-
-            <p>Tipo: {{ rosa.tipo }}</p>
-
-            <p>Pétalos: {{ rosa.petalos }}</p>
-            
-<a
-    href="{{ url_for('detalle_variedad', id=rosa.id) }}"
-    class="boton boton-detalle">
-    Ver detalles
-</a>
+            <p>
+                Cada rosa tiene características únicas.
+                Explora nuestro catálogo y descubre
+                su información técnica.
+            </p>
 
 
-        </article>
+            <div class="acceso-catalogo">
 
-        {% endfor %}
+                <h3>
+                    Catálogo NIRP International
+                </h3>
 
-    </div>
+                <p>
+                    Consulta las variedades registradas,
+                    sus fotografías y características.
+                </p>
 
-</section>
+                <a
+                    href="{{ url_for('catalogo') }}"
+                    class="boton">
 
-    
+                    Ver catálogo de rosas
 
-        <!-- FINCAS -->
+                </a>
+
+            </div>
+
+        </section>
+
+
+        <!-- ===================================
+             FINCAS
+        =================================== -->
+
         <section
             class="seccion seccion-verde"
             id="fincas">
 
-            <h2>Nuestras fincas</h2>
+            <h2>
+                Nuestras fincas
+            </h2>
 
             <p>
-                Próximamente podrás localizar
-                las variedades utilizando
-                OpenStreetMap.
+                Próximamente podrás consultar
+                las fincas, bloques y parcelas
+                donde se cultivan nuestras variedades.
             </p>
 
-            <a
-                class="boton"
-                href="https://www.openstreetmap.org/#map=5/4.33/-72.07"
-                target="_blank"
-                rel="noopener noreferrer">
-                Ver mapa
-            </a>
+            <p>
+                Estamos preparando un mapa interactivo
+                con OpenStreetMap.
+            </p>
 
         </section>
 
-        <!-- SOBRE NOSOTROS -->
+
+        <!-- ===================================
+             SOBRE NOSOTROS
+        =================================== -->
+
         <section class="seccion" id="nosotros">
 
-            <h2>Sobre NIRP International</h2>
+            <h2>
+                Sobre NIRP International
+            </h2>
 
             <p>
-                Explora nuestro catálogo de variedades
-                de rosas y las fincas donde se cultivan.
+                Conoce nuestras variedades de rosas
+                y la información de sus lugares de cultivo.
             </p>
 
         </section>
 
     </main>
 
-    <!-- PIE DE PAGINA -->
+
+    <!-- ===================================
+         PIE DE PAGINA
+    =================================== -->
+
     <footer>
+
         <p>
             NIRP International — Inventario de rosas
         </p>
+
     </footer>
 
 </body>

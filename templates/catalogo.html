@@ -1,0 +1,135 @@
+
+<!DOCTYPE html>
+<html lang="es">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport"
+          content="width=device-width, initial-scale=1.0">
+
+    <title>Catálogo de variedades | NIRP International</title>
+
+    <link rel="stylesheet"
+          href="{{ url_for('static', filename='styles.css') }}">
+</head>
+
+<body>
+
+    <!-- ENCABEZADO -->
+    <header class="encabezado">
+
+        <a href="{{ url_for('inicio') }}" class="marca">
+            <img
+                src="{{ url_for('static', filename='imagenes/logo-nirp.png') }}"
+                alt="NIRP International">
+        </a>
+
+        <a href="{{ url_for('inicio') }}" class="boton">
+            Volver al inicio
+        </a>
+
+    </header>
+
+    <!-- CATALOGO -->
+    <main class="catalogo-pagina">
+
+        <section class="seccion">
+
+            <h1>Catálogo de variedades</h1>
+
+            <p class="catalogo-descripcion">
+                Descubre las variedades de rosas registradas
+                en NIRP International.
+            </p>
+
+            {% if variedades %}
+
+                <div class="catalogo">
+
+                    {% for rosa in variedades %}
+
+                        <article class="tarjeta">
+
+                            {% if rosa.imagen %}
+
+                                <img
+                                    src="{{ url_for('static', filename=rosa.imagen) }}"
+                                    alt="Rosa {{ rosa.nombre }}"
+                                    loading="lazy">
+
+                            {% else %}
+
+                                <div class="sin-fotografia">
+                                    <span>🌹</span>
+                                    <p>Fotografía pendiente</p>
+                                </div>
+
+                            {% endif %}
+
+                            <div class="tarjeta-contenido">
+
+                                <h3>{{ rosa.nombre }}</h3>
+
+                                <p>
+                                    <strong>Color:</strong>
+                                    {{ rosa.color or 'Sin registrar' }}
+                                </p>
+
+                                <p>
+                                    <strong>Tipo:</strong>
+                                    {{ rosa.tipo or 'Sin registrar' }}
+                                </p>
+
+                                <p>
+                                    <strong>Pétalos:</strong>
+                                    {{ rosa.petalos if rosa.petalos is not none else 'Sin registrar' }}
+                                </p>
+
+                                <a
+                                    href="{{ url_for('detalle_variedad', id=rosa.id) }}"
+                                    class="boton boton-detalle">
+                                    Ver detalles
+                                </a>
+
+                            </div>
+
+                        </article>
+
+                    {% endfor %}
+
+                </div>
+
+            {% else %}
+
+                <div class="catalogo-vacio">
+
+                    <h2>🌹 Próximamente más variedades</h2>
+
+                    <p>
+                        Todavía no hay rosas registradas
+                        en el catálogo de NIRP International.
+                    </p>
+
+                    {% if session.get('rol') == 'admin' %}
+                        <a
+                            href="{{ url_for('registrar_variedad') }}"
+                            class="boton">
+                            Registrar primera variedad
+                        </a>
+                    {% endif %}
+
+                </div>
+
+            {% endif %}
+
+        </section>
+
+    </main>
+
+    <!-- PIE DE PAGINA -->
+    <footer>
+        <p>NIRP International — Catálogo de variedades</p>
+    </footer>
+
+</body>
+</html>

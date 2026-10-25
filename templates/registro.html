@@ -1,0 +1,227 @@
+
+<!DOCTYPE html>
+<html lang="es">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport"
+          content="width=device-width, initial-scale=1.0">
+
+    <title>Registro | NIRP International</title>
+
+    <link rel="stylesheet"
+          href="{{ url_for('static', filename='styles.css') }}">
+</head>
+
+<body class="pagina-registro">
+
+    <header class="encabezado">
+
+        <a href="{{ url_for('inicio') }}" class="marca">
+            <img
+                src="{{ url_for('static', filename='imagenes/logo-nirp.png') }}"
+                alt="NIRP International">
+        </a>
+
+        <a href="{{ url_for('login') }}" class="boton">
+            Iniciar sesión
+        </a>
+
+    </header>
+
+    <main class="registro-contenedor">
+
+        <section class="registro-tarjeta">
+
+            <img
+                class="registro-logo"
+                src="{{ url_for('static', filename='imagenes/logo-nirp.png') }}"
+                alt="Logo NIRP">
+
+            <h1>Crear una cuenta</h1>
+
+            <p class="registro-descripcion">
+                Bienvenido a NIRP International.
+                Completa tus datos para registrarte.
+            </p>
+
+            {% with mensajes = get_flashed_messages(with_categories=true) %}
+                {% for categoria, mensaje in mensajes %}
+                    <div class="mensaje mensaje-{{ categoria }}"
+                         role="alert">
+                        {{ mensaje }}
+                    </div>
+                {% endfor %}
+            {% endwith %}
+
+            <!-- ELEGIR EL TIPO DE REGISTRO -->
+
+            <div class="registro-tipos">
+
+                <button type="button"
+                        id="botonCliente"
+                        class="registro-tipo">
+                    Soy cliente
+                </button>
+
+                <button type="button"
+                        id="botonAdmin"
+                        class="registro-tipo">
+                    Solicitar acceso administrativo
+                </button>
+
+            </div>
+
+            <!-- FORMULARIO -->
+
+            <form method="POST"
+                  action="{{ url_for('registro') }}"
+                  class="formulario-registro">
+
+                <input type="hidden"
+                       name="csrf_token"
+                       value="{{ csrf_token() }}">
+
+                <input type="hidden"
+                       name="tipo"
+                       id="tipo"
+                       value="{{ tipo|default('cliente') }}">
+
+                <label for="nombre">Nombre completo *</label>
+                <input type="text"
+                       id="nombre"
+                       name="nombre"
+                       autocomplete="name"
+                       required>
+
+                <label for="correo">Correo electrónico *</label>
+                <input type="email"
+                       id="correo"
+                       name="correo"
+                       autocomplete="email"
+                       required>
+
+                <label for="telefono">Teléfono *</label>
+                <input type="tel"
+                       id="telefono"
+                       name="telefono"
+                       autocomplete="tel"
+                       required>
+
+                <!-- SOLO ADMINISTRADORES -->
+
+                <div id="camposAdmin" hidden>
+
+                    <h2>Datos administrativos</h2>
+
+                    <label for="empresa_finca">
+                        Empresa o finca *
+                    </label>
+                    <input type="text"
+                           id="empresa_finca"
+                           name="empresa_finca">
+
+                    <label for="cargo">Cargo *</label>
+                    <input type="text"
+                           id="cargo"
+                           name="cargo">
+
+                    <label for="motivo">
+                        Motivo de solicitud *
+                    </label>
+                    <textarea id="motivo"
+                              name="motivo"
+                              rows="4"></textarea>
+
+                    <p class="registro-aviso">
+                        Tu solicitud administrativa será
+                        revisada antes de conceder permisos.
+                    </p>
+
+                </div>
+
+                <label for="password">Contraseña *</label>
+                <input type="password"
+                       id="password"
+                       name="password"
+                       minlength="12"
+                       autocomplete="new-password"
+                       required>
+
+                <small>Utiliza al menos 12 caracteres.</small>
+
+                <label for="confirmar">
+                    Confirmar contraseña *
+                </label>
+                <input type="password"
+                       id="confirmar"
+                       name="confirmar"
+                       minlength="12"
+                       autocomplete="new-password"
+                       required>
+
+                <button type="submit"
+                        class="boton registro-boton">
+                    Crear mi cuenta
+                </button>
+
+            </form>
+
+            <p class="registro-pie">
+                ¿Ya tienes una cuenta?
+                <a href="{{ url_for('login') }}">
+                    Iniciar sesión
+                </a>
+            </p>
+
+        </section>
+
+    </main>
+
+    <script>
+    document.addEventListener("DOMContentLoaded", function () {
+
+        const tipo = document.getElementById("tipo");
+        const camposAdmin = document.getElementById("camposAdmin");
+        const botonCliente = document.getElementById("botonCliente");
+        const botonAdmin = document.getElementById("botonAdmin");
+
+        const camposObligatorios = camposAdmin.querySelectorAll(
+            "input, textarea"
+        );
+
+        function cambiarTipo(valor) {
+
+            const esAdmin = valor === "admin";
+
+            tipo.value = valor;
+            camposAdmin.hidden = !esAdmin;
+
+            botonCliente.classList.toggle(
+                "activo", !esAdmin
+            );
+
+            botonAdmin.classList.toggle(
+                "activo", esAdmin
+            );
+
+            camposObligatorios.forEach(function (campo) {
+                campo.required = esAdmin;
+            });
+        }
+
+        botonCliente.addEventListener("click", function () {
+            cambiarTipo("cliente");
+        });
+
+        botonAdmin.addEventListener("click", function () {
+            cambiarTipo("admin");
+        });
+
+        cambiarTipo(tipo.value);
+
+    });
+    </script>
+
+</body>
+</html>

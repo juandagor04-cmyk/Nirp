@@ -1,39 +1,134 @@
 
 <!DOCTYPE html>
 <html lang="es">
-
 <head>
     <meta charset="UTF-8">
     <meta name="viewport"
           content="width=device-width, initial-scale=1.0">
 
-    <title>Registrar variedad NIRP</title>
+    <title>{{ rosa.nombre }} | NIRP International</title>
+
+    <link rel="stylesheet"
+          href="{{ url_for('static', filename='styles.css') }}">
 </head>
 
 <body>
 
-    <h1>Registro de variedades NIRP</h1>
+    <!-- ENCABEZADO -->
+    <header class="encabezado">
 
-    <form action="{{ url_for('registrar_variedad') }}"
-          method="POST">
+        <a href="{{ url_for('inicio') }}" class="marca">
+            <img
+                src="{{ url_for('static', filename='imagenes/logo-nirp.png') }}"
+                alt="NIRP International">
+        </a>
 
-        <label for="nombre">Nombre de la rosa:</label>
-        <input type="text"
-               id="nombre"
-               name="nombre"
-               required>
+        <a href="{{ url_for('inicio') }}#variedades"
+           class="boton">
+            Volver al catálogo
+        </a>
 
-        <label for="color">Color:</label>
-        <input type="text"
-               id="color"
-               name="color"
-               required>
+    </header>
 
-        <button type="submit">
-            Registrar variedad
-        </button>
+    <!-- MENSAJES DE CONFIRMACION Y ADVERTENCIA -->
+    {% with mensajes = get_flashed_messages(with_categories=true) %}
+        {% if mensajes %}
+            <div class="contenedor-mensajes">
+                {% for categoria, mensaje in mensajes %}
+                    <div
+                        class="mensaje mensaje-{{ categoria }}"
+                        role="{{ 'alert' if categoria == 'error' else 'status' }}">
+                        {{ mensaje }}
+                    </div>
+                {% endfor %}
+            </div>
+        {% endif %}
+    {% endwith %}
 
-    </form>
+    <!-- FICHA TECNICA -->
+    <main class="detalle-variedad">
+
+        <div class="detalle-imagen">
+
+            {% if rosa.imagen %}
+                <img
+                    src="{{ url_for('static', filename=rosa.imagen) }}"
+                    alt="Rosa {{ rosa.nombre }}">
+            {% else %}
+                <div class="sin-fotografia">
+                    <span>🌹</span>
+                    <p>Fotografía pendiente</p>
+                </div>
+            {% endif %}
+
+        </div>
+
+        <div class="detalle-info">
+
+            <span class="etiqueta-detalle">
+                FICHA TÉCNICA NIRP
+            </span>
+
+            <h1>{{ rosa.nombre }}</h1>
+
+            <p>
+                Información de la variedad registrada
+                en nuestro catálogo.
+            </p>
+
+            <div class="caracteristicas">
+
+                <p>
+                    <strong>Denominación:</strong>
+                    {{ rosa.denominacion or 'Sin registrar' }}
+                </p>
+
+                <p>
+                    <strong>Código VBN:</strong>
+                    {{ rosa.codigo_vbn or 'Sin registrar' }}
+                </p>
+
+                <p>
+                    <strong>Color:</strong>
+                    {{ rosa.color }}
+                </p>
+
+                <p>
+                    <strong>Tipo:</strong>
+                    {{ rosa.tipo or 'Sin registrar' }}
+                </p>
+
+                <p>
+                    <strong>Pétalos:</strong>
+                    {{ rosa.petalos if rosa.petalos is not none else 'Sin registrar' }}
+                </p>
+
+                <p>
+                    <strong>Largo del tallo:</strong>
+                    {{ rosa.tallo or 'Sin registrar' }}
+                </p>
+
+                <p>
+                    <strong>Vida en florero:</strong>
+                    {{ rosa.vida_florero or 'Sin registrar' }}
+                </p>
+
+            </div>
+
+            <h2>Ubicaciones de cultivo</h2>
+
+            <p>
+                Próximamente podrás consultar las fincas
+                donde se encuentra esta variedad.
+            </p>
+
+        </div>
+
+    </main>
+
+    <footer>
+        <p>NIRP International — Inventario de rosas</p>
+    </footer>
 
 </body>
 </html>
