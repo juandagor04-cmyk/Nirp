@@ -2,6 +2,7 @@
 import sqlite3
 from pathlib import Path
 
+
 # ==========================================
 # BASE DE DATOS NIRP INTERNATIONAL
 # ==========================================
@@ -260,12 +261,10 @@ def registrar_usuario_con_perfil(
     motivo="",
     solicita_admin=False
 ):
-
-    # El usuario siempre se registra inicialmente
-    # como cliente, incluso si solicita ser admin.
+    # El usuario siempre se registra como cliente.
+    # Si solicita ser administrador, debe ser aprobado.
 
     with conectar() as conexion:
-
         cursor = conexion.execute("""
             INSERT INTO usuarios (
                 nombre,
@@ -302,9 +301,6 @@ def registrar_usuario_con_perfil(
             1 if solicita_admin else 0,
             "pendiente" if solicita_admin else "no_aplica"
         ))
-
-        # Si falla cualquiera de las dos inserciones,
-        # SQLite revierte toda la operación.
 
         return usuario_id
 
@@ -371,6 +367,127 @@ def aprobar_solicitud_admin(usuario_id):
 
 
 # ==========================================
+# CREAR TABLA DE FINCAS
+# ==========================================
+
+def crear_tabla_fincas():
+    with conectar() as conexion:
+
+        conexion.execute("""
+            CREATE TABLE IF NOT EXISTS fincas (
+                id INTEGER PRIMARY KEY AUTOINCREMENT,
+                nombre TEXT NOT NULL,
+                empresa TEXT,
+                departamento TEXT NOT NULL,
+                municipio TEXT NOT NULL,
+                vereda TEXT,
+                direccion TEXT,
+                telefono TEXT,
+                ubicacion_cultivo TEXT,
+                variedades_otras_casas TEXT,
+                latitud REAL,
+                longitud REAL,
+                observaciones TEXT,
+                fecha_registro TEXT DEFAULT CURRENT_TIMESTAMP
+            )
+        """)
+
+        # Revisar la estructura de la tabla existente.
+        columnas = {
+            fila["name"]
+            for fila in conexion.execute(
+                "PRAGMA table_info(fincas)"
+            ).fetchall()
+        }
+
+        # Agregar campos nuevos sin borrar las fincas.
+        columnas_nuevas = {
+            "telefono": "TEXT",
+            "ubicacion_cultivo": "TEXT",
+            "variedades_otras_casas": "TEXT"
+        }
+
+        for nombre, tipo in columnas_nuevas.items():
+            if nombre not in columnas:
+                conexion.execute(
+                    f"ALTER TABLE fincas ADD COLUMN {nombre} {tipo}"
+                )
+
+
+# ==========================================
+# GUARDAR FINCA
+# ==========================================
+
+def guardar_finca(datos):
+    with conectar() as conexion:
+
+        cursor = conexion.execute("""
+            INSERT INTO fincas (
+                nombre,
+                empresa,
+                departamento,
+                municipio,
+                vereda,
+                direccion,
+                telefono,
+                ubicacion_cultivo,
+                variedades_otras_casas,
+                latitud,
+                longitud,
+                observaciones
+            )
+            VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)
+        """, (
+            datos["nombre"],
+            datos.get("empresa", ""),
+            datos["departamento"],
+            datos["municipio"],
+            datos.get("vereda", ""),
+            datos.get("direccion", ""),
+            datos.get("telefono", ""),
+            datos.get("ubicacion_cultivo", ""),
+            datos.get("variedades_otras_casas", ""),
+            datos.get("latitud"),
+            datos.get("longitud"),
+            datos.get("observaciones", "")
+        ))
+
+        return cursor.lastrowid
+
+
+# ==========================================
+# OBTENER TODAS LAS FINCAS
+# ==========================================
+
+def obtener_fincas():
+    with conectar() as conexion:
+
+        filas = conexion.execute("""
+            SELECT *
+            FROM fincas
+            ORDER BY id DESC
+        """).fetchall()
+
+        return [dict(fila) for fila in filas]
+
+
+# ==========================================
+# BUSCAR FINCA POR ID
+# ==========================================
+
+def obtener_finca(finca_id):
+    with conectar() as conexion:
+
+        fila = conexion.execute("""
+            SELECT *
+            FROM fincas
+            WHERE id = ?
+        """, (finca_id,)).fetchone()
+
+        return dict(fila) if fila else None
+
+
+# ==========================================
 # PREPARAR BASE DE DATOS
 # ==========================================
 
@@ -379,6 +496,7 @@ if __name__ == "__main__":
     crear_tablas()
     crear_tabla_usuarios()
     crear_tabla_perfiles()
+    crear_tabla_fincas()
 
     print("====================================")
     print("NIRP INTERNATIONAL")
@@ -387,4 +505,5 @@ if __name__ == "__main__":
     print("- variedades")
     print("- usuarios")
     print("- perfiles")
+    print("- fincas")
     print("====================================")
