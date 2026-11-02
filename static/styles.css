@@ -1,1150 +1,1895 @@
-
 @import url('https://fonts.googleapis.com/css2?family=Playfair+Display:wght@400;600&family=DM+Sans:wght@400;500;700&display=swap');
 
 /* ESTILOS GENERALES */
 
 * {
+
     margin: 0;
+
     padding: 0;
+
     box-sizing: border-box;
+
 }
 
 html {
+
     scroll-behavior: smooth;
+
     scroll-padding-top: 100px;
+
 }
 
 body {
+
     font-family: 'DM Sans', sans-serif;
+
     color: #203d29;
+
     background: #fff;
+
     overflow-x: hidden;
+
 }
 
 h1, h2, h3 {
+
     font-family: 'Playfair Display', serif;
+
 }
 
 img {
+
     max-width: 100%;
+
 }
 
 /* ANIMACION DEL LOGO */
 
 .intro {
+
     position: fixed;
+
     inset: 0;
+
     z-index: 1000;
+
     background: white;
+
     display: flex;
+
     align-items: center;
+
     justify-content: center;
+
     animation: salir 0.8s ease 3.5s forwards;
+
 }
 
 .intro-contenido {
+
     display: flex;
+
     justify-content: center;
+
     align-items: center;
+
     width: 100%;
+
     padding: 20px;
+
 }
 
 .logo-animado {
+
     display: block;
+
     width: min(75vw, 380px);
+
     height: auto;
+
     object-fit: contain;
+
     opacity: 0;
+
     animation: entradaLogo 2s ease forwards;
+
 }
 
 @keyframes entradaLogo {
+
     0% {
+
         opacity: 0;
+
         transform: translateY(40px) scale(0.5);
+
     }
 
     60% {
+
         opacity: 1;
+
         transform: translateY(0) scale(1.08);
+
     }
 
     100% {
+
         opacity: 1;
+
         transform: translateY(0) scale(1);
+
     }
+
 }
 
 @keyframes salir {
+
     to {
+
         opacity: 0;
+
         visibility: hidden;
+
     }
+
 }
 
 /* MENU PRINCIPAL */
 
 .encabezado {
+
     padding: 15px 7%;
+
     min-height: 85px;
+
     background: white;
+
     display: flex;
+
     align-items: center;
+
     justify-content: space-between;
+
     gap: 20px;
+
     position: sticky;
+
     top: 0;
+
     z-index: 100;
+
     box-shadow: 0 3px 12px #00000012;
+
 }
 
 .marca img {
+
     display: block;
+
     width: 145px;
+
     height: auto;
+
     object-fit: contain;
+
 }
 
 .menu {
+
     display: flex;
+
     align-items: center;
+
     gap: 30px;
+
 }
 
 .menu a {
+
     text-decoration: none;
+
     color: #203d29;
+
     font-weight: 700;
+
 }
 
 .menu a:hover {
+
     color: #25853b;
+
 }
 
 .menu-boton {
+
     display: none;
+
     border: 0;
+
     background: transparent;
+
     color: #19472c;
+
     font-size: 30px;
+
     cursor: pointer;
+
 }
 
 .menu-pendiente {
+
     color: #64736a;
+
     font-weight: 700;
+
     opacity: 0.7;
+
     cursor: not-allowed;
+
 }
 
 /* PORTADA */
 
 .portada {
+
     min-height: 570px;
+
     padding: 90px 8%;
+
     display: flex;
+
     align-items: center;
+
     background:
+
         linear-gradient(90deg, #132d22d9, #132d2222),
+
         url('/static/imagenes/portada.jpg') center / cover no-repeat;
+
 }
 
 .contenido-portada {
+
     max-width: 700px;
+
     color: white;
+
 }
 
 .contenido-portada span {
+
     color: #f5c8d6;
+
     letter-spacing: 2px;
+
     font-size: 13px;
+
 }
 
 .portada h1 {
+
     font-size: clamp(36px, 5vw, 66px);
+
     line-height: 1.15;
+
     margin: 20px 0;
+
 }
 
 .portada p {
+
     line-height: 1.8;
+
     margin-bottom: 30px;
+
 }
 
 /* BOTONES */
 
 .boton {
+
     display: inline-block;
+
     padding: 14px 26px;
+
     background: #25853b;
+
     color: white;
+
     border-radius: 30px;
+
     text-decoration: none;
+
     font-weight: 700;
+
     text-align: center;
+
     transition: background 0.2s ease;
+
 }
 
 .boton:hover {
+
     background: #19472c;
+
 }
 
 /* SECCIONES */
 
 .seccion {
+
     padding: 90px 8%;
+
     text-align: center;
+
 }
 
 .seccion h1,
+
 .seccion h2 {
+
     font-size: clamp(30px, 4vw, 45px);
+
     margin-bottom: 25px;
+
 }
 
 .seccion > p {
+
     max-width: 760px;
+
     margin: 0 auto 25px;
+
     line-height: 1.8;
+
 }
 
 /* PRESENTACION DEL CATALOGO EN INICIO */
 
 .acceso-catalogo {
+
     max-width: 700px;
+
     margin: 50px auto 65px;
+
     padding: 50px 35px;
+
     background: #faf7f5;
+
     border-radius: 20px;
+
     text-align: center;
+
 }
 
 .acceso-catalogo h3 {
+
     font-size: 30px;
+
     margin-bottom: 22px;
+
     line-height: 1.3;
+
 }
 
 .acceso-catalogo p {
+
     margin-bottom: 30px;
+
     line-height: 1.8;
+
 }
 
 .acceso-catalogo .boton {
+
     margin-top: 15px;
+
 }
 
 /* CATALOGO DE VARIEDADES */
 
 .catalogo {
+
     display: grid;
+
     grid-template-columns: repeat(
+
         auto-fit,
+
         minmax(min(100%, 250px), 1fr)
+
     );
+
     gap: 30px;
+
     max-width: 1200px;
+
     margin: 45px auto 0;
+
 }
 
 .tarjeta {
+
     width: 100%;
+
     max-width: 350px;
+
     margin: 0 auto;
+
     padding-bottom: 28px;
+
     background: #faf7f5;
+
     border-radius: 18px;
+
     overflow: hidden;
+
     box-shadow: 0 8px 25px #00000015;
+
 }
 
 .tarjeta img {
+
     display: block;
+
     width: 100%;
+
     height: 300px;
+
     object-fit: cover;
+
 }
 
 .tarjeta h3 {
+
     font-size: 27px;
+
     margin: 22px 15px 12px;
+
 }
 
 .tarjeta p {
+
     padding: 6px 15px;
+
     line-height: 1.5;
+
 }
 
 .boton-detalle {
+
     margin-top: 25px;
+
 }
 
 .sin-fotografia {
+
     min-height: 250px;
+
     background: #edf2ec;
+
     display: flex;
+
     flex-direction: column;
+
     align-items: center;
+
     justify-content: center;
+
     gap: 12px;
+
     color: #64736a;
+
 }
 
 .sin-fotografia span {
+
     font-size: 55px;
+
 }
 
 /* SECCION DE FINCAS */
 
 .seccion-verde {
+
     background: #19472c;
+
     color: white;
+
 }
 
 .seccion-verde p {
+
     margin-bottom: 25px;
+
 }
 
 /* FICHA TECNICA */
 
 .detalle-variedad {
+
     max-width: 1200px;
+
     margin: 50px auto;
+
     padding: 30px;
+
     display: grid;
+
     grid-template-columns: minmax(0, 45fr) minmax(0, 55fr);
+
     gap: 35px;
+
     align-items: start;
+
 }
 
 .detalle-imagen {
+
     width: 100%;
+
     min-width: 0;
+
     background: #faf7f5;
+
     border-radius: 20px;
+
     overflow: hidden;
+
 }
 
 .detalle-imagen img {
+
     display: block;
+
     width: 100%;
+
     height: 480px;
+
     object-fit: contain;
+
 }
 
 .detalle-info {
+
     min-width: 0;
+
     padding: 20px;
+
 }
 
 .etiqueta-detalle {
+
     color: #26823a;
+
     font-weight: 700;
+
     letter-spacing: 2px;
+
     font-size: 12px;
+
 }
 
 .detalle-info h1 {
+
     font-size: clamp(34px, 4vw, 52px);
+
     color: #19472c;
+
     margin: 10px 0 18px;
+
 }
 
 .detalle-info h2 {
+
     font-size: 25px;
+
     margin: 28px 0 15px;
+
     color: #19472c;
+
 }
 
 .detalle-info > p {
+
     line-height: 1.7;
+
 }
 
 .caracteristicas {
+
     background: #faf7f5;
+
     border-radius: 15px;
+
     padding: 22px;
+
     margin-top: 20px;
+
 }
 
 .caracteristicas p {
+
     padding: 10px 0;
+
     border-bottom: 1px solid #e5e0dc;
+
     line-height: 1.5;
+
 }
 
 .caracteristicas p:last-child {
+
     border-bottom: none;
+
 }
 
 /* FORMULARIO DE REGISTRO */
 
 .registro-contenedor {
+
     max-width: 850px;
+
     margin: 60px auto;
+
     padding: 20px;
+
 }
 
 .registro-titulo {
+
     text-align: center;
+
     margin-bottom: 40px;
+
 }
 
 .registro-titulo span {
+
     color: #25853b;
+
     font-size: 12px;
+
     font-weight: bold;
+
     letter-spacing: 2px;
+
 }
 
 .registro-titulo h1 {
+
     font-size: clamp(32px, 5vw, 48px);
+
     margin: 15px 0;
+
 }
 
 .formulario-rosa {
+
     background: #faf7f5;
+
     padding: 35px;
+
     border-radius: 20px;
+
     display: flex;
+
     flex-direction: column;
+
     gap: 12px;
+
 }
 
 .formulario-rosa label {
+
     font-weight: 700;
+
     color: #19472c;
+
 }
 
 .formulario-rosa input {
+
     width: 100%;
+
     padding: 13px;
+
     border: 1px solid #d5d5d5;
+
     border-radius: 9px;
+
     font-family: inherit;
+
     font-size: 15px;
+
     margin-bottom: 10px;
+
 }
 
 .formulario-rosa input:focus {
+
     outline: 2px solid #25853b;
+
     outline-offset: 1px;
+
 }
 
 .formulario-rosa button {
+
     border: 0;
+
     cursor: pointer;
+
     margin-top: 15px;
+
 }
 
 .formulario-rosa input[type="file"] {
+
     width: 100%;
+
     background: white;
+
     border: 2px dashed #a4b8a7;
+
     border-radius: 10px;
+
     padding: 18px;
+
     cursor: pointer;
+
 }
 
 .formulario-rosa input[type="file"]:hover {
+
     border-color: #25853b;
+
 }
 
 .ayuda-imagen {
+
     font-size: 13px;
+
     color: #64736a;
+
     line-height: 1.5;
+
     margin-bottom: 12px;
+
 }
 
 /* NOTIFICACIONES */
 
 .contenedor-mensajes {
+
     width: min(90%, 900px);
+
     margin: 25px auto;
+
     display: flex;
+
     flex-direction: column;
+
     gap: 12px;
+
 }
 
 .mensaje {
+
     padding: 17px 22px;
+
     border-radius: 12px;
+
     font-size: 15px;
+
     line-height: 1.5;
+
     border: 1px solid;
+
 }
 
 .mensaje-success {
+
     background: #e9f7ec;
+
     color: #176331;
+
     border-color: #91c9a1;
+
 }
 
 .mensaje-warning {
+
     background: #fff8e6;
+
     color: #815b12;
+
     border-color: #eed18c;
+
 }
 
 .mensaje-error {
+
     background: #fff0ef;
+
     color: #a52d28;
+
     border-color: #e7aaa5;
+
 }
 
 /* PANEL DE ADMINISTRACION */
 
 .panel-admin {
+
     max-width: 1200px;
+
     margin: 0 auto;
+
     padding: 70px 25px;
+
     min-height: 75vh;
+
 }
 
 .panel-encabezado {
+
     text-align: center;
+
     margin-bottom: 45px;
+
 }
 
 .panel-encabezado span {
+
     color: #63836d;
+
     letter-spacing: 3px;
+
     font-size: 12px;
+
     font-weight: bold;
+
 }
 
 .panel-encabezado h1 {
+
     font-size: clamp(30px, 5vw, 48px);
+
     color: #203d29;
+
     margin: 15px 0;
+
 }
 
 .panel-encabezado p {
+
     color: #5c6b60;
+
     line-height: 1.7;
+
 }
 
 .panel-opciones {
+
     display: grid;
+
     grid-template-columns: repeat(2, minmax(0, 1fr));
+
     gap: 25px;
+
 }
 
 .panel-tarjeta {
+
     background: #faf9f5;
+
     border: 1px solid #e1e8df;
+
     border-radius: 20px;
+
     padding: 35px;
+
     box-shadow: 0 5px 20px rgba(0, 0, 0, 0.04);
+
 }
 
 .panel-icono {
+
     font-size: 35px;
+
     margin-bottom: 18px;
+
 }
 
 .panel-tarjeta h2 {
+
     color: #203d29;
+
     font-size: 23px;
+
     margin-bottom: 12px;
+
 }
 
 .panel-tarjeta p {
+
     color: #67746a;
+
     margin-bottom: 25px;
+
 }
 
 .panel-proximamente {
+
     display: inline-block;
+
     padding: 10px 18px;
+
     background: #e9eee9;
+
     color: #546358;
+
     border-radius: 10px;
+
 }
 
 /* PIE DE PAGINA */
 
 footer {
+
     background: #102c1c;
+
     color: white;
+
     text-align: center;
+
     padding: 30px;
+
 }
 
 /* DISENO RESPONSIVE */
 
 @media (max-width: 768px) {
+
     .encabezado {
+
         min-height: 75px;
+
         padding: 12px 5%;
+
     }
 
     .marca img {
+
         width: 115px;
+
     }
 
     .menu-boton {
+
         display: block;
+
         padding: 8px;
+
     }
 
     .menu {
+
         display: none;
+
         position: absolute;
+
         top: 100%;
+
         left: 0;
+
         right: 0;
+
         width: 100%;
+
         background: white;
+
         padding: 20px;
+
         flex-direction: column;
+
         align-items: stretch;
+
         gap: 10px;
+
         box-shadow: 0 10px 20px #0000001a;
+
         z-index: 200;
+
     }
 
     .menu.abierto {
+
         display: flex;
+
     }
 
     .menu a,
+
     .menu-pendiente {
+
         display: block;
+
         padding: 12px;
+
         text-align: center;
+
     }
 
     .portada {
+
         min-height: 550px;
+
         padding: 75px 6%;
+
         background-position: center;
+
     }
 
     .portada h1 {
+
         font-size: clamp(32px, 8vw, 44px);
+
     }
 
     .portada p {
+
         font-size: 15px;
+
     }
 
     .seccion {
+
         padding: 65px 6%;
+
     }
 
     .catalogo {
+
         grid-template-columns: 1fr;
+
     }
 
     .tarjeta {
+
         max-width: 340px;
+
     }
 
     .tarjeta img {
+
         height: 280px;
+
     }
 
     .logo-animado {
+
         width: min(80vw, 300px);
+
     }
 
     .detalle-variedad {
+
         grid-template-columns: 1fr;
+
         gap: 20px;
+
         padding: 20px;
+
         margin: 20px auto;
+
     }
 
     .detalle-imagen img {
+
         height: 320px;
+
     }
 
     .detalle-info {
+
         padding: 5px;
+
     }
 
     .detalle-info h1 {
+
         font-size: 36px;
+
     }
 
     .registro-contenedor {
+
         margin: 30px auto;
+
         padding: 15px;
+
     }
 
     .formulario-rosa {
+
         padding: 22px;
+
     }
 
     .acceso-catalogo {
+
         padding: 35px 20px;
+
         margin: 35px auto 45px;
+
     }
 
     .acceso-catalogo h3 {
+
         font-size: 25px;
+
     }
 
     .panel-opciones {
+
         grid-template-columns: 1fr;
+
     }
 
     .panel-admin {
+
         padding: 40px 18px;
+
     }
 
     .panel-tarjeta {
+
         padding: 25px;
+
     }
+
 }
 
 @media (max-width: 380px) {
+
     .marca img {
+
         width: 100px;
+
     }
 
     .portada h1 {
+
         font-size: 30px;
+
     }
 
     .boton {
+
         padding: 12px 18px;
+
         font-size: 14px;
+
     }
+
 }
 
 @media (prefers-reduced-motion: reduce) {
+
     .intro {
+
         display: none;
+
     }
 
     html {
+
         scroll-behavior: auto;
+
     }
+
 }
 
 /* ===================================
+
    LOGIN NIRP INTERNATIONAL
+
 =================================== */
 
 .login-contenedor {
+
     min-height: 75vh;
+
     padding: 65px 20px;
+
     display: flex;
+
     justify-content: center;
+
     align-items: center;
+
     background: #f5f8f4;
+
 }
 
 .login-tarjeta {
+
     width: 100%;
+
     max-width: 480px;
+
     padding: 45px 40px;
+
     background: white;
+
     border-radius: 22px;
+
     text-align: center;
+
     box-shadow: 0 12px 35px rgba(0, 0, 0, 0.08);
+
 }
 
 .login-logo {
+
     display: block;
+
     width: 155px;
+
     margin: 0 auto 25px;
+
 }
 
 .login-etiqueta {
+
     display: block;
+
     color: #25853b;
+
     font-weight: 700;
+
     font-size: 12px;
+
     letter-spacing: 2px;
+
     margin-bottom: 12px;
+
 }
 
 .login-tarjeta h1 {
+
     font-size: 38px;
+
     color: #19472c;
+
     margin-bottom: 15px;
+
 }
 
 .login-tarjeta > p {
+
     color: #64736a;
+
     line-height: 1.7;
+
     margin-bottom: 30px;
+
 }
 
 .formulario-login {
+
     display: flex;
+
     flex-direction: column;
+
     text-align: left;
+
     gap: 12px;
+
 }
 
 .formulario-login label {
+
     font-weight: 700;
+
     color: #19472c;
+
 }
 
 .formulario-login input {
+
     width: 100%;
+
     padding: 14px;
+
     margin-bottom: 15px;
+
     border: 1px solid #d5dfd5;
+
     border-radius: 10px;
+
     font: inherit;
+
 }
 
 .formulario-login input:focus {
+
     outline: 2px solid #25853b;
+
     outline-offset: 2px;
+
 }
 
 .formulario-login button {
+
     border: none;
+
     cursor: pointer;
+
     margin-top: 10px;
+
     font: inherit;
+
 }
 
 /* BARRA DEL ADMINISTRADOR */
 
 .barra-administrador {
+
     max-width: 1200px;
+
     margin: 25px auto 0;
+
     padding: 15px 25px;
+
     display: flex;
+
     justify-content: space-between;
+
     align-items: center;
+
     gap: 20px;
+
     background: #f5f8f4;
+
     border-radius: 12px;
+
 }
 
 .barra-administrador .boton {
+
     border: 0;
+
     cursor: pointer;
+
     font: inherit;
+
 }
 
 @media (max-width: 600px) {
+
     .login-tarjeta {
+
         padding: 35px 23px;
+
     }
 
     .login-tarjeta h1 {
+
         font-size: 32px;
+
     }
 
     .barra-administrador {
+
         margin: 15px;
+
         flex-direction: column;
+
         text-align: center;
+
     }
+
 }
+
 .catalogo-pagina {
+
     padding: 40px 20px 80px;
+
 }
 
 .catalogo {
+
     width: min(1100px, 100%);
+
     margin: 40px auto 0;
+
     display: grid;
+
     grid-template-columns: repeat(auto-fit, minmax(260px, 1fr));
+
     gap: 30px;
+
 }
 
 .tarjeta {
+
     background: #f7f4f1;
+
     border-radius: 22px;
+
     overflow: hidden;
+
     box-shadow: 0 12px 30px rgba(0, 0, 0, 0.08);
+
     padding-bottom: 24px;
+
     text-align: center;
+
 }
 
 .tarjeta img {
+
     width: 100%;
+
     height: 260px;
+
     object-fit: cover;
+
     display: block;
+
 }
 
 .tarjeta h3 {
+
     margin: 22px 20px 12px;
+
     font-size: 2rem;
+
     color: #1d3f2c;
+
 }
 
 .tarjeta p {
+
     margin: 8px 20px;
+
     color: #264734;
+
     font-size: 1rem;
+
 }
 
 .boton-detalle {
+
     display: inline-block;
+
     margin-top: 18px;
+
 }
 
 .sin-registros {
+
     max-width: 700px;
+
     margin: 40px auto 0;
+
     background: #f7f4f1;
+
     padding: 40px 30px;
+
     border-radius: 24px;
+
     text-align: center;
+
     box-shadow: 0 12px 30px rgba(0, 0, 0, 0.08);
+
 }
 
 .sin-registros h2 {
+
     color: #1d3f2c;
+
     margin-bottom: 14px;
+
 }
 
 .sin-registros p {
+
     color: #3b5a48;
+
     margin-bottom: 24px;
+
 }
 
 /* ==========================================
+
    NIRP INTERNATIONAL
+
    DISEÑO PROFESIONAL DEL LOGIN
+
    ========================================== */
 
 .pagina-login {
+
     background: #f4f8f3;
+
 }
 
 /* CONTENEDOR PRINCIPAL */
 
 .pagina-login .login-contenedor {
+
     min-height: 75vh;
+
     padding: 60px 20px;
+
     display: flex;
+
     justify-content: center;
+
     align-items: center;
+
     box-sizing: border-box;
 
     background:
+
         radial-gradient(
+
             circle at 10% 20%,
+
             rgba(80, 160, 90, 0.12),
+
             transparent 35%
+
         ),
+
         radial-gradient(
+
             circle at 90% 80%,
+
             rgba(80, 160, 90, 0.10),
+
             transparent 40%
+
         ),
+
         #f4f8f3;
+
 }
 
 /* TARJETA DE INICIO DE SESION */
 
 .pagina-login .login-tarjeta {
+
     width: 100%;
+
     max-width: 460px;
+
     padding: 42px 38px;
+
     background: white;
+
     border-radius: 22px;
+
     box-shadow: 0 16px 45px rgba(22, 60, 35, 0.10);
+
     border: 1px solid #e1e9df;
+
     box-sizing: border-box;
+
     text-align: center;
+
 }
 
 /* LOGO */
 
 .pagina-login .login-logo {
+
     width: 175px;
+
     max-width: 70%;
+
     height: auto;
+
     display: block;
+
     margin: 0 auto 18px;
+
     object-fit: contain;
+
 }
 
 /* ETIQUETA */
 
 .pagina-login .login-etiqueta {
+
     display: inline-block;
+
     padding: 8px 16px;
+
     background: #edf6ee;
+
     color: #22783c;
+
     font-size: 11px;
+
     font-weight: 700;
+
     letter-spacing: 2px;
+
     border-radius: 30px;
+
     margin-bottom: 18px;
+
 }
 
 /* TITULO */
 
 .pagina-login .login-tarjeta h1 {
+
     font-family: "Playfair Display", Georgia, serif;
+
     font-size: clamp(30px, 4vw, 39px);
+
     color: #163d28;
+
     margin: 0 0 12px;
+
     line-height: 1.2;
+
 }
 
 /* DESCRIPCION */
 
 .pagina-login .login-descripcion {
+
     font-size: 14px;
+
     color: #647568;
+
     line-height: 1.7;
+
     margin: 0 auto 28px;
+
     max-width: 320px;
+
 }
 
 /* FORMULARIO */
 
 .pagina-login .formulario-login {
+
     display: flex;
+
     flex-direction: column;
+
     align-items: stretch;
+
     gap: 10px;
+
     width: 100%;
+
     text-align: left;
+
 }
 
 /* ETIQUETAS */
 
 .pagina-login .formulario-login label {
+
     display: block;
+
     font-size: 14px;
+
     font-weight: 600;
+
     color: #264b34;
+
     margin: 8px 0 2px;
+
 }
 
 /* CAMPOS */
 
 .pagina-login .formulario-login input:not([type="hidden"]) {
+
     width: 100%;
+
     height: 48px;
+
     padding: 0 15px;
 
     font-family: inherit;
+
     font-size: 14px;
+
     color: #1d3f2c;
 
     background: #fbfdfb;
+
     border: 1px solid #ccdace;
+
     border-radius: 10px;
+
     box-sizing: border-box;
 
     outline: none;
+
     transition: border-color 0.2s, box-shadow 0.2s;
+
 }
 
 /* CAMPOS AL SELECCIONARLOS */
 
 .pagina-login .formulario-login input:focus {
+
     border-color: #248341;
+
     box-shadow: 0 0 0 3px rgba(36, 131, 65, 0.13);
+
 }
 
 /* BOTON INGRESAR */
 
 .pagina-login .formulario-login .login-boton {
+
     display: block;
+
     width: 100%;
+
     min-height: 50px;
+
     margin-top: 18px;
+
     padding: 12px 18px;
 
     background: #21833e;
+
     color: white;
+
     border: none;
+
     border-radius: 12px;
 
     font-family: inherit;
+
     font-size: 15px;
+
     font-weight: 700;
 
     cursor: pointer;
+
     transition: background 0.2s, transform 0.2s;
+
 }
 
 .pagina-login .formulario-login .login-boton:hover {
+
     background: #17652e;
+
     transform: translateY(-2px);
+
 }
 
 /* SECCION REGISTRARSE */
 
 .pagina-login .login-registro {
+
     margin-top: 30px;
+
     padding-top: 25px;
+
     border-top: 1px solid #e5ebe4;
+
     text-align: center;
+
 }
 
 .pagina-login .login-registro p {
+
     color: #647568;
+
     font-size: 14px;
+
     margin: 0 0 12px;
+
 }
 
 .pagina-login .login-registro a {
+
     display: inline-block;
+
     color: #187638;
+
     font-size: 14px;
+
     font-weight: 700;
+
     text-decoration: none;
+
 }
 
 .pagina-login .login-registro a:hover {
+
     text-decoration: underline;
+
 }
 
 /* SEPARADOR */
 
 .pagina-login .login-separador {
+
     display: flex;
+
     align-items: center;
+
     gap: 12px;
+
     margin: 18px 0;
+
     color: #91a095;
+
     font-size: 12px;
+
 }
 
 .pagina-login .login-separador::before,
+
 .pagina-login .login-separador::after {
+
     content: "";
+
     height: 1px;
+
     flex: 1;
+
     background: #e2e9e1;
+
 }
 
 /* MENSAJES */
 
 .pagina-login .mensaje {
+
     padding: 12px 15px;
+
     margin: 15px 0;
+
     border-radius: 9px;
+
     font-size: 13px;
+
     text-align: left;
+
 }
 
 .pagina-login .mensaje-error {
+
     background: #fff0f0;
+
     color: #a32b2b;
+
 }
 
 .pagina-login .mensaje-success {
+
     background: #e8f6ec;
+
     color: #176b35;
+
 }
 
 .pagina-login .mensaje-warning {
+
     background: #fff5df;
+
     color: #8b6011;
+
 }
 
 /* RESPONSIVE */
@@ -1152,458 +1897,1326 @@ footer {
 @media (max-width: 600px) {
 
     .pagina-login .login-contenedor {
+
         padding: 30px 15px;
+
     }
 
     .pagina-login .login-tarjeta {
+
         padding: 30px 22px;
+
         border-radius: 16px;
+
     }
 
     .pagina-login .login-logo {
+
         width: 150px;
+
     }
 
     .pagina-login .login-tarjeta h1 {
+
         font-size: 31px;
+
     }
 
     .pagina-login .formulario-login input:not([type="hidden"]) {
+
         font-size: 16px;
+
     }
+
 }
 
 /* ==========================================
+
    REGISTRO DE USUARIOS - NIRP
+
    ========================================== */
 
 .pagina-registro {
+
     background: #f4f8f3;
+
 }
 
-.registro-contenedor {
+.pagina-registro .registro-contenedor {
+
     min-height: 80vh;
+
     display: flex;
+
     justify-content: center;
+
     padding: 50px 20px;
+
     box-sizing: border-box;
+
 }
 
 .registro-tarjeta {
+
     width: 100%;
+
     max-width: 560px;
+
     padding: 40px;
+
     background: white;
+
     border-radius: 22px;
+
     border: 1px solid #e0e9df;
+
     box-shadow: 0 15px 40px rgba(22, 60, 35, 0.09);
+
     box-sizing: border-box;
+
 }
 
 .registro-logo {
+
     display: block;
+
     width: 170px;
+
     max-width: 65%;
+
     height: auto;
+
     margin: 0 auto 20px;
+
 }
 
 .registro-tarjeta h1 {
+
     color: #173d27;
+
     text-align: center;
+
     font-size: 34px;
+
     margin-bottom: 12px;
+
 }
 
 .registro-descripcion {
+
     text-align: center;
+
     color: #647568;
+
     line-height: 1.6;
+
     margin-bottom: 25px;
+
 }
 
 .registro-tipos {
+
     display: grid;
+
     grid-template-columns: 1fr 1fr;
+
     gap: 12px;
+
     margin-bottom: 25px;
+
 }
 
 .registro-tipo {
+
     padding: 15px 12px;
+
     border: 2px solid #d5e3d6;
+
     border-radius: 12px;
+
     background: white;
+
     color: #244c31;
+
     font-weight: 700;
+
     cursor: pointer;
+
 }
 
 .registro-tipo.activo {
+
     background: #e5f4e9;
+
     border-color: #21833e;
+
 }
 
 .formulario-registro {
+
     display: flex;
+
     flex-direction: column;
+
     align-items: stretch;
+
     gap: 10px;
+
 }
 
 .formulario-registro label {
+
     display: block;
+
     margin-top: 10px;
+
     color: #254b33;
+
     font-size: 14px;
+
     font-weight: 600;
+
 }
 
 .formulario-registro input:not([type="hidden"]),
+
 .formulario-registro textarea {
+
     width: 100%;
+
     padding: 13px 15px;
+
     font: inherit;
+
     border: 1px solid #cddace;
+
     border-radius: 10px;
+
     box-sizing: border-box;
+
     background: #fbfdfb;
+
 }
 
 .formulario-registro input:focus,
+
 .formulario-registro textarea:focus {
+
     outline: 2px solid rgba(33, 131, 62, 0.3);
+
     border-color: #21833e;
+
 }
 
 #camposAdmin {
+
     margin-top: 15px;
+
 }
 
 #camposAdmin[hidden] {
+
     display: none;
+
 }
 
 #camposAdmin h2 {
+
     margin: 22px 0 10px;
+
     font-size: 22px;
+
     color: #173d27;
+
 }
 
 #camposAdmin label,
+
 #camposAdmin input,
+
 #camposAdmin textarea {
+
     display: block;
+
     margin-bottom: 10px;
+
 }
 
 .registro-aviso {
+
     background: #edf6ee;
+
     padding: 14px;
+
     border-radius: 10px;
+
     color: #285437;
+
     font-size: 13px;
+
 }
 
 .formulario-registro .registro-boton {
+
     width: 100%;
+
     min-height: 50px;
+
     margin-top: 22px;
+
     border: none;
+
     border-radius: 12px;
+
     background: #21833e;
+
     color: white;
+
     font-size: 15px;
+
     font-weight: 700;
+
     cursor: pointer;
+
 }
 
 .formulario-registro .registro-boton:hover {
+
     background: #17652e;
+
 }
 
 .registro-pie {
+
     margin-top: 25px;
+
     text-align: center;
+
 }
 
 .registro-pie a {
+
     color: #187638;
+
     font-weight: 700;
+
 }
 
 @media (max-width: 600px) {
 
-    .registro-contenedor {
+    .pagina-registro .registro-contenedor {
+
         padding: 25px 15px;
+
     }
 
     .registro-tarjeta {
+
         padding: 28px 20px;
+
     }
 
     .registro-tipos {
+
         grid-template-columns: 1fr;
+
     }
 
     .registro-tarjeta h1 {
+
         font-size: 29px;
+
     }
+
 }
 
 /* ENLACES DE REGISTRO EN LOGIN */
 
 .pagina-login .login-registro {
+
     display: flex;
+
     flex-direction: column;
+
     align-items: center;
+
     gap: 14px;
+
     margin-top: 30px;
+
     padding-top: 25px;
+
     border-top: 1px solid #e3ebe3;
+
     text-align: center;
+
 }
 
 .pagina-login .login-registro-titulo {
+
     margin: 0;
+
     font-size: 15px;
+
     color: #526b58;
+
 }
 
 .pagina-login .login-enlace-registro {
+
     display: block;
+
     width: 100%;
+
     box-sizing: border-box;
+
     padding: 15px;
+
     background: #e7f4e9;
+
     color: #176b35;
+
     border: 1px solid #c9e3ce;
+
     border-radius: 12px;
+
     text-decoration: none;
+
     font-weight: 700;
+
 }
 
 .pagina-login .login-enlace-registro:hover {
+
     background: #d8eddd;
+
 }
 
 .pagina-login .login-enlace-admin {
+
     color: #187638;
+
     font-weight: 700;
+
     text-decoration: none;
+
 }
 
 .pagina-login .login-enlace-admin:hover {
+
     text-decoration: underline;
+
 }
 
 .pagina-login .login-separador {
+
     display: flex;
+
     align-items: center;
+
     width: 100%;
+
     gap: 12px;
+
     color: #91a095;
+
 }
 
 .pagina-login .login-separador::before,
+
 .pagina-login .login-separador::after {
+
     content: "";
+
     flex: 1;
+
     height: 1px;
+
     background: #e2e9e1;
+
 }
 
 /* ==========================================
+
    REGISTRO VISIBLE EN EL LOGIN NIRP
+
    ========================================== */
 
 .pagina-login .login-registro {
+
     display: flex;
+
     flex-direction: column;
+
     align-items: center;
+
     gap: 14px;
+
     margin-top: 32px;
+
     padding-top: 28px;
+
     border-top: 1px solid #dce8dd;
+
     text-align: center;
+
 }
 
 .pagina-login .login-registro h2 {
+
     font-size: 22px;
+
     color: #173d27;
+
     margin: 0;
+
 }
 
 .pagina-login .login-registro p {
+
     color: #607463;
+
     font-size: 14px;
+
     line-height: 1.5;
+
     margin: 0;
+
 }
 
 .pagina-login .login-enlace-registro {
+
     display: block;
+
     width: 100%;
+
     padding: 15px;
+
     box-sizing: border-box;
+
     border-radius: 12px;
+
     background: #21833e;
+
     color: white;
+
     font-weight: 700;
+
     text-decoration: none;
+
     text-align: center;
+
     transition: background 0.2s ease;
+
 }
 
 .pagina-login .login-enlace-registro:hover {
+
     background: #17652e;
+
 }
 
 .pagina-login .login-enlace-admin {
+
     display: block;
+
     width: 100%;
+
     padding: 14px;
+
     box-sizing: border-box;
+
     border: 1px solid #21833e;
+
     border-radius: 12px;
+
     color: #17652e;
+
     text-decoration: none;
+
     font-weight: 700;
+
     background: #edf7ef;
+
 }
 
 .pagina-login .login-enlace-admin:hover {
+
     background: #ddefe1;
+
 }
 
 .pagina-login .login-separador {
+
     display: flex;
+
     width: 100%;
+
     align-items: center;
+
     gap: 12px;
+
     color: #8fa091;
+
 }
 
 .pagina-login .login-separador::before,
+
 .pagina-login .login-separador::after {
+
     content: "";
+
     height: 1px;
+
     background: #dce8dd;
+
     flex: 1;
+
 }
 
 .pagina-login .login-nota {
+    color: #607463;
+    font-size: 13px;
+}
+
 /* OPCIONES DE REGISTRO VISIBLES */
 
 .pagina-login .login-accesos {
+
     display: grid;
+
     grid-template-columns: 1fr;
+
     gap: 12px;
+
     margin: 25px 0;
+
 }
 
 .pagina-login .login-accesos a {
+
     display: block;
+
     width: 100%;
+
     box-sizing: border-box;
+
     text-align: center;
+
     padding: 15px 12px;
+
     border-radius: 12px;
+
     text-decoration: none;
+
     font-weight: 700;
+
     font-size: 14px;
+
 }
 
 .pagina-login .acceso-cliente {
+
     background: #21833e;
+
     color: #ffffff;
+
 }
 
 .pagina-login .acceso-cliente:hover {
+
     background: #17652e;
+
 }
 
 .pagina-login .acceso-administrador {
+
     background: #edf7ef;
+
     color: #17652e;
+
     border: 1px solid #21833e;
+
 }
 
 .pagina-login .acceso-administrador:hover {
+
     background: #dcefe1;
+
 }
 
 .pagina-login .login-seccion-titulo {
+
     margin: 25px 0 12px;
+
     font-weight: 600;
+
     font-size: 14px;
+
     text-align: center;
+
     color: #385a43;
+
 }
-}
+
+
+
 /* ==========================================
+
    REGISTRO VISIBLE EN INICIO DE SESION
+
    ========================================== */
 
 .pagina-login .nirp-registro-visible {
+
     display: flex !important;
+
     flex-direction: column;
+
     gap: 13px;
+
     width: 100%;
+
     padding: 20px;
+
     margin: 22px 0;
+
     background: #f0f8f1;
+
     border: 1px solid #d7e8d9;
+
     border-radius: 15px;
+
     box-sizing: border-box;
+
     text-align: center;
+
     visibility: visible !important;
+
     opacity: 1 !important;
+
 }
 
 .pagina-login .nirp-registro-visible h2 {
+
     font-size: 19px;
+
     color: #173d27;
+
     margin: 0;
+
 }
 
 .pagina-login .nirp-registro-visible p {
+
     color: #57725f;
+
     font-size: 14px;
+
     margin: 0;
+
 }
 
 .pagina-login .nirp-registro-visible a {
+
     display: block;
+
     width: 100%;
+
     padding: 14px;
+
     box-sizing: border-box;
+
     border-radius: 11px;
+
     text-decoration: none;
+
     font-weight: 700;
+
 }
 
 .pagina-login .nirp-boton-cliente {
+
     background: #21833e;
+
     color: #ffffff;
+
 }
 
 .pagina-login .nirp-boton-admin {
+
     background: #ffffff;
+
     color: #17652e;
+
     border: 2px solid #21833e;
+
 }
 
 .pagina-login .nirp-registro-visible small {
+
     font-size: 12px;
+
     color: #627968;
+
 }
 
 .pagina-login .nirp-separador {
+
     margin: 25px 0 15px;
+
     padding-bottom: 10px;
+
     border-bottom: 1px solid #dce8dd;
+
     color: #47664e;
+
     font-size: 13px;
+
     text-align: center;
+
+}
+
+/* BOTON REGISTRARSE */
+
+.pagina-login .opcion-registrarse {
+
+    display: flex;
+
+    flex-direction: column;
+
+    align-items: center;
+
+    gap: 12px;
+
+    margin-top: 25px;
+
+    padding-top: 22px;
+
+    border-top: 1px solid #dce8dd;
+
+    text-align: center;
+
+}
+
+.pagina-login .opcion-registrarse p {
+
+    margin: 0;
+
+    color: #526b58;
+
+    font-size: 15px;
+
+}
+
+.pagina-login .boton-registrarse {
+
+    display: block;
+
+    width: 100%;
+
+    padding: 14px 20px;
+
+    box-sizing: border-box;
+
+    background: white;
+
+    color: #21833e;
+
+    border: 2px solid #21833e;
+
+    border-radius: 12px;
+
+    font-size: 16px;
+
+    font-weight: 700;
+
+    text-decoration: none;
+
+    text-align: center;
+
+}
+
+.pagina-login .boton-registrarse:hover {
+
+    background: #edf7ef;
+
+}
+
+/* PANEL ADMINISTRATIVO - ACCIONES */
+
+.panel-cerrar-sesion {
+
+    margin: 40px auto 20px;
+
+    text-align: center;
+
+}
+
+.panel-cerrar-sesion form {
+
+    display: inline-block;
+
+}
+
+.panel-cerrar-sesion button {
+
+    border: none;
+
+    cursor: pointer;
+
+    background: #204832;
+
+    color: white;
+
+    padding: 14px 24px;
+
+    border-radius: 10px;
+
+    font: inherit;
+
+    font-weight: 600;
+
+}
+
+.panel-cerrar-sesion button:hover {
+
+    background: #123520;
+
+}
+
+/* REGISTRO DE FINCAS NIRP */
+
+.pagina-fincas {
+
+    background: #f4f8f3;
+
+}
+
+.fincas-contenedor {
+
+    padding: 45px 20px 80px;
+
+    min-height: 75vh;
+
+}
+
+.fincas-tarjeta,
+
+.fincas-listado {
+
+    max-width: 750px;
+
+    margin: auto;
+
+}
+
+.fincas-tarjeta {
+
+    background: white;
+
+    padding: 35px;
+
+    border: 1px solid #e0e9df;
+
+    border-radius: 20px;
+
+    box-shadow: 0 12px 35px rgba(20,60,30,.08);
+
+}
+
+.fincas-etiqueta {
+
+    color: #21833e;
+
+    letter-spacing: 2px;
+
+    font-size: 12px;
+
+    font-weight: 700;
+
+}
+
+.fincas-tarjeta h1,
+
+.fincas-listado h1 {
+
+    color: #173d27;
+
+    margin: 12px 0 20px;
+
+}
+
+.formulario-finca {
+
+    display: flex;
+
+    flex-direction: column;
+
+    gap: 10px;
+
+    margin-top: 25px;
+
+}
+
+.formulario-finca h2 {
+
+    color: #204c31;
+
+    font-size: 21px;
+
+    margin: 25px 0 5px;
+
+}
+
+.formulario-finca label {
+
+    font-weight: 600;
+
+    color: #234b33;
+
+}
+
+.formulario-finca input,
+
+.formulario-finca textarea {
+
+    width: 100%;
+
+    padding: 13px;
+
+    border: 1px solid #cfdbd0;
+
+    border-radius: 10px;
+
+    font: inherit;
+
+    box-sizing: border-box;
+
+}
+
+.fincas-dos-columnas {
+
+    display: grid;
+
+    grid-template-columns: 1fr 1fr;
+
+    gap: 16px;
+
+}
+
+.fincas-boton {
+
+    width: 100%;
+
+    margin-top: 20px;
+
+    cursor: pointer;
+
+    border: none;
+
+}
+
+.fincas-enlace {
+
+    display: block;
+
+    text-align: center;
+
+    margin-top: 25px;
+
+    color: #21833e;
+
+    font-weight: 600;
+
+}
+
+.fincas-listado {
+
+    max-width: 1100px;
+
+}
+
+.fincas-grid {
+
+    display: grid;
+
+    grid-template-columns: repeat(
+
+        auto-fit, minmax(280px, 1fr)
+
+    );
+
+    gap: 22px;
+
+    margin-top: 30px;
+
+}
+
+.finca-card,
+
+.fincas-vacio {
+
+    background: white;
+
+    border: 1px solid #e0e9df;
+
+    border-radius: 16px;
+
+    padding: 25px;
+
+}
+
+.finca-card h2 {
+
+    color: #173d27;
+
+}
+
+.finca-card p {
+
+    margin: 12px 0;
+
+    overflow-wrap: anywhere;
+
+}
+
+.finca-mapa {
+
+    display: inline-block;
+
+    margin-top: 15px;
+
+}
+
+@media (max-width: 600px) {
+
+    .fincas-tarjeta {
+
+        padding: 25px 18px;
+
+    }
+
+    .fincas-dos-columnas {
+
+        grid-template-columns: 1fr;
+
+    }
+
+}
+
+/* PANEL ADMINISTRATIVO NIRP */
+
+.panel-bienvenida {
+
+    margin-top: 15px;
+
+    color: #237b3e;
+
+    font-weight: 600;
+
+}
+
+.panel-cerrar-sesion {
+
+    margin: 40px auto 20px;
+
+    text-align: center;
+
+}
+
+.panel-cerrar-sesion form {
+
+    display: inline-block;
+
+}
+
+.panel-cerrar-sesion button {
+
+    background: #204832;
+
+    color: white;
+
+    border: none;
+
+    padding: 14px 28px;
+
+    border-radius: 12px;
+
+    font: inherit;
+
+    font-weight: 700;
+
+    cursor: pointer;
+
+}
+
+.panel-cerrar-sesion button:hover {
+
+    background: #123520;
+
+}
+
+.panel-proximamente {
+
+    display: inline-block;
+
+    margin-top: 15px;
+
+    padding: 10px 15px;
+
+    border-radius: 8px;
+
+    background: #edf3ed;
+
+    color: #607565;
+
+    font-weight: 600;
+
+}
+
+/* ==========================================
+
+   FOTOGRAFIA - REGISTRO DE VARIEDADES
+
+========================================== */
+
+.campo-fotografia {
+
+    display: flex;
+
+    flex-direction: column;
+
+    gap: 14px;
+
+    margin: 25px 0;
+
+    padding: 25px;
+
+    background: #f5f8f2;
+
+    border: 2px dashed #8ab492;
+
+    border-radius: 18px;
+
+}
+
+.campo-fotografia label {
+
+    color: #17462c;
+
+    font-weight: 700;
+
+    font-size: 1.1rem;
+
+}
+
+.campo-fotografia p {
+
+    margin: 0;
+
+    color: #526657;
+
+    line-height: 1.6;
+
+}
+
+.campo-fotografia input[type="file"] {
+
+    display: block;
+
+    width: 100%;
+
+    box-sizing: border-box;
+
+    padding: 14px;
+
+    background: white;
+
+    border: 1px solid #d5e1d3;
+
+    border-radius: 12px;
+
+}
+
+.campo-fotografia input[type="file"]::file-selector-button {
+
+    padding: 10px 16px;
+
+    margin-right: 12px;
+
+    background: #238a40;
+
+    color: white;
+
+    border: none;
+
+    border-radius: 10px;
+
+    cursor: pointer;
+
+}
+
+.campo-fotografia small {
+
+    color: #607567;
+
+    font-size: 0.85rem;
+
+}
+
+/* ==========================================
+   REGISTRO DE VARIEDADES - ALINEACION CORREGIDA
+   No afecta al registro de usuarios ni a fincas
+========================================== */
+.registro-contenedor:has(> .formulario-rosa) {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: flex-start;
+    gap: 24px;
+    width: 100%;
+    max-width: 900px;
+    min-height: auto;
+    margin: 40px auto 70px;
+    padding: 20px;
+}
+
+.registro-contenedor:has(> .formulario-rosa) > .registro-titulo {
+    width: 100%;
+    max-width: 700px;
+    margin: 0;
+    text-align: center;
+}
+
+.registro-contenedor:has(> .formulario-rosa) > .registro-titulo p {
+    max-width: 600px;
+    margin: 0 auto;
+    line-height: 1.7;
+}
+
+.registro-contenedor:has(> .formulario-rosa) > .mensaje,
+.registro-contenedor:has(> .formulario-rosa) > .formulario-rosa {
+    width: 100%;
+    max-width: 600px;
+    margin: 0;
+}
+
+.registro-contenedor:has(> .formulario-rosa) > .formulario-rosa {
+    padding: 35px;
+    border-radius: 22px;
+    box-shadow: 0 10px 30px rgba(0, 0, 0, 0.06);
+}
+
+@media (max-width: 600px) {
+    .registro-contenedor:has(> .formulario-rosa) {
+        margin: 20px auto 40px;
+        padding: 15px;
+    }
+    .registro-contenedor:has(> .formulario-rosa) > .formulario-rosa {
+        padding: 22px 18px;
+    }
+    .registro-contenedor:has(> .formulario-rosa) .campo-fotografia {
+        padding: 15px;
+    }
 }

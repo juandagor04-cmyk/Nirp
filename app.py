@@ -45,7 +45,10 @@ from database import (
     aprobar_solicitud_admin,
     crear_tabla_fincas,
     guardar_finca,
-    obtener_fincas
+    obtener_fincas,
+    actualizar_variedad,
+    eliminar_variedad
+    
 )
 
 
@@ -435,8 +438,15 @@ def logout():
 @administrador_requerido
 def panel_admin():
 
+    variedades = obtener_variedades()
+    fincas = obtener_fincas()
+    solicitudes = obtener_solicitudes_admin()
+
     return render_template(
-        "panel_admin.html"
+        "panel_admin.html",
+        variedades=variedades,
+        fincas=fincas,
+        solicitudes=solicitudes
     )
 
 
@@ -561,6 +571,171 @@ def guardar_fotografia(archivo):
         raise ValueError(
             "La foto debe ser JPG, PNG o WebP válido."
         )
+    
+# ==========================================
+# EDITAR VARIEDAD
+# ==========================================
+
+@app.route(
+    "/editar-variedad/<int:id>",
+    methods=["GET", "POST"]
+)
+@administrador_requerido
+def editar_variedad(id):
+
+    rosa = obtener_variedad(id)
+
+    if rosa is None:
+        abort(404)
+
+    if request.method == "GET":
+        return render_template(
+            "editar_variedad.html",
+            rosa=rosa
+        )
+
+    validar_csrf()
+
+    nombre = request.form.get(
+        "nombre", ""
+    ).strip()
+
+    color = request.form.get(
+        "color", ""
+    ).strip()
+
+    if not nombre or not color:
+        flash(
+            "Nombre y color son obligatorios.",
+            "error"
+        )
+        return redirect(
+            url_for("editar_variedad", id=id)
+        )
+
+    petalos_texto = request.form.get(
+        "petalos", ""
+    ).strip()
+
+    try:
+        petalos = (
+            int(petalos_texto)
+            if petalos_texto
+            else None
+        )
+        if petalos is not None and petalos < 0:
+            raise ValueError()
+
+    except ValueError:
+        flash(
+            "El número de pétalos no es válido.",
+            "error"
+        )
+        return redirect(
+            url_for("editar_variedad", id=id)
+        )
+
+    ruta_imagen = rosa["imagen"]
+
+    archivo = request.files.get("imagen")
+
+    if archivo and archivo.filename:
+        try:
+            ruta_imagen = guardar_fotografia(
+                archivo
+            )
+        except ValueError as error:
+            flash(str(error), "error")
+            return redirect(
+                url_for("editar_variedad", id=id)
+            )
+
+    datos = {
+        "nombre": nombre,
+        "denominacion": request.form.get(
+            "denominacion", ""
+        ).strip(),
+        "codigo_vbn": request.form.get(
+            "codigo_vbn", ""
+        ).strip(),
+        "color": color,
+        "tipo": request.form.get(
+            "tipo", ""
+        ).strip(),
+        "petalos": petalos,
+        "tallo": request.form.get(
+            "tallo", ""
+        ).strip(),
+        "vida_florero": request.form.get(
+            "vida_florero", ""
+        ).strip(),
+        "imagen": ruta_imagen
+    }
+
+    actualizado = actualizar_variedad(
+        id, datos
+    )
+
+    if not actualizado:
+        abort(404)
+
+    flash(
+        "Variedad actualizada correctamente.",
+        "success"
+    )
+
+    return redirect(
+        url_for("panel_admin")
+    )
+
+# ==========================================
+# ELIMINAR VARIEDAD
+# ==========================================
+
+@app.route(
+    "/eliminar-variedad/<int:id>",
+    methods=["POST"]
+)
+@administrador_requerido
+def eliminar_variedad_ruta(id):
+
+    # Validar seguridad del formulario
+    validar_csrf()
+
+    # Buscar la variedad
+    rosa = obtener_variedad(id)
+
+    if rosa is None:
+        abort(404)
+
+    # Eliminar de la base de datos
+    try:
+        eliminado = eliminar_variedad(id)
+
+    except sqlite3.IntegrityError:
+        flash(
+            "No se puede eliminar esta variedad "
+            "porque tiene registros relacionados.",
+            "error"
+        )
+        return redirect(
+            url_for("panel_admin")
+        )
+
+    if not eliminado:
+        abort(404)
+
+    flash(
+        f"La variedad {rosa['nombre']} "
+        "se eliminó correctamente.",
+        "success"
+    )
+
+    return redirect(
+        url_for("panel_admin")
+    )
+
+
 
 
 # ==========================================
@@ -635,19 +810,39 @@ def registrar_variedad():
             url_for("registrar_variedad")
         )
 
-    try:
+    
+    # ==========================================
+    # FOTOGRAFIA OBLIGATORIA DE LA VARIEDAD
+    # ==========================================
 
-        ruta_imagen = guardar_fotografia(
-            request.files.get("imagen")
+    archivo = request.files.get("imagen")
+
+    if not archivo or not archivo.filename:
+
+        flash(
+            "Debes seleccionar una fotografía "
+            "de la variedad antes de registrarla.",
+            "error"
         )
-
-    except ValueError as error:
-
-        flash(str(error), "error")
 
         return redirect(
             url_for("registrar_variedad")
         )
+
+    try:
+        ruta_imagen = guardar_fotografia(archivo)
+
+    except ValueError as error:
+
+        flash(
+            str(error),
+            "error"
+        )
+
+        return redirect(
+            url_for("registrar_variedad")
+        )
+
 
     nueva_rosa = {
 

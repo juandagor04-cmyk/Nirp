@@ -1,8 +1,10 @@
 
 <!DOCTYPE html>
 <html lang="es">
+
 <head>
     <meta charset="UTF-8">
+
     <meta name="viewport"
           content="width=device-width, initial-scale=1.0">
 
@@ -14,68 +16,191 @@
 
 <body>
 
+    <!-- ENCABEZADO -->
     <header class="encabezado">
+
         <a href="{{ url_for('inicio') }}" class="marca">
             <img
                 src="{{ url_for('static', filename='imagenes/logo-nirp.png') }}"
                 alt="NIRP International">
         </a>
 
-        <a href="{{ url_for('inicio') }}#variedades"
+        <a href="{{ url_for('catalogo') }}"
            class="boton">
             Volver al catálogo
         </a>
+
     </header>
 
     <main class="registro-contenedor">
 
         <div class="registro-titulo">
+
             <span>ADMINISTRACIÓN DE VARIEDADES</span>
+
             <h1>Registrar nueva variedad</h1>
+
             <p>
-                Completa la información técnica
-                de la rosa.
+                Completa la información técnica de la rosa
+                y agrega una fotografía para identificarla.
+                Los campos con * son obligatorios.
             </p>
+
         </div>
 
+        <!-- MENSAJES DEL SISTEMA -->
+        {% with mensajes = get_flashed_messages(with_categories=true) %}
+            {% for categoria, mensaje in mensajes %}
+                <p class="mensaje mensaje-{{ categoria }}"
+                   role="alert">
+                    {{ mensaje }}
+                </p>
+            {% endfor %}
+        {% endwith %}
+
+        <!-- FORMULARIO -->
         <form
             action="{{ url_for('registrar_variedad') }}"
             method="POST"
+            enctype="multipart/form-data"
             class="formulario-rosa">
 
-            <label for="nombre">Nombre comercial *</label>
-            <input type="text" id="nombre"
-                   name="nombre" required>
+            <!-- PROTECCION CSRF -->
+            <input
+                type="hidden"
+                name="csrf_token"
+                value="{{ csrf_token() }}">
 
-            <label for="denominacion">Denominación varietal</label>
-            <input type="text" id="denominacion"
-                   name="denominacion">
+            <!-- INFORMACION GENERAL -->
+            <label for="nombre">
+                Nombre comercial *
+            </label>
 
-            <label for="codigo_vbn">Código VBN</label>
-            <input type="text" id="codigo_vbn"
-                   name="codigo_vbn">
+            <input
+                type="text"
+                id="nombre"
+                name="nombre"
+                placeholder="Ejemplo: Explorer"
+                required>
 
-            <label for="color">Color *</label>
-            <input type="text" id="color"
-                   name="color" required>
+            <label for="denominacion">
+                Denominación varietal
+            </label>
 
-            <label for="tipo">Tipo de flor</label>
-            <input type="text" id="tipo"
-                   name="tipo">
+            <input
+                type="text"
+                id="denominacion"
+                name="denominacion">
 
-            <label for="petalos">Número de pétalos</label>
-            <input type="number" id="petalos"
-                   name="petalos" min="0">
+            <label for="codigo_vbn">
+                Código VBN
+            </label>
 
-            <label for="tallo">Largo del tallo</label>
-            <input type="text" id="tallo"
-                   name="tallo">
+            <input
+                type="text"
+                id="codigo_vbn"
+                name="codigo_vbn">
 
-            <label for="vida_florero">Vida en florero</label>
-            <input type="text" id="vida_florero"
-                   name="vida_florero">
+            <label for="color">
+                Color de la flor *
+            </label>
 
-            <button type="submit" class="boton">
+            <input
+                type="text"
+                id="color"
+                name="color"
+                placeholder="Ejemplo: Rojo intenso"
+                required>
+
+            <label for="tipo">
+                Tipo de flor
+            </label>
+
+            <input
+                type="text"
+                id="tipo"
+                name="tipo"
+                placeholder="Ejemplo: Flor grande (HT)">
+
+            <label for="petalos">
+                Número de pétalos
+            </label>
+
+            <input
+                type="number"
+                id="petalos"
+                name="petalos"
+                min="0">
+
+            <label for="tallo">
+                Largo del tallo
+            </label>
+
+            <input
+                type="text"
+                id="tallo"
+                name="tallo"
+                placeholder="Ejemplo: 40-60 cm">
+
+            <label for="vida_florero">
+                Vida en florero
+            </label>
+
+            <input
+                type="text"
+                id="vida_florero"
+                name="vida_florero"
+                placeholder="Ejemplo: 15 días">
+
+            <!-- FOTOGRAFIA OBLIGATORIA -->
+            <div class="campo-fotografia">
+
+                <label for="imagen">
+                    Fotografía de la variedad *
+                </label>
+
+                <p>
+                    Selecciona una fotografía real
+                    de la rosa para identificar
+                    correctamente su color y apariencia.
+                </p>
+
+                <input
+                    type="file"
+                    id="imagen"
+                    name="imagen"
+                    accept=".jpg,.jpeg,.png,.webp,image/jpeg,image/png,image/webp"
+                    required>
+
+                <small>
+                    Formatos: JPG, PNG o WebP.
+                    Tamaño máximo: 5 MB.
+                </small>
+
+                <!-- VISTA PREVIA -->
+                <div id="contenedor-vista-previa"
+                     style="display: none; text-align: center;">
+
+                    <p>
+                        <strong>Vista previa de la fotografía</strong>
+                    </p>
+
+                    <img
+                        id="vista-previa"
+                        src=""
+                        alt="Vista previa de la variedad"
+                        style="max-width: 100%;
+                               max-height: 300px;
+                               object-fit: contain;
+                               border-radius: 12px;">
+                </div>
+
+            </div>
+
+            <!-- BOTON REGISTRAR -->
+            <button
+                type="submit"
+                class="boton">
                 Registrar variedad
             </button>
 
@@ -86,6 +211,58 @@
     <footer>
         <p>NIRP International — Inventario de rosas</p>
     </footer>
+
+    <!-- VISTA PREVIA DE LA FOTOGRAFIA -->
+    <script>
+        const inputImagen = document.getElementById("imagen");
+        const vistaPrevia = document.getElementById("vista-previa");
+        const contenedorVistaPrevia = document.getElementById(
+            "contenedor-vista-previa"
+        );
+
+        let urlTemporal = null;
+
+        inputImagen.addEventListener("change", function () {
+
+            if (urlTemporal) {
+                URL.revokeObjectURL(urlTemporal);
+                urlTemporal = null;
+            }
+
+            const archivo = this.files[0];
+
+            if (!archivo) {
+                vistaPrevia.removeAttribute("src");
+                contenedorVistaPrevia.style.display = "none";
+                return;
+            }
+
+            const formatosValidos = [
+                "image/jpeg",
+                "image/png",
+                "image/webp"
+            ];
+
+            if (!formatosValidos.includes(archivo.type)) {
+                alert("Selecciona una fotografía JPG, PNG o WebP.");
+                this.value = "";
+                contenedorVistaPrevia.style.display = "none";
+                return;
+            }
+
+            if (archivo.size > 5 * 1024 * 1024) {
+                alert("La fotografía no debe superar los 5 MB.");
+                this.value = "";
+                contenedorVistaPrevia.style.display = "none";
+                return;
+            }
+
+            urlTemporal = URL.createObjectURL(archivo);
+
+            vistaPrevia.src = urlTemporal;
+            contenedorVistaPrevia.style.display = "block";
+        });
+    </script>
 
 </body>
 </html>
