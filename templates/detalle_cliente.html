@@ -1,0 +1,113 @@
+
+<!DOCTYPE html>
+<html lang="es">
+
+<head>
+    <meta charset="UTF-8">
+
+    <meta name="viewport"
+          content="width=device-width, initial-scale=1.0">
+
+    <title>{{ rosa.nombre }} | NIRP International</title>
+
+    <link rel="stylesheet"
+          href="{{ url_for('static', filename='styles.css') }}">
+
+</head>
+
+<body>
+
+    <!-- ENCABEZADO -->
+    <header class="encabezado">
+
+        <a href="{{ url_for('inicio') }}"
+           class="marca">
+
+            <img
+                src="{{ url_for('static', filename='imagenes/logo-nirp.png') }}"
+                alt="NIRP International">
+
+        </a>
+
+        <a href="{{ url_for('catalogo') }}"
+           class="boton">
+            Volver al catálogo
+        </a>
+
+    </header>
+
+
+    <!-- DETALLE PUBLICO DE LA ROSA -->
+    <main class="cliente-detalle">
+
+        <section class="cliente-detalle-tarjeta">
+
+            <!-- FOTOGRAFIA -->
+            <div class="cliente-detalle-imagen">
+
+                {% if rosa.imagen %}
+
+                    <img
+                        src="{{ url_for('static', filename=rosa.imagen) }}"
+                        alt="Fotografía de {{ rosa.nombre }}">
+
+                {% else %}
+
+                    <div class="cliente-detalle-sin-imagen">
+                        🌹
+                    </div>
+
+                {% endif %}
+
+            </div>
+
+
+            <!-- INFORMACION PUBLICA -->
+            <div class="cliente-detalle-info">
+
+                <span class="cliente-detalle-etiqueta">
+                    NIRP INTERNATIONAL
+                </span>
+
+                <h1>{{ rosa.nombre }}</h1>
+
+                <p>
+                    Descubre esta variedad de rosa
+                    de nuestro catálogo
+                    NIRP International.
+                </p>
+
+                <div class="cliente-detalle-botones">
+
+                    <a
+                        href="{{ url_for('catalogo') }}"
+                        class="boton">
+                        Ver más variedades
+                    </a>
+
+                    <a
+                        href="{{ url_for('ubicaciones_publicas') }}"
+                        class="boton">
+                        Ver ubicaciones
+                    </a>
+
+                </div>
+
+            </div>
+
+        </section>
+
+    </main>
+
+
+    <!-- PIE DE PAGINA -->
+    <footer>
+
+        <p>
+            NIRP International — Catálogo de rosas
+        </p>
+
+    </footer>
+
+</body>
+</html>

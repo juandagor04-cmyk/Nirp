@@ -1,0 +1,546 @@
+
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport"
+          content="width=device-width, initial-scale=1.0">
+
+    <title>Reportes de inventario | NIRP International</title>
+
+    <link rel="stylesheet"
+          href="{{ url_for('static', filename='styles.css') }}">
+
+    <style>
+        /* ==========================================
+           NIRP INTERNATIONAL - REPORTES
+           ========================================== */
+
+        .reportes-pagina {
+            margin: 0;
+            background: #f4f8f5;
+            color: #253b2d;
+            min-height: 100vh;
+        }
+
+        .reportes-contenedor {
+            width: min(1150px, 94%);
+            margin: 35px auto 70px;
+        }
+
+        /* BOTON VOLVER */
+
+        .reportes-volver {
+            display: inline-block;
+            color: #246b43;
+            text-decoration: none;
+            font-weight: 700;
+            margin-bottom: 22px;
+        }
+
+        .reportes-volver:hover {
+            color: #153e29;
+            text-decoration: underline;
+        }
+
+        /* ENCABEZADO */
+
+        .reportes-encabezado {
+            background: linear-gradient(
+                135deg,
+                #153e29,
+                #317c51
+            );
+            color: white;
+            border-radius: 22px;
+            padding: 40px;
+            margin-bottom: 28px;
+            box-shadow: 0 10px 25px rgba(15, 60, 35, 0.12);
+        }
+
+        .reportes-encabezado h1 {
+            color: white;
+            font-size: clamp(26px, 4vw, 40px);
+            margin: 0 0 12px;
+        }
+
+        .reportes-encabezado p {
+            color: #e1f1e5;
+            line-height: 1.7;
+            margin: 0;
+        }
+
+        /* TARJETAS DE ESTADISTICAS */
+
+        .reportes-tarjetas {
+            display: grid;
+            grid-template-columns:
+                repeat(4, minmax(0, 1fr));
+            gap: 18px;
+            margin-bottom: 28px;
+        }
+
+        .reporte-tarjeta {
+            background: white;
+            border: 1px solid #deeadf;
+            border-radius: 18px;
+            padding: 23px;
+            box-shadow:
+                0 7px 20px rgba(0, 0, 0, 0.04);
+        }
+
+        .reporte-tarjeta span {
+            display: block;
+            color: #617266;
+            font-size: 14px;
+        }
+
+        .reporte-tarjeta strong {
+            display: block;
+            margin-top: 12px;
+            font-size: 30px;
+            color: #1b6037;
+            overflow-wrap: anywhere;
+        }
+
+        /* SECCIONES */
+
+        .reportes-seccion {
+            background: white;
+            border: 1px solid #deeadf;
+            border-radius: 20px;
+            padding: 28px;
+            margin-bottom: 28px;
+            box-shadow:
+                0 7px 20px rgba(0, 0, 0, 0.03);
+        }
+
+        .reportes-seccion h2 {
+            margin: 0 0 20px;
+            color: #194b30;
+            font-size: 23px;
+        }
+
+        /* TABLAS */
+
+        .reportes-tabla-contenedor {
+            width: 100%;
+            overflow-x: auto;
+        }
+
+        .reportes-tabla {
+            width: 100%;
+            border-collapse: collapse;
+            min-width: 550px;
+        }
+
+        .reportes-tabla th,
+        .reportes-tabla td {
+            text-align: left;
+            padding: 15px;
+            border-bottom: 1px solid #e5ede7;
+        }
+
+        .reportes-tabla th {
+            color: #194b30;
+            background: #eaf4ed;
+            font-weight: 700;
+        }
+
+        .reportes-tabla td {
+            color: #354d3c;
+        }
+
+        .reportes-tabla tbody tr:hover {
+            background: #f4f9f5;
+        }
+
+        /* GRAFICOS */
+
+        .reportes-grafico {
+            display: grid;
+            gap: 20px;
+        }
+
+        .reportes-barra-datos {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            gap: 15px;
+            margin-bottom: 8px;
+        }
+
+        .reportes-barra-datos span {
+            overflow-wrap: anywhere;
+            color: #365340;
+        }
+
+        .reportes-barra-datos strong {
+            color: #1b6037;
+        }
+
+        .reportes-barra-fondo {
+            width: 100%;
+            height: 14px;
+            background: #e5eee7;
+            border-radius: 20px;
+            overflow: hidden;
+        }
+
+        .reportes-barra-valor {
+            width: 0;
+            height: 100%;
+            background: linear-gradient(
+                90deg,
+                #287a48,
+                #4eaa70
+            );
+            border-radius: 20px;
+            transition: width 0.5s ease;
+        }
+
+        /* MENSAJES VACIOS */
+
+        .reportes-vacio {
+            padding: 25px;
+            text-align: center;
+            color: #617266;
+            background: #f4f9f5;
+            border-radius: 12px;
+            line-height: 1.7;
+        }
+
+        /* TABLETS */
+
+        @media (max-width: 900px) {
+
+            .reportes-tarjetas {
+                grid-template-columns:
+                    repeat(2, minmax(0, 1fr));
+            }
+        }
+
+        /* CELULARES */
+
+        @media (max-width: 550px) {
+
+            .reportes-contenedor {
+                width: 94%;
+                margin: 25px auto 50px;
+            }
+
+            .reportes-tarjetas {
+                grid-template-columns: 1fr;
+            }
+
+            .reportes-encabezado {
+                padding: 28px 22px;
+                border-radius: 18px;
+            }
+
+            .reportes-seccion {
+                padding: 20px 15px;
+            }
+
+            .reportes-seccion h2 {
+                font-size: 20px;
+            }
+
+            .reporte-tarjeta strong {
+                font-size: 28px;
+            }
+        }
+
+        @media (prefers-reduced-motion: reduce) {
+            .reportes-barra-valor {
+                transition: none;
+            }
+        }
+    </style>
+</head>
+
+<body class="reportes-pagina">
+
+<main class="reportes-contenedor">
+
+    <!-- VOLVER AL PANEL -->
+
+    <a class="reportes-volver"
+       href="{{ url_for('panel_admin') }}">
+        ← Volver al panel de administración
+    </a>
+
+    <!-- ENCABEZADO -->
+
+    <header class="reportes-encabezado">
+
+        <h1>Reportes y estadísticas</h1>
+
+        <p>
+            NIRP International · Consulta las
+            cantidades actuales de inventario
+            por finca y variedad.
+        </p>
+
+    </header>
+
+    <!-- ==========================================
+         TARJETAS DE ESTADISTICAS
+         ========================================== -->
+
+    <section class="reportes-tarjetas">
+
+        <article class="reporte-tarjeta">
+
+            <span>Total de rosas</span>
+
+            <strong>
+                {{ resumen.total_rosas }}
+            </strong>
+
+        </article>
+
+        <article class="reporte-tarjeta">
+
+            <span>Fincas con inventario</span>
+
+            <strong>
+                {{ resumen.fincas_con_inventario }}
+            </strong>
+
+        </article>
+
+        <article class="reporte-tarjeta">
+
+            <span>Variedades con inventario</span>
+
+            <strong>
+                {{ resumen.variedades_con_inventario }}
+            </strong>
+
+        </article>
+
+        <article class="reporte-tarjeta">
+
+            <span>Registros de inventario</span>
+
+            <strong>
+                {{ resumen.total_registros }}
+            </strong>
+
+        </article>
+
+    </section>
+
+    <!-- ==========================================
+         INVENTARIO POR FINCA
+         ========================================== -->
+
+    <section class="reportes-seccion">
+
+        <h2>Inventario por finca</h2>
+
+        {% if fincas %}
+
+        <div class="reportes-tabla-contenedor">
+
+            <table class="reportes-tabla">
+
+                <thead>
+                    <tr>
+                        <th>Finca</th>
+                        <th>Registros</th>
+                        <th>Total de rosas</th>
+                    </tr>
+                </thead>
+
+                <tbody>
+
+                    {% for finca in fincas %}
+
+                    <tr>
+                        <td>
+                            {{ finca.nombre }}
+                        </td>
+
+                        <td>
+                            {{ finca.total_registros }}
+                        </td>
+
+                        <td>
+                            <strong>
+                                {{ finca.total_rosas }}
+                            </strong>
+                        </td>
+                    </tr>
+
+                    {% endfor %}
+
+                </tbody>
+
+            </table>
+
+        </div>
+
+        {% else %}
+
+        <p class="reportes-vacio">
+            Todavía no hay fincas registradas.
+        </p>
+
+        {% endif %}
+
+    </section>
+
+    <!-- ==========================================
+         INVENTARIO POR VARIEDAD
+         ========================================== -->
+
+    <section class="reportes-seccion">
+
+        <h2>Inventario por variedad</h2>
+
+        {% if variedades %}
+
+        <div class="reportes-tabla-contenedor">
+
+            <table class="reportes-tabla">
+
+                <thead>
+                    <tr>
+                        <th>Variedad</th>
+                        <th>Registros</th>
+                        <th>Total de rosas</th>
+                    </tr>
+                </thead>
+
+                <tbody>
+
+                    {% for variedad in variedades %}
+
+                    <tr>
+                        <td>
+                            {{ variedad.nombre }}
+                        </td>
+
+                        <td>
+                            {{ variedad.total_registros }}
+                        </td>
+
+                        <td>
+                            <strong>
+                                {{ variedad.total_rosas }}
+                            </strong>
+                        </td>
+                    </tr>
+
+                    {% endfor %}
+
+                </tbody>
+
+            </table>
+
+        </div>
+
+        {% else %}
+
+        <p class="reportes-vacio">
+            Todavía no hay variedades registradas.
+        </p>
+
+        {% endif %}
+
+    </section>
+
+    <!-- ==========================================
+         GRAFICOS POR VARIEDAD
+         ========================================== -->
+
+ <section class="reportes-seccion">
+
+    <h2>Gráfico de inventario por variedad</h2>
+
+    {% set cantidades = variedades
+        | map(attribute='total_rosas')
+        | list %}
+
+    {% set maximo = cantidades | max if cantidades else 0 %}
+
+    {% if maximo > 0 %}
+
+        <div class="reportes-grafico">
+
+            {% for variedad in variedades %}
+
+            <div class="reportes-grafico-item">
+
+                <div class="reportes-barra-datos">
+
+                    <span>
+                        {{ variedad.nombre }}
+                    </span>
+
+                    <strong>
+                        {{ variedad.total_rosas }}
+                    </strong>
+
+                </div>
+
+                <div class="reportes-barra-fondo">
+
+                    <div
+                        class="reportes-barra-valor"
+                        role="img"
+                        aria-label="Inventario de {{ variedad.nombre }}: {{ variedad.total_rosas }}"
+                        data-porcentaje="{{ (variedad.total_rosas / maximo * 100) | round(1) }}">
+                    </div>
+
+                </div>
+
+            </div>
+
+            {% endfor %}
+
+        </div>
+
+        {% else %}
+
+        <p class="reportes-vacio">
+            Registra cantidades de inventario
+            para visualizar los gráficos.
+        </p>
+
+        {% endif %}
+
+    </section>
+
+</main>
+
+<!-- ==========================================
+     JAVASCRIPT PARA LAS BARRAS
+     ========================================== -->
+
+<script>
+    document.querySelectorAll(
+        ".reportes-barra-valor"
+    ).forEach(function(barra) {
+
+        const porcentaje = Number(
+            barra.dataset.porcentaje
+        );
+
+        if (Number.isFinite(porcentaje)) {
+
+            const valorSeguro = Math.max(
+                0,
+                Math.min(100, porcentaje)
+            );
+
+            barra.style.width = valorSeguro + "%";
+        }
+
+    });
+</script>
+
+</body>
+</html>

@@ -1,0 +1,143 @@
+
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport"
+          content="width=device-width, initial-scale=1.0">
+    <title>Fincas registradas | NIRP International</title>
+    <link rel="stylesheet"
+          href="{{ url_for('static', filename='styles.css') }}">
+</head>
+
+<body class="pagina-fincas">
+
+<header class="encabezado">
+    <a href="{{ url_for('inicio') }}" class="marca">
+        <img
+            src="{{ url_for('static', filename='imagenes/logo-nirp.png') }}"
+            alt="NIRP International">
+    </a>
+    <a href="{{ url_for('panel_admin') }}" class="boton">
+        Volver al panel
+    </a>
+</header>
+
+<main class="fincas-contenedor">
+
+    <section class="fincas-listado">
+
+        <h1>Fincas registradas</h1>
+
+        {% with mensajes = get_flashed_messages(with_categories=true) %}
+            {% for categoria, mensaje in mensajes %}
+                <p class="mensaje mensaje-{{ categoria }}"
+                   role="alert">
+                    {{ mensaje }}
+                </p>
+            {% endfor %}
+        {% endwith %}
+
+        <a href="{{ url_for('registrar_finca') }}"
+           class="boton">
+            Registrar nueva finca
+        </a>
+
+        <div class="fincas-grid">
+
+            {% for finca in fincas %}
+
+                <article class="finca-card">
+
+                    <h2>{{ finca.nombre }}</h2>
+
+                    <p>
+                        <strong>Empresa:</strong>
+                        {{ finca.empresa or 'Sin registrar' }}
+                    </p>
+
+                    <p>
+                        <strong>Teléfono:</strong>
+                        {{ finca.telefono or 'Sin registrar' }}
+                    </p>
+
+                    <p>
+                        <strong>Departamento:</strong>
+                        {{ finca.departamento }}
+                    </p>
+
+                    <p>
+                        <strong>Municipio:</strong>
+                        {{ finca.municipio }}
+                    </p>
+
+                    <p>
+                        <strong>Vereda:</strong>
+                        {{ finca.vereda or 'Sin registrar' }}
+                    </p>
+
+                    <p>
+                        <strong>Dirección:</strong>
+                        {{ finca.direccion or 'Sin registrar' }}
+                    </p>
+
+                    <p>
+                        <strong>Ubicación del cultivo:</strong>
+                        {{ finca.ubicacion_cultivo or 'Sin registrar' }}
+                    </p>
+                    <p>
+    <strong>Vereda:</strong>
+    {{ finca.vereda or 'No aplica' }}
+</p>
+
+<p>
+    <strong>Variedades en otras casas:</strong>
+    {{ finca.variedades_otras_casas or 'No registra' }}
+</p>
+
+                    {% if finca.latitud is not none
+                          and finca.longitud is not none %}
+
+                        <a
+                            href="https://www.openstreetmap.org/?mlat={{ finca.latitud }}&mlon={{ finca.longitud }}#map=16/{{ finca.latitud }}/{{ finca.longitud }}"
+                            target="_blank"
+                            rel="noopener noreferrer"
+                            class="boton finca-mapa">
+                            Ver ubicación en el mapa
+                        </a>
+
+                    {% else %}
+
+                        <p>Coordenadas pendientes.</p>
+
+                    {% endif %}
+
+                    {% if finca.observaciones %}
+                        <p>
+                            <strong>Observaciones:</strong>
+                            {{ finca.observaciones }}
+                        </p>
+                    {% endif %}
+
+                </article>
+
+            {% else %}
+
+                <div class="fincas-vacio">
+                    <h2>No hay fincas registradas</h2>
+                    <p>
+                        Registra tu primera finca para
+                        comenzar el inventario.
+                    </p>
+                </div>
+
+            {% endfor %}
+
+        </div>
+
+    </section>
+
+</main>
+
+</body>
+</html>

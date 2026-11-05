@@ -2475,8 +2475,11 @@ footer {
 }
 
 .pagina-login .login-nota {
+
     color: #607463;
+
     font-size: 13px;
+
 }
 
 /* OPCIONES DE REGISTRO VISIBLES */
@@ -2558,8 +2561,6 @@ footer {
     color: #385a43;
 
 }
-
-
 
 /* ==========================================
 
@@ -3165,58 +3166,1655 @@ footer {
 
 }
 
-/* ==========================================
-   REGISTRO DE VARIEDADES - ALINEACION CORREGIDA
-   No afecta al registro de usuarios ni a fincas
-========================================== */
-.registro-contenedor:has(> .formulario-rosa) {
-    display: flex;
-    flex-direction: column;
-    align-items: center;
-    justify-content: flex-start;
-    gap: 24px;
-    width: 100%;
-    max-width: 900px;
-    min-height: auto;
-    margin: 40px auto 70px;
-    padding: 20px;
+/* ACCIONES DE VARIEDADES */
+
+.admin-ver {
+
+    display: inline-block;
+
+    background: #245c43;
+
+    color: white;
+
+    text-decoration: none;
+
+    padding: 10px 14px;
+
+    border-radius: 8px;
+
+    margin: 4px;
+
+    font-size: 14px;
+
 }
 
-.registro-contenedor:has(> .formulario-rosa) > .registro-titulo {
+.admin-ver:hover {
+
+    background: #17422f;
+
+}
+
+.admin-form-eliminar {
+
+    display: inline-block;
+
+    margin: 4px;
+
+}
+
+.admin-eliminar {
+
+    background: #b42332;
+
+    color: white;
+
+    border: none;
+
+    padding: 10px 14px;
+
+    border-radius: 8px;
+
+    cursor: pointer;
+
+    font-size: 14px;
+
+}
+
+.admin-eliminar:hover {
+
+    background: #8c1926;
+
+}
+
+/* ==========================================
+
+   NIRP INTERNATIONAL
+
+   REGISTRO DE VARIEDADES CENTRADO
+
+========================================== */
+
+.registro-contenedor:has(.formulario-rosa) {
+
+    display: flex;
+
+    flex-direction: column;
+
+    align-items: center;
+
+    justify-content: flex-start;
+
     width: 100%;
+
+    max-width: 900px;
+
+    min-height: auto;
+
+    margin: 40px auto 70px;
+
+    padding: 20px;
+
+    gap: 24px;
+
+    box-sizing: border-box;
+
+}
+
+/* TITULO */
+
+.registro-contenedor:has(.formulario-rosa) .registro-titulo {
+
+    width: 100%;
+
     max-width: 700px;
+
+    margin: 0 auto;
+
+    text-align: center;
+
+}
+
+.registro-contenedor:has(.formulario-rosa) .registro-titulo h1 {
+
+    margin: 15px 0;
+
+    font-size: clamp(30px, 5vw, 48px);
+
+    line-height: 1.2;
+
+}
+
+.registro-contenedor:has(.formulario-rosa) .registro-titulo p {
+
+    max-width: 600px;
+
+    margin: 0 auto;
+
+    line-height: 1.7;
+
+}
+
+/* MENSAJES */
+
+.registro-contenedor:has(.formulario-rosa) .mensaje {
+
+    width: 100%;
+
+    max-width: 600px;
+
+    margin: 0 auto;
+
+    box-sizing: border-box;
+
+}
+
+/* FORMULARIO */
+
+.registro-contenedor:has(.formulario-rosa) .formulario-rosa {
+
+    display: flex;
+
+    flex-direction: column;
+
+    width: 100%;
+
+    max-width: 600px;
+
+    margin: 0 auto;
+
+    padding: 35px;
+
+    background: #faf7f5;
+
+    border: 1px solid #e5e9e2;
+
+    border-radius: 22px;
+
+    box-shadow: 0 10px 30px rgba(0, 0, 0, 0.06);
+
+    box-sizing: border-box;
+
+}
+
+/* FOTOGRAFIA */
+
+.registro-contenedor:has(.formulario-rosa) .campo-fotografia {
+
+    width: 100%;
+
+    box-sizing: border-box;
+
+}
+
+.registro-contenedor:has(.formulario-rosa) .formulario-rosa input {
+
+    max-width: 100%;
+
+}
+
+/* CELULARES */
+
+@media (max-width: 600px) {
+
+    .registro-contenedor:has(.formulario-rosa) {
+
+        margin: 20px auto 40px;
+
+        padding: 15px;
+
+        gap: 20px;
+
+    }
+
+    .registro-contenedor:has(.formulario-rosa) .formulario-rosa {
+
+        padding: 22px 18px;
+
+    }
+
+    .registro-contenedor:has(.formulario-rosa) .campo-fotografia {
+
+        padding: 15px;
+
+    }
+
+}
+
+/* ==========================================
+   NIRP INTERNATIONAL
+   PANEL ADMINISTRATIVO - DISEÑO
+========================================== */
+
+.panel-admin {
+    width: min(1200px, 94%);
+    margin: 0 auto;
+    padding: 45px 0 80px;
+    box-sizing: border-box;
+}
+
+/* ENCABEZADO DEL ADMINISTRADOR */
+
+.panel-encabezado {
+    background: linear-gradient(
+        135deg,
+        #17492f,
+        #367a50
+    );
+    color: white;
+    border-radius: 22px;
+    padding: 40px;
+    margin-bottom: 30px;
+}
+
+.panel-encabezado > span {
+    display: inline-block;
+    font-size: 12px;
+    font-weight: 700;
+    letter-spacing: 2px;
+    margin-bottom: 12px;
+    color: #d6eddb;
+}
+
+.panel-encabezado h1 {
+    color: white;
+    font-size: clamp(28px, 4vw, 42px);
+    margin: 0 0 12px;
+}
+
+.panel-encabezado > p {
+    color: #e9f5ec;
+    line-height: 1.6;
+}
+
+.panel-bienvenida {
+    margin-top: 20px;
+    padding: 14px 18px;
+    border-radius: 12px;
+    background: rgba(255, 255, 255, 0.14);
+}
+
+/* ESTADÍSTICAS */
+
+.admin-resumen {
+    display: grid;
+    grid-template-columns: repeat(3, minmax(0, 1fr));
+    gap: 20px;
+    margin-bottom: 35px;
+}
+
+.admin-resumen-tarjeta {
+    background: white;
+    border: 1px solid #dce8df;
+    border-radius: 18px;
+    padding: 24px;
+    box-shadow: 0 8px 24px rgba(20, 65, 40, 0.06);
+}
+
+.admin-resumen-tarjeta span {
+    display: block;
+    font-size: 30px;
+    margin-bottom: 12px;
+}
+
+.admin-resumen-tarjeta h3 {
+    font-size: 15px;
+    font-weight: 600;
+    color: #4b6354;
+    margin: 0 0 12px;
+}
+
+.admin-resumen-tarjeta strong {
+    display: block;
+    font-size: 38px;
+    color: #17492f;
+}
+
+/* TARJETAS DE OPCIONES */
+
+.panel-opciones {
+    display: grid;
+    grid-template-columns: repeat(3, minmax(0, 1fr));
+    gap: 22px;
+    margin-bottom: 45px;
+}
+
+.panel-tarjeta {
+    display: flex;
+    flex-direction: column;
+    align-items: flex-start;
+    background: #ffffff;
+    border: 1px solid #dfebe1;
+    border-radius: 20px;
+    padding: 28px;
+    min-width: 0;
+    box-shadow: 0 8px 24px rgba(20, 65, 40, 0.06);
+    transition: transform 0.2s ease,
+                box-shadow 0.2s ease;
+}
+
+.panel-tarjeta:hover {
+    transform: translateY(-4px);
+    box-shadow: 0 14px 30px rgba(20, 65, 40, 0.12);
+}
+
+.panel-icono {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    width: 56px;
+    height: 56px;
+    background: #e9f5ec;
+    border-radius: 15px;
+    font-size: 27px;
+    margin-bottom: 20px;
+}
+
+.panel-tarjeta h2 {
+    font-size: 21px;
+    line-height: 1.3;
+    color: #17492f;
+    margin: 0 0 12px;
+}
+
+.panel-tarjeta p {
+    flex: 1;
+    color: #53675a;
+    font-size: 14px;
+    line-height: 1.7;
+    margin: 0 0 22px;
+}
+
+.panel-tarjeta .boton {
+    display: inline-block;
+    width: 100%;
+    padding: 13px 18px;
+    border-radius: 11px;
+    background: #246a43;
+    color: white;
+    text-align: center;
+    text-decoration: none;
+    box-sizing: border-box;
+    font-weight: 600;
+}
+
+.panel-tarjeta .boton:hover {
+    background: #17492f;
+}
+
+.panel-proximamente {
+    display: inline-block;
+    background: #eef1ed;
+    color: #657468;
+    border-radius: 10px;
+    padding: 12px 18px;
+    font-size: 14px;
+    font-weight: 600;
+}
+
+/* GESTIÓN DE VARIEDADES */
+
+.admin-listado {
+    background: white;
+    border: 1px solid #dfebe1;
+    border-radius: 20px;
+    padding: 28px;
+    box-shadow: 0 8px 24px rgba(20, 65, 40, 0.06);
+}
+
+.admin-listado-titulo {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    flex-wrap: wrap;
+    gap: 20px;
+    margin-bottom: 25px;
+}
+
+.admin-listado-titulo h2 {
+    color: #17492f;
+    margin: 0 0 8px;
+}
+
+.admin-listado-titulo p {
+    color: #53675a;
     margin: 0;
+}
+
+.admin-tabla-contenedor {
+    width: 100%;
+    overflow-x: auto;
+}
+
+.admin-tabla {
+    width: 100%;
+    border-collapse: collapse;
+    min-width: 700px;
+}
+
+.admin-tabla th,
+.admin-tabla td {
+    padding: 15px;
+    text-align: left;
+    border-bottom: 1px solid #e4ebe5;
+    vertical-align: middle;
+}
+
+.admin-tabla th {
+    background: #eaf4ed;
+    color: #17492f;
+}
+
+.admin-ver {
+    display: inline-block;
+    margin: 4px;
+    color: #246a43;
+    font-weight: 600;
+    text-decoration: none;
+}
+
+.admin-form-eliminar {
+    display: inline-block;
+}
+
+.admin-eliminar {
+    border: 0;
+    border-radius: 8px;
+    padding: 9px 12px;
+    background: #b93440;
+    color: white;
+    cursor: pointer;
+}
+
+.admin-sin-datos {
+    padding: 35px;
+    text-align: center;
+    background: #f4f8f5;
+    border-radius: 14px;
+}
+
+.panel-cerrar-sesion {
+    margin-top: 35px;
     text-align: center;
 }
 
-.registro-contenedor:has(> .formulario-rosa) > .registro-titulo p {
-    max-width: 600px;
+/* RESPONSIVE - TABLET */
+
+@media (max-width: 950px) {
+
+    .panel-opciones {
+        grid-template-columns: repeat(2, minmax(0, 1fr));
+    }
+
+}
+
+/* RESPONSIVE - CELULAR */
+
+@media (max-width: 600px) {
+
+    .panel-admin {
+        padding-top: 25px;
+    }
+
+    .panel-encabezado {
+        padding: 25px 20px;
+    }
+
+    .admin-resumen {
+        grid-template-columns: 1fr;
+        gap: 12px;
+    }
+
+    .panel-opciones {
+        grid-template-columns: 1fr;
+        gap: 15px;
+    }
+
+    .panel-tarjeta {
+        padding: 22px;
+    }
+
+    .admin-listado {
+        padding: 20px 14px;
+    }
+
+    .admin-listado-titulo {
+        align-items: flex-start;
+        flex-direction: column;
+    }
+
+    .admin-resumen-tarjeta strong {
+        font-size: 32px;
+    }
+
+}
+
+/* ================================================
+   NIRP INTERNATIONAL
+   DISEÑO COMPLETO DE LAS 3 PAGINAS DEL CLIENTE
+
+   1. CATALOGO DE VARIEDADES
+   2. DETALLE DE VARIEDAD
+   3. UBICACIONES DE FINCAS
+
+   RESPONSIVE: PC, TABLET Y CELULAR
+================================================ */
+
+
+/* ================================================
+   1. COLORES GENERALES
+================================================ */
+
+:root {
+    --nirp-verde-oscuro: #17492f;
+    --nirp-verde: #246a43;
+    --nirp-verde-claro: #eaf4ed;
+    --nirp-fondo: #f6f9f6;
+    --nirp-texto: #263d2d;
+    --nirp-texto-suave: #53675a;
+    --nirp-borde: #dfebe1;
+    --nirp-blanco: #ffffff;
+}
+
+
+/* ================================================
+   2. ESTRUCTURA COMPARTIDA DEL CLIENTE
+================================================ */
+
+.cliente-catalogo,
+.cliente-detalle {
+    width: min(1200px, 94%);
+    margin-left: auto;
+    margin-right: auto;
+    box-sizing: border-box;
+}
+
+.cliente-catalogo {
+    padding: 45px 0 80px;
+}
+
+.cliente-catalogo *,
+.cliente-detalle * {
+    box-sizing: border-box;
+}
+
+
+/* ================================================
+   3. NAVEGACION PUBLICA
+================================================ */
+
+.cliente-navegacion {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    flex-wrap: wrap;
+    gap: 22px;
+}
+
+.cliente-navegacion a {
+    color: var(--nirp-verde-oscuro);
+    text-decoration: none;
+    font-size: 15px;
+    font-weight: 600;
+    transition: color 0.2s ease;
+}
+
+.cliente-navegacion a:hover,
+.cliente-navegacion a[aria-current="page"] {
+    color: #31985d;
+}
+
+
+/* ================================================
+   4. ENCABEZADO VERDE
+   CATALOGO Y UBICACIONES
+================================================ */
+
+.cliente-encabezado {
+    text-align: center;
+
+    padding: 65px 30px;
+
+    margin-bottom: 40px;
+
+    background: linear-gradient(
+        135deg,
+        #17492f 0%,
+        #246a43 55%,
+        #367a50 100%
+    );
+
+    border-radius: 24px;
+
+    color: white;
+
+    box-shadow: 0 12px 30px
+        rgba(20, 65, 40, 0.12);
+}
+
+.cliente-encabezado span {
+    display: inline-block;
+
+    color: #d6eddb;
+
+    font-size: 12px;
+
+    font-weight: 700;
+
+    letter-spacing: 3px;
+
+    margin-bottom: 16px;
+}
+
+.cliente-encabezado h1 {
+    color: #ffffff;
+
+    font-size: clamp(28px, 4vw, 44px);
+
+    line-height: 1.2;
+
+    margin: 0 0 18px;
+}
+
+.cliente-encabezado p {
+    color: #edf7ef;
+
+    font-size: 16px;
+
+    line-height: 1.8;
+
+    max-width: 650px;
+
     margin: 0 auto;
+}
+
+
+/* ================================================
+   5. CATALOGO DE VARIEDADES
+================================================ */
+
+.cliente-variedades {
+    display: grid;
+
+    grid-template-columns: repeat(
+        3,
+        minmax(0, 1fr)
+    );
+
+    gap: 25px;
+
+    margin-bottom: 55px;
+}
+
+.cliente-tarjeta {
+    display: flex;
+
+    flex-direction: column;
+
+    min-width: 0;
+
+    background: var(--nirp-blanco);
+
+    border: 1px solid var(--nirp-borde);
+
+    border-radius: 20px;
+
+    overflow: hidden;
+
+    box-shadow: 0 8px 24px
+        rgba(20, 65, 40, 0.07);
+
+    transition:
+        transform 0.2s ease,
+        box-shadow 0.2s ease;
+}
+
+.cliente-tarjeta:hover {
+    transform: translateY(-5px);
+
+    box-shadow: 0 16px 35px
+        rgba(20, 65, 40, 0.13);
+}
+
+.cliente-imagen {
+    height: 290px;
+
+    background: #eff4ef;
+
+    overflow: hidden;
+}
+
+.cliente-imagen img {
+    display: block;
+
+    width: 100%;
+
+    height: 100%;
+
+    object-fit: cover;
+
+    transition: transform 0.3s ease;
+}
+
+.cliente-tarjeta:hover .cliente-imagen img {
+    transform: scale(1.04);
+}
+
+.cliente-sin-imagen {
+    display: flex;
+
+    justify-content: center;
+
+    align-items: center;
+
+    width: 100%;
+
+    height: 100%;
+
+    font-size: 70px;
+}
+
+.cliente-tarjeta-info {
+    display: flex;
+
+    flex-direction: column;
+
+    align-items: flex-start;
+
+    flex: 1;
+
+    padding: 25px;
+}
+
+.cliente-tarjeta-info h2 {
+    color: var(--nirp-verde-oscuro);
+
+    font-size: 23px;
+
+    line-height: 1.3;
+
+    margin: 0 0 22px;
+}
+
+.cliente-tarjeta-info .boton {
+    display: inline-block;
+
+    margin-top: auto;
+
+    background: var(--nirp-verde);
+
+    color: #ffffff;
+
+    padding: 13px 22px;
+
+    border-radius: 11px;
+
+    text-decoration: none;
+
+    text-align: center;
+
+    font-size: 14px;
+
+    font-weight: 600;
+
+    transition: background 0.2s ease;
+}
+
+.cliente-tarjeta-info .boton:hover {
+    background: var(--nirp-verde-oscuro);
+}
+
+
+/* ================================================
+   6. CATALOGO SIN REGISTROS
+================================================ */
+
+.cliente-vacio {
+    text-align: center;
+
+    background: #f0f6f1;
+
+    border: 1px solid var(--nirp-borde);
+
+    border-radius: 22px;
+
+    padding: 65px 25px;
+
+    margin-bottom: 45px;
+}
+
+.cliente-vacio > div {
+    font-size: 65px;
+
+    margin-bottom: 18px;
+}
+
+.cliente-vacio h2 {
+    color: var(--nirp-verde-oscuro);
+
+    font-size: 25px;
+
+    margin-bottom: 12px;
+}
+
+.cliente-vacio p {
+    color: var(--nirp-texto-suave);
+
     line-height: 1.7;
 }
 
-.registro-contenedor:has(> .formulario-rosa) > .mensaje,
-.registro-contenedor:has(> .formulario-rosa) > .formulario-rosa {
-    width: 100%;
-    max-width: 600px;
-    margin: 0;
+
+/* ================================================
+   7. SECCION DE UBICACIONES EN CATALOGO
+================================================ */
+
+.cliente-ubicaciones {
+    text-align: center;
+
+    padding: 50px 25px;
+
+    background: var(--nirp-verde-claro);
+
+    border-radius: 22px;
+
+    border: 1px solid #d6e7d9;
 }
 
-.registro-contenedor:has(> .formulario-rosa) > .formulario-rosa {
-    padding: 35px;
-    border-radius: 22px;
-    box-shadow: 0 10px 30px rgba(0, 0, 0, 0.06);
+.cliente-ubicaciones h2 {
+    color: var(--nirp-verde-oscuro);
+
+    font-size: 28px;
+
+    margin: 0 0 15px;
 }
+
+.cliente-ubicaciones p {
+    color: var(--nirp-texto-suave);
+
+    line-height: 1.7;
+
+    margin: 0 0 25px;
+}
+
+.cliente-ubicaciones .boton {
+    display: inline-block;
+
+    background: var(--nirp-verde);
+
+    color: white;
+
+    padding: 14px 27px;
+
+    border-radius: 11px;
+
+    text-decoration: none;
+
+    font-weight: 600;
+}
+
+.cliente-ubicaciones .boton:hover {
+    background: var(--nirp-verde-oscuro);
+}
+
+
+/* ================================================
+   8. DETALLE DE VARIEDAD
+================================================ */
+
+.cliente-detalle {
+    min-height: 70vh;
+
+    padding: 65px 0;
+}
+
+.cliente-detalle-tarjeta {
+    display: grid;
+
+    grid-template-columns: minmax(0, 1fr)
+                           minmax(0, 1fr);
+
+    background: var(--nirp-blanco);
+
+    border: 1px solid var(--nirp-borde);
+
+    border-radius: 24px;
+
+    overflow: hidden;
+
+    box-shadow: 0 14px 35px
+        rgba(20, 65, 40, 0.09);
+}
+
+.cliente-detalle-imagen {
+    min-height: 480px;
+
+    background: #eef4ef;
+}
+
+.cliente-detalle-imagen img {
+    width: 100%;
+
+    height: 100%;
+
+    min-height: 480px;
+
+    display: block;
+
+    object-fit: cover;
+}
+
+.cliente-detalle-sin-imagen {
+    display: flex;
+
+    align-items: center;
+
+    justify-content: center;
+
+    min-height: 480px;
+
+    font-size: 100px;
+}
+
+.cliente-detalle-info {
+    display: flex;
+
+    flex-direction: column;
+
+    justify-content: center;
+
+    padding: 50px;
+}
+
+.cliente-detalle-etiqueta {
+    color: #327b50;
+
+    font-size: 12px;
+
+    letter-spacing: 2px;
+
+    font-weight: 700;
+
+    margin-bottom: 20px;
+}
+
+.cliente-detalle-info h1 {
+    color: var(--nirp-verde-oscuro);
+
+    font-size: clamp(30px, 4vw, 48px);
+
+    line-height: 1.2;
+
+    margin: 0 0 20px;
+}
+
+.cliente-detalle-info p {
+    color: var(--nirp-texto-suave);
+
+    line-height: 1.8;
+
+    font-size: 16px;
+
+    margin: 0 0 30px;
+}
+
+.cliente-detalle-botones {
+    display: flex;
+
+    flex-wrap: wrap;
+
+    gap: 12px;
+}
+
+.cliente-detalle-botones .boton {
+    display: inline-block;
+
+    background: var(--nirp-verde);
+
+    color: #ffffff;
+
+    padding: 14px 22px;
+
+    text-decoration: none;
+
+    text-align: center;
+
+    border-radius: 11px;
+
+    font-weight: 600;
+}
+
+.cliente-detalle-botones .boton:hover {
+    background: var(--nirp-verde-oscuro);
+}
+
+
+/* ================================================
+   9. UBICACIONES PUBLICAS DE FINCAS
+================================================ */
+
+.ubicaciones-grid {
+    display: grid;
+
+    grid-template-columns: repeat(
+        3,
+        minmax(0, 1fr)
+    );
+
+    gap: 24px;
+
+    margin-bottom: 35px;
+}
+
+.ubicacion-cliente-tarjeta {
+    display: flex;
+
+    flex-direction: column;
+
+    align-items: flex-start;
+
+    min-width: 0;
+
+    padding: 30px;
+
+    background: var(--nirp-blanco);
+
+    border: 1px solid var(--nirp-borde);
+
+    border-radius: 20px;
+
+    box-shadow: 0 8px 24px
+        rgba(20, 65, 40, 0.07);
+
+    transition: transform 0.2s ease;
+}
+
+.ubicacion-cliente-tarjeta:hover {
+    transform: translateY(-4px);
+}
+
+.ubicacion-cliente-icono {
+    display: flex;
+
+    align-items: center;
+
+    justify-content: center;
+
+    width: 60px;
+
+    height: 60px;
+
+    background: var(--nirp-verde-claro);
+
+    border-radius: 16px;
+
+    font-size: 28px;
+
+    margin-bottom: 20px;
+}
+
+.ubicacion-cliente-tarjeta h2 {
+    color: var(--nirp-verde-oscuro);
+
+    font-size: 23px;
+
+    margin: 0 0 20px;
+}
+
+.ubicacion-cliente-tarjeta p {
+    color: var(--nirp-texto-suave);
+
+    line-height: 1.7;
+
+    margin: 0 0 13px;
+}
+
+.ubicacion-cliente-tarjeta strong {
+    color: var(--nirp-verde-oscuro);
+}
+
+.ubicacion-cliente-tarjeta .boton {
+    display: inline-block;
+
+    margin-top: auto;
+
+    padding: 14px 20px;
+
+    border-radius: 11px;
+
+    background: var(--nirp-verde);
+
+    color: #ffffff;
+
+    text-decoration: none;
+
+    text-align: center;
+
+    font-weight: 600;
+}
+
+.ubicacion-cliente-tarjeta .boton:hover {
+    background: var(--nirp-verde-oscuro);
+}
+
+.ubicacion-no-disponible {
+    background: #f0f2f0;
+
+    color: #69766d;
+
+    border-radius: 10px;
+
+    padding: 12px 15px;
+
+    margin-top: auto !important;
+}
+
+.ubicaciones-volver {
+    text-align: center;
+
+    margin-top: 35px;
+}
+
+.ubicaciones-volver .boton {
+    display: inline-block;
+
+    background: var(--nirp-verde);
+
+    color: white;
+
+    border-radius: 11px;
+
+    padding: 14px 25px;
+
+    text-decoration: none;
+
+    font-weight: 600;
+}
+
+.ubicaciones-volver .boton:hover {
+    background: var(--nirp-verde-oscuro);
+}
+
+
+/* ================================================
+   10. RESPONSIVE PARA TABLET
+================================================ */
+
+@media (max-width: 950px) {
+
+    .cliente-variedades,
+    .ubicaciones-grid {
+        grid-template-columns: repeat(
+            2,
+            minmax(0, 1fr)
+        );
+    }
+
+    .cliente-detalle-info {
+        padding: 30px;
+    }
+
+}
+
+
+/* ================================================
+   11. RESPONSIVE PARA CELULAR
+================================================ */
+
+@media (max-width: 650px) {
+
+    .cliente-catalogo {
+        padding: 25px 0 50px;
+    }
+
+    .cliente-encabezado {
+        padding: 40px 20px;
+
+        border-radius: 18px;
+    }
+
+    .cliente-encabezado h1 {
+        font-size: 29px;
+    }
+
+    .cliente-encabezado p {
+        font-size: 14px;
+    }
+
+    .cliente-variedades,
+    .ubicaciones-grid {
+        grid-template-columns: 1fr;
+
+        gap: 18px;
+    }
+
+    .cliente-imagen {
+        height: 270px;
+    }
+
+    .cliente-tarjeta-info {
+        padding: 22px;
+    }
+
+    .cliente-ubicaciones {
+        padding: 35px 20px;
+    }
+
+    .cliente-detalle {
+        padding: 30px 0;
+    }
+
+    .cliente-detalle-tarjeta {
+        grid-template-columns: 1fr;
+    }
+
+    .cliente-detalle-imagen,
+    .cliente-detalle-imagen img,
+    .cliente-detalle-sin-imagen {
+        min-height: 320px;
+    }
+
+    .cliente-detalle-imagen img {
+        max-height: 420px;
+    }
+
+    .cliente-detalle-info {
+        padding: 30px 22px;
+    }
+
+    .cliente-detalle-botones {
+        flex-direction: column;
+    }
+
+    .cliente-detalle-botones .boton {
+        width: 100%;
+    }
+
+    .ubicacion-cliente-tarjeta {
+        padding: 24px;
+    }
+
+    .cliente-navegacion {
+        gap: 12px;
+    }
+
+    .cliente-navegacion a {
+        font-size: 13px;
+    }
+
+}
+
+
+/* ================================================
+   12. ACCESIBILIDAD
+================================================ */
+
+@media (prefers-reduced-motion: reduce) {
+
+    .cliente-tarjeta,
+    .cliente-imagen img,
+    .ubicacion-cliente-tarjeta {
+        transition: none;
+    }
+
+    .cliente-tarjeta:hover,
+    .ubicacion-cliente-tarjeta:hover {
+        transform: none;
+    }
+
+}
+.estadisticas-admin {
+    display: grid;
+    grid-template-columns: repeat(3, 1fr);
+    gap: 20px;
+    margin: 30px 0;
+}
+
+.tarjeta-estadistica {
+    background: white;
+    border-radius: 16px;
+    padding: 25px;
+    text-align: center;
+    box-shadow: 0 4px 15px rgba(0,0,0,0.1);
+}
+
+.tarjeta-estadistica span {
+    font-size: 32px;
+}
+
+.tarjeta-estadistica h3 {
+    margin: 12px 0;
+    color: #254b36;
+}
+
+.tarjeta-estadistica strong {
+    font-size: 30px;
+    color: #218353;
+}
+
+@media (max-width: 768px) {
+    .estadisticas-admin {
+        grid-template-columns: 1fr;
+    }
+}
+
+/* ==========================================
+   NIRP INTERNATIONAL
+   SOLICITUDES DE ADMINISTRADOR
+   ========================================== */
+
+.solicitudes-contenedor {
+    width: min(1200px, 94%);
+    margin: 45px auto 80px;
+    min-height: 75vh;
+}
+
+/* ENCABEZADO PRINCIPAL */
+
+.solicitudes-encabezado {
+    position: relative;
+    padding: 48px 40px;
+    margin-bottom: 30px;
+
+    background: linear-gradient(
+        135deg,
+        #17492f 0%,
+        #246a43 60%,
+        #367a50 100%
+    );
+
+    color: #ffffff;
+    border-radius: 24px;
+    box-shadow: 0 12px 30px rgba(20, 65, 40, 0.12);
+}
+
+.solicitudes-encabezado h1 {
+    font-size: clamp(28px, 4vw, 44px);
+    line-height: 1.2;
+    color: #ffffff;
+    margin: 0 0 16px;
+}
+
+.solicitudes-encabezado p {
+    max-width: 750px;
+    font-size: 16px;
+    line-height: 1.8;
+    color: #e9f5ec;
+}
+
+/* MENSAJES DEL SISTEMA */
+
+.solicitudes-mensaje {
+    padding: 16px 20px;
+    margin-bottom: 20px;
+    border-radius: 12px;
+    background: #e9f7ec;
+    border: 1px solid #badfc5;
+    color: #176331;
+    font-weight: 500;
+}
+
+.solicitudes-mensaje.mensaje-error {
+    background: #fff0f0;
+    border-color: #efb3b3;
+    color: #a32b2b;
+}
+
+/* CONTENEDOR DE TABLA */
+
+.solicitudes-tabla-contenedor {
+    width: 100%;
+    overflow-x: auto;
+
+    padding: 20px;
+    background: #ffffff;
+    border: 1px solid #dfebe1;
+    border-radius: 22px;
+
+    box-shadow: 0 10px 30px rgba(20, 65, 40, 0.07);
+}
+
+/* TABLA DE SOLICITUDES */
+
+.solicitudes-tabla {
+    width: 100%;
+    min-width: 950px;
+    border-collapse: collapse;
+}
+
+.solicitudes-tabla thead {
+    background: #eaf4ed;
+}
+
+.solicitudes-tabla th {
+    padding: 18px 15px;
+    text-align: left;
+
+    color: #17492f;
+    font-size: 14px;
+    font-weight: 700;
+    white-space: nowrap;
+}
+
+.solicitudes-tabla th:first-child {
+    border-radius: 12px 0 0 12px;
+}
+
+.solicitudes-tabla th:last-child {
+    border-radius: 0 12px 12px 0;
+}
+
+.solicitudes-tabla td {
+    padding: 20px 15px;
+    border-bottom: 1px solid #e7eee8;
+
+    color: #354e3e;
+    font-size: 14px;
+    line-height: 1.6;
+    vertical-align: middle;
+
+    overflow-wrap: anywhere;
+}
+
+.solicitudes-tabla tbody tr {
+    transition: background 0.2s ease;
+}
+
+.solicitudes-tabla tbody tr:hover {
+    background: #f4f9f5;
+}
+
+.solicitudes-tabla tbody tr:last-child td {
+    border-bottom: none;
+}
+
+/* BOTON APROBAR */
+
+.solicitudes-aprobar {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+
+    min-height: 42px;
+    padding: 11px 20px;
+
+    background: #246a43;
+    color: #ffffff;
+
+    border: none;
+    border-radius: 10px;
+
+    font: inherit;
+    font-size: 14px;
+    font-weight: 700;
+    white-space: nowrap;
+
+    cursor: pointer;
+    transition: background 0.2s ease,
+                transform 0.2s ease;
+}
+
+.solicitudes-aprobar:hover {
+    background: #17492f;
+    transform: translateY(-2px);
+}
+
+.solicitudes-aprobar:focus-visible {
+    outline: 3px solid #80bf90;
+    outline-offset: 3px;
+}
+
+/* CUANDO NO HAY SOLICITUDES */
+
+.solicitudes-vacio {
+    padding: 70px 30px;
+
+    background: #f4f9f5;
+    border: 1px solid #dfebe1;
+    border-radius: 22px;
+
+    text-align: center;
+    box-shadow: 0 8px 24px rgba(20, 65, 40, 0.05);
+}
+
+.solicitudes-vacio::before {
+    content: "✓";
+    display: flex;
+    align-items: center;
+    justify-content: center;
+
+    width: 74px;
+    height: 74px;
+    margin: 0 auto 25px;
+
+    background: #dff1e4;
+    color: #246a43;
+    border-radius: 50%;
+    font-size: 38px;
+    font-weight: 700;
+}
+
+.solicitudes-vacio h2 {
+    color: #17492f;
+    font-size: 28px;
+    margin-bottom: 14px;
+}
+
+.solicitudes-vacio p {
+    max-width: 550px;
+    margin: 0 auto;
+
+    color: #53675a;
+    font-size: 15px;
+    line-height: 1.8;
+}
+
+/* VOLVER AL ADMINISTRADOR */
+
+.solicitudes-volver {
+    display: inline-block;
+    margin-top: 30px;
+    padding: 14px 25px;
+
+    background: #246a43;
+    color: #ffffff;
+
+    border-radius: 11px;
+    text-decoration: none;
+    font-weight: 700;
+    text-align: center;
+}
+
+.solicitudes-volver:hover {
+    background: #17492f;
+    color: #ffffff;
+}
+
+/* RESPONSIVE - TABLETS */
+
+@media (max-width: 950px) {
+    .solicitudes-encabezado {
+        padding: 35px 28px;
+    }
+
+    .solicitudes-tabla-contenedor {
+        padding: 15px;
+    }
+}
+
+/* RESPONSIVE - CELULARES */
 
 @media (max-width: 600px) {
-    .registro-contenedor:has(> .formulario-rosa) {
-        margin: 20px auto 40px;
-        padding: 15px;
+    .solicitudes-contenedor {
+        width: 94%;
+        margin: 25px auto 50px;
     }
-    .registro-contenedor:has(> .formulario-rosa) > .formulario-rosa {
-        padding: 22px 18px;
+
+    .solicitudes-encabezado {
+        padding: 30px 22px;
+        border-radius: 18px;
     }
-    .registro-contenedor:has(> .formulario-rosa) .campo-fotografia {
-        padding: 15px;
+
+    .solicitudes-encabezado h1 {
+        font-size: 29px;
+    }
+
+    .solicitudes-encabezado p {
+        font-size: 14px;
+    }
+
+    .solicitudes-vacio {
+        padding: 45px 20px;
+    }
+
+    .solicitudes-vacio h2 {
+        font-size: 23px;
+    }
+
+    .solicitudes-volver {
+        display: block;
+        width: 100%;
+        box-sizing: border-box;
+    }
+
+    .solicitudes-tabla-contenedor {
+        padding: 10px;
     }
 }
+
+@media (prefers-reduced-motion: reduce) {
+    .solicitudes-aprobar,
+    .solicitudes-tabla tbody tr {
+        transition: none;
+    }
+
+    .solicitudes-aprobar:hover {
+        transform: none;
+    }
+}
+/* ==========================================
+   BOTON ACTA DE INVENTARIO
+   ========================================== */
+
+.boton-acta-inventario {
+    display: inline-block;
+    margin-top: 20px;
+    padding: 14px 22px;
+
+    background-color: #238442;
+    color: #ffffff;
+
+    border-radius: 12px;
+    text-decoration: none;
+    font-weight: 700;
+
+    transition: background-color 0.3s ease,
+                transform 0.3s ease;
+}
+
+.boton-acta-inventario:hover {
+    background-color: #185b31;
+    color: #ffffff;
+    transform: translateY(-2px);
+}
+
+
+

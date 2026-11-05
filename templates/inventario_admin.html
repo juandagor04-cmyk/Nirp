@@ -1,0 +1,615 @@
+
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport"
+          content="width=device-width, initial-scale=1.0">
+
+    <title>Inventario | NIRP International</title>
+
+    <link rel="stylesheet"
+          href="{{ url_for('static', filename='styles.css') }}">
+
+    <style>
+        .inventario-contenedor {
+            max-width: 1200px;
+            margin: 0 auto;
+            padding: 50px 20px 80px;
+        }
+
+        .inventario-titulo {
+            text-align: center;
+            margin-bottom: 35px;
+        }
+
+        .inventario-titulo h1 {
+            color: #19472c;
+            margin: 12px 0;
+        }
+
+        .inventario-titulo p {
+            color: #52665a;
+            line-height: 1.6;
+        }
+
+        .inventario-panel {
+            background: #fafbf9;
+            border: 1px solid #dfe8df;
+            border-radius: 20px;
+            padding: 30px;
+            margin-bottom: 35px;
+            box-shadow: 0 8px 25px rgba(0, 0, 0, 0.04);
+        }
+
+        .inventario-panel h2 {
+            margin-bottom: 20px;
+            color: #19472c;
+        }
+
+        .inventario-formulario {
+            display: grid;
+            grid-template-columns: repeat(2, minmax(0, 1fr));
+            gap: 20px;
+        }
+
+        .inventario-campo {
+            display: flex;
+            flex-direction: column;
+            gap: 8px;
+            min-width: 0;
+        }
+
+        .inventario-campo label {
+            font-weight: 700;
+            color: #19472c;
+        }
+
+        .inventario-campo input,
+        .inventario-campo select,
+        .inventario-campo textarea {
+            width: 100%;
+            padding: 13px;
+            border: 1px solid #cddace;
+            border-radius: 10px;
+            font: inherit;
+            background: #ffffff;
+            color: #263a2d;
+        }
+
+        .inventario-campo input:focus,
+        .inventario-campo select:focus,
+        .inventario-campo textarea:focus {
+            outline: 2px solid #619a72;
+            outline-offset: 1px;
+            border-color: #619a72;
+        }
+
+        .inventario-campo-completo {
+            grid-column: 1 / -1;
+        }
+
+        .inventario-ayuda {
+            font-size: 0.88rem;
+            color: #65776b;
+        }
+
+        .inventario-acciones {
+            grid-column: 1 / -1;
+            display: flex;
+            justify-content: flex-start;
+        }
+
+        .inventario-guardar {
+            background: #246b43;
+            color: white;
+            padding: 13px 24px;
+            border: none;
+            border-radius: 10px;
+            font: inherit;
+            font-weight: 700;
+            cursor: pointer;
+            transition: background 0.2s ease;
+        }
+
+        .inventario-guardar:hover {
+            background: #19472c;
+        }
+
+        .inventario-tabla-contenedor {
+            width: 100%;
+            overflow-x: auto;
+        }
+
+        .inventario-tabla {
+            width: 100%;
+            border-collapse: collapse;
+            min-width: 1100px;
+        }
+
+        .inventario-tabla th,
+        .inventario-tabla td {
+            padding: 14px 12px;
+            border-bottom: 1px solid #e1e7df;
+            text-align: left;
+            vertical-align: middle;
+        }
+
+        .inventario-tabla th {
+            background: #e8f1e8;
+            color: #19472c;
+            font-weight: 700;
+        }
+
+        .inventario-tabla tbody tr:hover {
+            background: #f3f8f3;
+        }
+
+        .inventario-cantidad {
+            font-weight: 700;
+            color: #19472c;
+        }
+
+        .inventario-eliminar {
+            background: #ad2936;
+            color: white;
+            border: none;
+            padding: 10px 15px;
+            border-radius: 8px;
+            font: inherit;
+            cursor: pointer;
+        }
+
+        .inventario-eliminar:hover {
+            background: #8c1926;
+        }
+
+        .inventario-mensaje {
+            padding: 14px;
+            margin-bottom: 15px;
+            border-radius: 10px;
+            background: #e9f7ec;
+            color: #176331;
+        }
+
+        .inventario-mensaje.error {
+            background: #fff0f0;
+            color: #9a2732;
+        }
+
+        .inventario-vacio {
+            text-align: center;
+            padding: 35px 15px;
+            color: #52665a;
+        }
+
+        .inventario-vacio h3 {
+            color: #19472c;
+            margin-bottom: 10px;
+        }
+
+        .inventario-volver {
+            display: flex;
+            justify-content: center;
+            margin-top: 25px;
+        }
+
+        .inventario-volver a {
+            display: inline-block;
+            background: #246b43;
+            color: #ffffff;
+            padding: 12px 22px;
+            border-radius: 10px;
+            text-decoration: none;
+            font-weight: 700;
+        }
+
+        .inventario-volver a:hover {
+            background: #19472c;
+        }
+
+        @media (max-width: 700px) {
+            .inventario-contenedor {
+                padding: 30px 15px 50px;
+            }
+
+            .inventario-panel {
+                padding: 20px;
+            }
+
+            .inventario-formulario {
+                grid-template-columns: 1fr;
+            }
+
+            .inventario-guardar {
+                width: 100%;
+            }
+
+            .inventario-titulo h1 {
+                font-size: 1.7rem;
+            }
+        }
+    </style>
+</head>
+
+<body>
+
+    <!-- ENCABEZADO -->
+    <header class="encabezado">
+
+        <a href="{{ url_for('inicio') }}" class="marca">
+            <img
+                src="{{ url_for('static', filename='imagenes/logo-nirp.png') }}"
+                alt="NIRP International">
+        </a>
+
+        <nav class="menu">
+
+            <a href="{{ url_for('panel_admin') }}">
+                Panel administrador
+            </a>
+
+            <a href="{{ url_for('lista_fincas') }}">
+                Fincas
+            </a>
+
+            <a href="{{ url_for('catalogo') }}">
+                Variedades
+            </a>
+
+        </nav>
+
+    </header>
+
+    <main class="inventario-contenedor">
+
+        <!-- TITULO -->
+        <div class="inventario-titulo">
+
+            <span class="etiqueta-detalle">
+                ADMINISTRACIÓN NIRP
+            </span>
+
+            <h1>Inventario de rosas por ubicación</h1>
+
+            <p>
+                Registra y administra las cantidades de rosas
+                por finca, casa, bloque y cama.
+            </p>
+
+        </div>
+
+        <!-- MENSAJES DE FLASK -->
+        {% with mensajes = get_flashed_messages(with_categories=true) %}
+
+            {% for categoria, mensaje in mensajes %}
+
+                <div class="inventario-mensaje {{ categoria }}">
+                    {{ mensaje }}
+                </div>
+
+            {% endfor %}
+
+        {% endwith %}
+
+        <!-- FORMULARIO -->
+        <section class="inventario-panel">
+
+            <h2>Registrar o actualizar inventario</h2>
+
+            <form
+                action="{{ url_for('inventario_admin') }}"
+                method="POST"
+                class="inventario-formulario">
+
+                <!-- PROTECCION CSRF -->
+                <input
+                    type="hidden"
+                    name="csrf_token"
+                    value="{{ csrf_token() }}">
+
+                <!-- FINCA -->
+                <div class="inventario-campo">
+
+                    <label for="finca_id">
+                        Seleccionar finca *
+                    </label>
+
+                    <select
+                        name="finca_id"
+                        id="finca_id"
+                        required>
+
+                        <option value="">
+                            Selecciona una finca
+                        </option>
+
+                        {% for finca in fincas %}
+
+                            <option value="{{ finca.id }}">
+                                {{ finca.nombre }}
+                            </option>
+
+                        {% endfor %}
+
+                    </select>
+
+                </div>
+
+                <!-- VARIEDAD -->
+                <div class="inventario-campo">
+
+                    <label for="variedad_id">
+                        Seleccionar variedad *
+                    </label>
+
+                    <select
+                        name="variedad_id"
+                        id="variedad_id"
+                        required>
+
+                        <option value="">
+                            Selecciona una variedad
+                        </option>
+
+                        {% for rosa in variedades %}
+
+                            <option value="{{ rosa.id }}">
+                                {{ rosa.nombre }}
+                            </option>
+
+                        {% endfor %}
+
+                    </select>
+
+                </div>
+
+                <!-- CASA -->
+                <div class="inventario-campo">
+
+                    <label for="casa">
+                        Casa de cultivo *
+                    </label>
+
+                    <input
+                        type="text"
+                        name="casa"
+                        id="casa"
+                        maxlength="50"
+                        placeholder="Ejemplo: Casa 1"
+                        required>
+
+                </div>
+
+                <!-- BLOQUE -->
+                <div class="inventario-campo">
+
+                    <label for="bloque">
+                        Bloque *
+                    </label>
+
+                    <input
+                        type="text"
+                        name="bloque"
+                        id="bloque"
+                        maxlength="50"
+                        placeholder="Ejemplo: Bloque 2"
+                        required>
+
+                </div>
+
+                <!-- CAMA -->
+                <div class="inventario-campo">
+
+                    <label for="cama">
+                        Cama *
+                    </label>
+
+                    <input
+                        type="text"
+                        name="cama"
+                        id="cama"
+                        maxlength="50"
+                        placeholder="Ejemplo: Cama 5"
+                        required>
+
+                </div>
+
+                <!-- CANTIDAD -->
+                <div class="inventario-campo">
+
+                    <label for="cantidad">
+                        Cantidad disponible *
+                    </label>
+
+                    <input
+                        type="number"
+                        name="cantidad"
+                        id="cantidad"
+                        min="0"
+                        step="1"
+                        placeholder="Ejemplo: 150"
+                        required>
+
+                </div>
+
+                <!-- OBSERVACIONES -->
+                <div class="inventario-campo inventario-campo-completo">
+
+                    <label for="observaciones">
+                        Observaciones internas
+                    </label>
+
+                    <textarea
+                        name="observaciones"
+                        id="observaciones"
+                        rows="4"
+                        maxlength="500"
+                        placeholder="Escribe observaciones del cultivo"></textarea>
+
+                    <span class="inventario-ayuda">
+                        Máximo 500 caracteres.
+                    </span>
+
+                </div>
+
+                <!-- GUARDAR -->
+                <div class="inventario-acciones">
+
+                    <button
+                        type="submit"
+                        class="inventario-guardar"
+                        {% if not fincas or not variedades %}disabled{% endif %}>
+                        Guardar inventario
+                    </button>
+
+                </div>
+
+            </form>
+
+            {% if not fincas or not variedades %}
+
+                <p class="inventario-ayuda">
+                    Para registrar inventarios necesitas
+                    tener al menos una finca y una variedad registradas.
+                </p>
+
+            {% endif %}
+
+        </section>
+
+        <!-- INVENTARIOS REGISTRADOS -->
+        <section class="inventario-panel">
+
+            <h2>Inventarios registrados</h2>
+
+            {% if inventarios %}
+
+                <div class="inventario-tabla-contenedor">
+
+                    <table class="inventario-tabla">
+
+                        <thead>
+                            <tr>
+                                <th>Finca</th>
+                                <th>Variedad</th>
+                                <th>Casa</th>
+                                <th>Bloque</th>
+                                <th>Cama</th>
+                                <th>Cantidad</th>
+                                <th>Actualización</th>
+                                <th>Observaciones</th>
+                                <th>Acciones</th>
+                            </tr>
+                        </thead>
+
+                        <tbody>
+
+                            {% for item in inventarios %}
+
+                                <tr>
+
+                                    <td>
+                                        {{ item.finca_nombre }}
+                                    </td>
+
+                                    <td>
+                                        {{ item.variedad_nombre }}
+                                    </td>
+
+                                    <td>
+                                        {{ item.casa }}
+                                    </td>
+
+                                    <td>
+                                        {{ item.bloque }}
+                                    </td>
+
+                                    <td>
+                                        {{ item.cama }}
+                                    </td>
+
+                                    <td class="inventario-cantidad">
+                                        {{ item.cantidad }}
+                                    </td>
+
+                                    <td>
+                                        {{ item.actualizado_en }}
+                                    </td>
+
+                                    <td>
+                                        {{ item.observaciones or '-' }}
+                                    </td>
+
+                                    <td>
+
+                                        <form
+                                            method="POST"
+                                            action="{{ url_for(
+                                                'borrar_inventario_admin',
+                                                inventario_id=item.id
+                                            ) }}"
+                                            onsubmit="return confirm(
+                                                '¿Eliminar este inventario?'
+                                            );">
+
+                                            <input
+                                                type="hidden"
+                                                name="csrf_token"
+                                                value="{{ csrf_token() }}">
+
+                                            <button
+                                                type="submit"
+                                                class="inventario-eliminar">
+                                                Eliminar
+                                            </button>
+
+                                        </form>
+
+                                    </td>
+
+                                </tr>
+
+                            {% endfor %}
+
+                        </tbody>
+
+                    </table>
+
+                </div>
+
+            {% else %}
+
+                <div class="inventario-vacio">
+
+                    <h3>No hay inventarios registrados</h3>
+
+                    <p>
+                        Registra tu primer inventario
+                        seleccionando la finca, la variedad
+                        y la ubicación del cultivo.
+                    </p>
+
+                </div>
+
+            {% endif %}
+
+        </section>
+
+        <!-- VOLVER AL PANEL -->
+        <div class="inventario-volver">
+
+            <a href="{{ url_for('panel_admin') }}">
+                Volver al administrador
+            </a>
+
+        </div>
+
+    </main>
+
+    <footer>
+        <p>NIRP International — Administración</p>
+    </footer>
+
+</body>
+</html>

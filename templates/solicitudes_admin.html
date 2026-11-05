@@ -1,0 +1,233 @@
+
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport"
+          content="width=device-width, initial-scale=1.0">
+
+    <title>Solicitudes de administrador | NIRP International</title>
+
+    <link rel="stylesheet"
+          href="{{ url_for('static', filename='styles.css') }}">
+
+    <style>
+        .solicitudes-contenedor {
+            width: min(1100px, 94%);
+            margin: 45px auto 80px;
+        }
+
+        .solicitudes-encabezado {
+            padding: 35px;
+            background: #19472c;
+            color: white;
+            border-radius: 20px;
+            margin-bottom: 30px;
+        }
+
+        .solicitudes-encabezado h1 {
+            color: white;
+            margin-bottom: 12px;
+        }
+
+        .solicitudes-encabezado p {
+            line-height: 1.7;
+        }
+
+        .solicitudes-tabla-contenedor {
+            overflow-x: auto;
+            background: white;
+            border: 1px solid #dce8df;
+            border-radius: 16px;
+            padding: 15px;
+        }
+
+        .solicitudes-tabla {
+            width: 100%;
+            min-width: 850px;
+            border-collapse: collapse;
+        }
+
+        .solicitudes-tabla th,
+        .solicitudes-tabla td {
+            padding: 15px;
+            text-align: left;
+            border-bottom: 1px solid #e1e8df;
+            vertical-align: top;
+        }
+
+        .solicitudes-tabla th {
+            background: #eaf4ed;
+            color: #19472c;
+        }
+
+        .solicitudes-aprobar {
+            padding: 11px 17px;
+            background: #25853b;
+            color: white;
+            border: none;
+            border-radius: 9px;
+            font: inherit;
+            cursor: pointer;
+        }
+
+        .solicitudes-aprobar:hover {
+            background: #19472c;
+        }
+
+        .solicitudes-vacio {
+            padding: 45px 25px;
+            text-align: center;
+            background: #f3f8f3;
+            border-radius: 18px;
+        }
+
+        .solicitudes-vacio h2 {
+            color: #19472c;
+            margin-bottom: 12px;
+        }
+
+        .solicitudes-mensaje {
+            padding: 14px;
+            margin-bottom: 18px;
+            background: #e9f7ec;
+            border-radius: 10px;
+        }
+
+        .solicitudes-volver {
+            display: inline-block;
+            margin-top: 30px;
+        }
+
+        @media (max-width: 600px) {
+            .solicitudes-encabezado {
+                padding: 25px 20px;
+            }
+
+            .solicitudes-encabezado h1 {
+                font-size: 28px;
+            }
+        }
+    </style>
+</head>
+
+<body>
+
+    <header class="encabezado">
+        <a href="{{ url_for('inicio') }}" class="marca">
+            <img
+                src="{{ url_for('static', filename='imagenes/logo-nirp.png') }}"
+                alt="NIRP International">
+        </a>
+
+        <a href="{{ url_for('panel_admin') }}" class="boton">
+            Volver al panel
+        </a>
+    </header>
+
+    <main class="solicitudes-contenedor">
+
+        <section class="solicitudes-encabezado">
+            <h1>Solicitudes de administrador</h1>
+
+            <p>
+                Revisa las solicitudes de usuarios
+                que desean obtener permisos administrativos
+                en NIRP International.
+            </p>
+        </section>
+
+        {% with mensajes = get_flashed_messages(with_categories=true) %}
+            {% for categoria, mensaje in mensajes %}
+                <div class="solicitudes-mensaje mensaje-{{ categoria }}"
+                     role="alert">
+                    {{ mensaje }}
+                </div>
+            {% endfor %}
+        {% endwith %}
+
+        {% if solicitudes %}
+
+        <section class="solicitudes-tabla-contenedor">
+
+            <table class="solicitudes-tabla">
+                <thead>
+                    <tr>
+                        <th>Nombre</th>
+                        <th>Correo</th>
+                        <th>Teléfono</th>
+                        <th>Empresa / Finca</th>
+                        <th>Cargo</th>
+                        <th>Motivo</th>
+                        <th>Acción</th>
+                    </tr>
+                </thead>
+
+                <tbody>
+                    {% for solicitud in solicitudes %}
+
+                    <tr>
+                        <td>{{ solicitud.nombre }}</td>
+                        <td>{{ solicitud.correo }}</td>
+                        <td>{{ solicitud.telefono }}</td>
+                        <td>{{ solicitud.empresa_finca or '-' }}</td>
+                        <td>{{ solicitud.cargo or '-' }}</td>
+                        <td>{{ solicitud.motivo or '-' }}</td>
+
+                        <td>
+                            <form
+                                method="POST"
+                                action="{{ url_for(
+                                    'aprobar_admin',
+                                    usuario_id=solicitud.id
+                                ) }}"
+                                onsubmit="return confirm(
+                                    '¿Aprobar los permisos de administrador para este usuario?'
+                                );">
+
+                                <input
+                                    type="hidden"
+                                    name="csrf_token"
+                                    value="{{ csrf_token() }}">
+
+                                <button
+                                    type="submit"
+                                    class="solicitudes-aprobar">
+                                    Aprobar
+                                </button>
+                            </form>
+                        </td>
+                    </tr>
+
+                    {% endfor %}
+                </tbody>
+            </table>
+
+        </section>
+
+        {% else %}
+
+        <section class="solicitudes-vacio">
+            <h2>No hay solicitudes pendientes</h2>
+
+            <p>
+                Cuando un usuario solicite acceso como
+                administrador, su solicitud aparecerá aquí.
+            </p>
+        </section>
+
+        {% endif %}
+
+        <a href="{{ url_for('panel_admin') }}"
+           class="boton solicitudes-volver">
+            Volver al administrador
+        </a>
+
+    </main>
+
+    <footer>
+        <p>NIRP International — Administración</p>
+    </footer>
+
+</body>
+</html>

@@ -1,0 +1,160 @@
+
+<!DOCTYPE html>
+<html lang="es">
+
+<head>
+    <meta charset="UTF-8">
+
+    <meta name="viewport"
+          content="width=device-width, initial-scale=1.0">
+
+    <title>Ubicaciones | NIRP International</title>
+
+    <link rel="stylesheet"
+          href="{{ url_for('static', filename='styles.css') }}">
+</head>
+
+<body>
+
+    <!-- ENCABEZADO -->
+    <header class="encabezado">
+
+        <a href="{{ url_for('inicio') }}"
+           class="marca">
+
+            <img
+                src="{{ url_for('static', filename='imagenes/logo-nirp.png') }}"
+                alt="NIRP International">
+
+        </a>
+
+        <nav class="cliente-navegacion"
+             aria-label="Navegación principal">
+
+            <a href="{{ url_for('inicio') }}">
+                Inicio
+            </a>
+
+            <a href="{{ url_for('catalogo') }}">
+                Variedades
+            </a>
+
+            <a href="{{ url_for('ubicaciones_publicas') }}"
+               aria-current="page">
+                Ubicaciones
+            </a>
+
+        </nav>
+
+    </header>
+
+
+    <!-- UBICACIONES -->
+    <main class="cliente-catalogo">
+
+        <section class="cliente-encabezado">
+
+            <span>NIRP INTERNATIONAL</span>
+
+            <h1>Ubicación de nuestras fincas</h1>
+
+            <p>
+                Conoce las ubicaciones públicas
+                de las fincas registradas
+                en NIRP International.
+            </p>
+
+        </section>
+
+
+        {% if fincas %}
+
+            <section class="ubicaciones-grid">
+
+                {% for finca in fincas %}
+
+                    <article class="ubicacion-cliente-tarjeta">
+
+                        <div class="ubicacion-cliente-icono">
+                            📍
+                        </div>
+
+                        <h2>{{ finca.nombre }}</h2>
+
+                        <p>
+                            <strong>Departamento:</strong>
+                            {{ finca.departamento }}
+                        </p>
+
+                        <p>
+                            <strong>Municipio:</strong>
+                            {{ finca.municipio }}
+                        </p>
+
+                        {% if finca.latitud is not none
+                              and finca.longitud is not none %}
+
+                            <a
+                                href="https://www.openstreetmap.org/?mlat={{ finca.latitud }}&mlon={{ finca.longitud }}#map=15/{{ finca.latitud }}/{{ finca.longitud }}"
+                                target="_blank"
+                                rel="noopener noreferrer"
+                                class="boton">
+                                Ver en OpenStreetMap
+                            </a>
+
+                        {% else %}
+
+                            <p class="ubicacion-no-disponible">
+                                Mapa no disponible
+                            </p>
+
+                        {% endif %}
+
+                    </article>
+
+                {% endfor %}
+
+            </section>
+
+        {% else %}
+
+            <section class="cliente-vacio">
+
+                <div>📍</div>
+
+                <h2>No hay ubicaciones disponibles</h2>
+
+                <p>
+                    Próximamente podrás consultar
+                    las ubicaciones de nuestras fincas.
+                </p>
+
+            </section>
+
+        {% endif %}
+
+
+        <!-- VOLVER AL CATALOGO -->
+        <div class="ubicaciones-volver">
+
+            <a href="{{ url_for('catalogo') }}"
+               class="boton">
+                Volver a las variedades
+            </a>
+
+        </div>
+
+    </main>
+
+
+    <!-- PIE DE PAGINA -->
+    <footer>
+
+        <p>
+            NIRP International — Ubicaciones
+        </p>
+
+    </footer>
+
+</body>
+</html>

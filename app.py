@@ -1,4 +1,3 @@
-
 from flask import (
     Flask,
     render_template,
@@ -47,7 +46,19 @@ from database import (
     guardar_finca,
     obtener_fincas,
     actualizar_variedad,
-    eliminar_variedad
+    eliminar_variedad,
+    obtener_variedades_publicas,
+    obtener_variedad_publica,
+    obtener_ubicaciones_publicas,
+    crear_tabla_inventario,
+    obtener_inventarios,
+    guardar_inventario,
+    eliminar_inventario,
+    crear_tablas_actas,
+obtener_actas_inventario,
+generar_acta_inventario,
+obtener_reporte_inventario
+
     
 )
 
@@ -93,6 +104,8 @@ crear_tablas()
 crear_tabla_usuarios()
 crear_tabla_perfiles()
 crear_tabla_fincas()
+crear_tabla_inventario()
+crear_tablas_actas()
 
 
 # ==========================================
@@ -182,7 +195,7 @@ def inicio():
 
     return render_template(
         "index.html",
-        variedades=obtener_variedades()
+        variedades=obtener_variedades_publicas()
     )
 
 
@@ -193,10 +206,10 @@ def inicio():
 @app.route("/variedades")
 def catalogo():
 
-    return render_template(
-        "catalogo.html",
-        variedades=obtener_variedades()
-    )
+    usuario = obtener_usuario_id(session["usuario_id"]) if session.get("usuario_id") else None
+    if usuario and usuario["rol"] == "admin":
+        return render_template("catalogo.html", variedades=obtener_variedades())
+    return render_template("catalogo_cliente.html", variedades=obtener_variedades_publicas())
 
 
 # ==========================================
@@ -504,15 +517,17 @@ def aprobar_admin(usuario_id):
 @app.route("/variedad/<int:id>")
 def detalle_variedad(id):
 
-    rosa = obtener_variedad(id)
+    usuario = obtener_usuario_id(session["usuario_id"]) if session.get("usuario_id") else None
+    if usuario and usuario["rol"] == "admin":
+        rosa = obtener_variedad(id)
+        if rosa is None:
+            abort(404)
+        return render_template("detalle_variedad.html", rosa=rosa)
 
+    rosa = obtener_variedad_publica(id)
     if rosa is None:
         abort(404)
-
-    return render_template(
-        "detalle_variedad.html",
-        rosa=rosa
-    )
+    return render_template("detalle_cliente.html", rosa=rosa)
 
 
 # ==========================================
@@ -1062,6 +1077,145 @@ def lista_fincas():
     )
 
 
+
+# ==========================================
+# UBICACIONES PUBLICAS: SOLO CAMPOS AUTORIZADOS
+# ==========================================
+
+@app.route("/ubicaciones")
+def ubicaciones_publicas():
+    return render_template(
+        "ubicaciones_cliente.html", fincas=obtener_ubicaciones_publicas()
+    )
+
+
+# ==========================================
+# PANEL DE INVENTARIO: ADMINISTRADORES
+# ==========================================
+
+@app.route("/admin/inventario", methods=["GET", "POST"])
+
+# ==========================================
+# INVENTARIO ADMINISTRATIVO POR UBICACION
+# ==========================================
+
+@administrador_requerido
+def inventario_admin():
+
+    if request.method == "POST":
+
+        # Seguridad del formulario
+        validar_csrf()
+
+        # Validar finca, variedad y cantidad
+        try:
+            finca_id = int(request.form.get("finca_id", ""))
+            variedad_id = int(request.form.get("variedad_id", ""))
+            cantidad = int(request.form.get("cantidad", ""))
+
+        except (ValueError, TypeError):
+            flash(
+                "Selecciona una finca, variedad y cantidad valida.",
+                "error"
+            )
+            return redirect(url_for("inventario_admin"))
+
+        # Validar cantidad
+        if cantidad < 0:
+            flash(
+                "La cantidad no puede ser negativa.",
+                "error"
+            )
+            return redirect(url_for("inventario_admin"))
+
+        # Obtener ubicacion del cultivo
+        casa = request.form.get("casa", "").strip()
+        bloque = request.form.get("bloque", "").strip()
+        cama = request.form.get("cama", "").strip()
+
+        # Todos los campos de ubicacion son obligatorios
+        if not casa or not bloque or not cama:
+            flash(
+                "Debes indicar casa, bloque y cama.",
+                "error"
+            )
+            return redirect(url_for("inventario_admin"))
+
+        # Limitar longitud de los campos
+        if (
+            len(casa) > 50
+            or len(bloque) > 50
+            or len(cama) > 50
+        ):
+            flash(
+                "Casa, bloque y cama no pueden superar "
+                "50 caracteres cada uno.",
+                "error"
+            )
+            return redirect(url_for("inventario_admin"))
+
+        # Observaciones
+        observaciones = request.form.get(
+            "observaciones", ""
+        ).strip()
+
+        if len(observaciones) > 500:
+            flash(
+                "Las observaciones no pueden superar "
+                "500 caracteres.",
+                "error"
+            )
+            return redirect(url_for("inventario_admin"))
+
+        # Guardar inventario en SQLite
+        try:
+            guardar_inventario(
+                finca_id,
+                variedad_id,
+                cantidad,
+                observaciones,
+                casa=casa,
+                bloque=bloque,
+                cama=cama
+            )
+
+        except sqlite3.IntegrityError:
+            flash(
+                "La finca o la variedad seleccionada no existe.",
+                "error"
+            )
+
+        except ValueError as error:
+            flash(str(error), "error")
+
+        else:
+            flash(
+                "Inventario guardado correctamente.",
+                "success"
+            )
+
+        return redirect(url_for("inventario_admin"))
+
+    # Mostrar formulario y registros
+    return render_template(
+        "inventario_admin.html",
+        fincas=obtener_fincas(),
+        variedades=obtener_variedades(),
+        inventarios=obtener_inventarios()
+    )
+
+
+
+@app.route("/admin/inventario/<int:inventario_id>/eliminar", methods=["POST"])
+@administrador_requerido
+def borrar_inventario_admin(inventario_id):
+    validar_csrf()
+    if eliminar_inventario(inventario_id):
+        flash("Registro de inventario eliminado.", "success")
+    else:
+        flash("Registro de inventario no encontrado.", "warning")
+    return redirect(url_for("inventario_admin"))
+
 # ==========================================
 # MANEJO DE ARCHIVOS GRANDES
 # ==========================================
@@ -1093,6 +1247,117 @@ def prueba_conexion():
 
 
 # ==========================================
+# FASE 7 - ACTAS DE INVENTARIO
+# SOLO ADMINISTRADORES
+# ==========================================
+
+@app.route(
+    "/admin/actas",
+    methods=["GET", "POST"]
+)
+@administrador_requerido
+def actas_inventario_admin():
+
+    if request.method == "POST":
+
+        # Verificar seguridad del formulario
+        validar_csrf()
+
+        try:
+            finca_id = int(
+                request.form.get("finca_id", "")
+            )
+        except (ValueError, TypeError):
+            flash(
+                "Debes seleccionar una finca válida.",
+                "error"
+            )
+            return redirect(
+                url_for("actas_inventario_admin")
+            )
+
+        fecha_corte = request.form.get(
+            "fecha_corte", ""
+        ).strip()
+
+        observaciones = request.form.get(
+            "observaciones", ""
+        ).strip()
+
+        # Obtener el administrador autenticado
+        responsable_id = session.get("usuario_id")
+
+        if not responsable_id:
+            abort(403)
+
+        # Generar el acta con el inventario actual
+        try:
+            acta_id = generar_acta_inventario(
+                finca_id=finca_id,
+                responsable_id=responsable_id,
+                fecha_corte=fecha_corte,
+                observaciones=observaciones
+            )
+
+        except ValueError as error:
+            flash(str(error), "error")
+
+        except sqlite3.IntegrityError:
+            flash(
+                "No se pudo generar el acta. "
+                "Comprueba la finca y el administrador.",
+                "error"
+            )
+
+        else:
+            flash(
+                f"Acta N.º {acta_id} generada correctamente.",
+                "success"
+            )
+
+        return redirect(
+            url_for("actas_inventario_admin")
+        )
+
+    # Mostrar el formulario y el historial
+    return render_template(
+        "actas_inventario.html",
+        fincas=obtener_fincas(),
+        actas=obtener_actas_inventario()
+    )
+# ==========================================
+# VER DETALLE DE UN ACTA DE INVENTARIO
+# ==========================================
+
+@app.route("/admin/actas/<int:acta_id>")
+@administrador_requerido
+def detalle_acta(acta_id):
+    # Aqui agregaremos la consulta del acta
+    # y su informacion historica.
+    pass
+
+# ==========================================
+# FASE 8 - REPORTES Y ESTADISTICAS
+# SOLO ADMINISTRADORES
+# ==========================================
+
+@app.route("/admin/reportes", methods=["GET"])
+@administrador_requerido
+def reportes_inventario_admin():
+
+    # Consultar las estadisticas actuales
+    reporte = obtener_reporte_inventario()
+
+    # Mostrar la pagina de reportes
+    return render_template(
+        "reportes_inventario.html",
+        resumen=reporte["resumen"],
+        fincas=reporte["fincas"],
+        variedades=reporte["variedades"]
+    )
+
+
+# ==========================================
 # INICIAR FLASK
 # ==========================================
 
@@ -1101,5 +1366,5 @@ if __name__ == "__main__":
     app.run(
         host="127.0.0.1",
         port=5000,
-        debug=False
+        debug=True 
     )

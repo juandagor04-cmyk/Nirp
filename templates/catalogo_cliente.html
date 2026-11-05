@@ -1,0 +1,157 @@
+
+<!DOCTYPE html>
+<html lang="es">
+
+<head>
+    <meta charset="UTF-8">
+
+    <meta name="viewport"
+          content="width=device-width, initial-scale=1.0">
+
+    <title>Catálogo de rosas | NIRP International</title>
+
+    <link rel="stylesheet"
+          href="{{ url_for('static', filename='styles.css') }}">
+</head>
+
+<body>
+
+    <!-- ENCABEZADO -->
+    <header class="encabezado">
+
+        <a href="{{ url_for('inicio') }}"
+           class="marca">
+
+            <img
+                src="{{ url_for('static', filename='imagenes/logo-nirp.png') }}"
+                alt="NIRP International">
+
+        </a>
+
+        <a href="{{ url_for('inicio') }}"
+           class="boton">
+            Volver al inicio
+        </a>
+
+    </header>
+
+
+    <!-- CATALOGO DE CLIENTES -->
+    <main class="cliente-catalogo">
+
+        <!-- PRESENTACION -->
+        <section class="cliente-encabezado">
+
+            <span>NIRP INTERNATIONAL</span>
+
+            <h1>Nuestras variedades de rosas</h1>
+
+            <p>
+                Descubre nuestra colección de rosas
+                y conoce las variedades registradas
+                en NIRP International.
+            </p>
+
+        </section>
+
+
+        <!-- LISTADO DE VARIEDADES -->
+        {% if variedades %}
+
+            <section class="cliente-variedades">
+
+                {% for rosa in variedades %}
+
+                    <article class="cliente-tarjeta">
+
+                        <!-- FOTOGRAFIA -->
+                        <div class="cliente-imagen">
+
+                            {% if rosa.imagen %}
+
+                                <img
+                                    src="{{ url_for('static', filename=rosa.imagen) }}"
+                                    alt="Fotografía de {{ rosa.nombre }}"
+                                    loading="lazy">
+
+                            {% else %}
+
+                                <div class="cliente-sin-imagen">
+                                    🌹
+                                </div>
+
+                            {% endif %}
+
+                        </div>
+
+                        <!-- INFORMACION PUBLICA -->
+                        <div class="cliente-tarjeta-info">
+
+                            <h2>{{ rosa.nombre }}</h2>
+
+                            <a
+                                href="{{ url_for('detalle_variedad', id=rosa.id) }}"
+                                class="boton">
+                                Ver fotografía
+                            </a>
+
+                        </div>
+
+                    </article>
+
+                {% endfor %}
+
+            </section>
+
+        {% else %}
+
+            <!-- CATALOGO SIN VARIEDADES -->
+            <section class="cliente-vacio">
+
+                <div>🌹</div>
+
+                <h2>Próximamente más variedades</h2>
+
+                <p>
+                    Estamos preparando nuestro catálogo
+                    de rosas para que puedas
+                    conocer nuestras variedades.
+                </p>
+
+            </section>
+
+        {% endif %}
+
+
+        <!-- UBICACIONES DE FINCAS -->
+        <section class="cliente-ubicaciones">
+
+            <h2>Conoce nuestras fincas</h2>
+
+            <p>
+                Consulta las ubicaciones públicas
+                de nuestras fincas registradas.
+            </p>
+
+            <a
+                href="{{ url_for('ubicaciones_publicas') }}"
+                class="boton">
+                Ver ubicaciones
+            </a>
+
+        </section>
+
+    </main>
+
+
+    <!-- PIE DE PAGINA -->
+    <footer>
+
+        <p>
+            NIRP International — Catálogo de variedades
+        </p>
+
+    </footer>
+
+</body>
+</html>

@@ -1,0 +1,209 @@
+
+<!DOCTYPE html>
+<html lang="es">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport"
+          content="width=device-width, initial-scale=1.0">
+
+    <title>Editar variedad | NIRP International</title>
+
+    <link rel="stylesheet"
+          href="{{ url_for('static', filename='styles.css') }}">
+
+    <style>
+        .editar-contenedor {
+            max-width: 760px;
+            margin: 40px auto;
+            padding: 30px;
+            background: white;
+            border-radius: 15px;
+        }
+
+        .editar-formulario {
+            display: grid;
+            grid-template-columns: repeat(
+                2, minmax(0, 1fr)
+            );
+            gap: 18px;
+        }
+
+        .editar-campo {
+            display: flex;
+            flex-direction: column;
+            gap: 8px;
+        }
+
+        .editar-campo label {
+            font-weight: bold;
+        }
+
+        .editar-campo input {
+            width: 100%;
+            padding: 12px;
+            border: 1px solid #cbd5ce;
+            border-radius: 8px;
+            font: inherit;
+        }
+
+        .editar-completo {
+            grid-column: 1 / -1;
+        }
+
+        .editar-imagen {
+            max-width: 200px;
+            max-height: 200px;
+            object-fit: contain;
+            border-radius: 10px;
+        }
+
+        .editar-acciones {
+            display: flex;
+            gap: 12px;
+            flex-wrap: wrap;
+        }
+
+        @media (max-width: 600px) {
+            .editar-contenedor {
+                margin: 20px 12px;
+                padding: 18px;
+            }
+
+            .editar-formulario {
+                grid-template-columns: 1fr;
+            }
+        }
+    </style>
+</head>
+
+<body>
+
+    <main class="editar-contenedor">
+
+        <h1>🌹 Editar variedad</h1>
+
+        <p>
+            Modifica los datos de la rosa seleccionada.
+        </p>
+
+        {% with mensajes = get_flashed_messages(with_categories=true) %}
+            {% for categoria, mensaje in mensajes %}
+                <p role="alert">{{ mensaje }}</p>
+            {% endfor %}
+        {% endwith %}
+
+        <form
+            class="editar-formulario"
+            method="POST"
+            enctype="multipart/form-data"
+            action="{{ url_for('editar_variedad', id=rosa.id) }}"
+        >
+
+            <input type="hidden"
+                   name="csrf_token"
+                   value="{{ csrf_token() }}">
+
+            <div class="editar-campo">
+                <label for="nombre">Nombre *</label>
+                <input id="nombre"
+                       name="nombre"
+                       value="{{ rosa.nombre }}"
+                       required>
+            </div>
+
+            <div class="editar-campo">
+                <label for="denominacion">Denominación</label>
+                <input id="denominacion"
+                       name="denominacion"
+                       value="{{ rosa.denominacion or '' }}">
+            </div>
+
+            <div class="editar-campo">
+                <label for="codigo_vbn">Código VBN</label>
+                <input id="codigo_vbn"
+                       name="codigo_vbn"
+                       value="{{ rosa.codigo_vbn or '' }}">
+            </div>
+
+            <div class="editar-campo">
+                <label for="color">Color *</label>
+                <input id="color"
+                       name="color"
+                       value="{{ rosa.color }}"
+                       required>
+            </div>
+
+            <div class="editar-campo">
+                <label for="tipo">Tipo de flor</label>
+                <input id="tipo"
+                       name="tipo"
+                       value="{{ rosa.tipo or '' }}">
+            </div>
+
+            <div class="editar-campo">
+                <label for="petalos">Número de pétalos</label>
+                <input id="petalos"
+                       type="number"
+                       min="0"
+                       name="petalos"
+                       value="{{ rosa.petalos if rosa.petalos is not none else '' }}">
+            </div>
+
+            <div class="editar-campo">
+                <label for="tallo">Tallo</label>
+                <input id="tallo"
+                       name="tallo"
+                       value="{{ rosa.tallo or '' }}">
+            </div>
+
+            <div class="editar-campo">
+                <label for="vida_florero">Vida en florero</label>
+                <input id="vida_florero"
+                       name="vida_florero"
+                       value="{{ rosa.vida_florero or '' }}">
+            </div>
+
+            <div class="editar-campo editar-completo">
+                <label>Fotografía actual</label>
+
+                {% if rosa.imagen %}
+                    <img
+                        class="editar-imagen"
+                        src="{{ url_for('static', filename=rosa.imagen) }}"
+                        alt="{{ rosa.nombre }}">
+                {% else %}
+                    <p>Sin fotografía registrada.</p>
+                {% endif %}
+            </div>
+
+            <div class="editar-campo editar-completo">
+                <label for="imagen">
+                    Cambiar fotografía (opcional)
+                </label>
+
+                <input id="imagen"
+                       type="file"
+                       name="imagen"
+                       accept="image/jpeg,image/png,image/webp">
+            </div>
+
+            <div class="editar-acciones editar-completo">
+
+                <button type="submit" class="boton">
+                    Guardar cambios
+                </button>
+
+                <a href="{{ url_for('panel_admin') }}"
+                   class="boton">
+                    Cancelar
+                </a>
+
+            </div>
+
+        </form>
+
+    </main>
+
+</body>
+</html>

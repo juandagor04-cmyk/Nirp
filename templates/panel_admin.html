@@ -1,8 +1,10 @@
 
 <!DOCTYPE html>
 <html lang="es">
+
 <head>
     <meta charset="UTF-8">
+
     <meta name="viewport"
           content="width=device-width, initial-scale=1.0">
 
@@ -14,6 +16,10 @@
 
 <body>
 
+    <!-- ======================================
+         ENCABEZADO
+    ======================================= -->
+
     <header class="encabezado">
 
         <a class="marca" href="{{ url_for('inicio') }}">
@@ -22,71 +28,451 @@
                 alt="NIRP International">
         </a>
 
-        <a href="{{ url_for('inicio') }}" class="boton">
+        <a href="{{ url_for('inicio') }}"
+           class="boton">
             Volver al inicio
         </a>
 
     </header>
 
+
+    <!-- ======================================
+         PANEL ADMINISTRATIVO
+    ======================================= -->
+
     <main class="panel-admin">
 
         <div class="panel-encabezado">
+
             <span>GESTIÓN INTERNA</span>
+
             <h1>Panel de administración</h1>
+
             <p>
-                Gestiona las variedades y los inventarios
-                de las fincas de NIRP International.
+                Gestiona las variedades, las fincas
+                y los inventarios de NIRP International.
             </p>
+
+            {% if session.get('nombre') %}
+
+                <p class="panel-bienvenida">
+                    Bienvenido, {{ session.get('nombre') }}.
+                </p>
+
+            {% endif %}
+
         </div>
 
-        <div class="panel-opciones">
+
+        <!-- ======================================
+             NOTIFICACIONES
+        ======================================= -->
+
+        {% with mensajes = get_flashed_messages(
+            with_categories=true
+        ) %}
+
+            {% for categoria, mensaje in mensajes %}
+
+                <div
+                    class="mensaje mensaje-{{ categoria }}"
+                    role="alert">
+                    {{ mensaje }}
+                </div>
+
+            {% endfor %}
+
+        {% endwith %}
+
+
+        <!-- ======================================
+             RESUMEN GENERAL
+        ======================================= -->
+
+        <section class="admin-resumen">
+
+            <div class="admin-resumen-tarjeta">
+
+                <span>🌹</span>
+
+                <h3>Variedades registradas</h3>
+
+                <strong>{{ variedades|length }}</strong>
+
+            </div>
+
+            <div class="admin-resumen-tarjeta">
+
+                <span>🏡</span>
+
+                <h3>Fincas registradas</h3>
+
+                <strong>{{ fincas|length }}</strong>
+
+            </div>
+
+            <div class="admin-resumen-tarjeta">
+
+                <span>👥</span>
+
+                <h3>Solicitudes pendientes</h3>
+
+                <strong>{{ solicitudes|length }}</strong>
+
+            </div>
+
+        </section>
+
+
+        <!-- ======================================
+             OPCIONES DEL ADMINISTRADOR
+        ======================================= -->
+
+        <section class="panel-opciones">
+
+
+            <!-- REGISTRAR VARIEDADES -->
 
             <article class="panel-tarjeta">
-                <div class="panel-icono">🌹</div>
-                <h2>Registro de variedades</h2>
-                <p>Crear una rosa nueva.</p>
 
-                <a href="{{ url_for('registrar_variedad') }}"
-                   class="boton">
+                <div class="panel-icono">🌹</div>
+
+                <h2>Registro de variedades</h2>
+
+                <p>
+                    Registra nuevas variedades de rosas
+                    con sus características y fotografías.
+                </p>
+
+                <a
+                    href="{{ url_for('registrar_variedad') }}"
+                    class="boton">
                     Registrar variedad
                 </a>
+
             </article>
 
-            <article class="panel-tarjeta">
-                <div class="panel-icono">📋</div>
-                <h2>Variedades registradas</h2>
-                <p>Consultar y gestionar fichas técnicas.</p>
 
-                <a href="{{ url_for('catalogo') }}"
-                   class="boton">
+            <!-- VER VARIEDADES -->
+
+            <article class="panel-tarjeta">
+
+                <div class="panel-icono">📋</div>
+
+                <h2>Variedades registradas</h2>
+
+                <p>
+                    Consulta las variedades existentes
+                    y sus fichas técnicas completas.
+                </p>
+
+                <a
+                    href="{{ url_for('catalogo') }}"
+                    class="boton">
                     Ver variedades
                 </a>
+
             </article>
 
+
+            <!-- REGISTRAR FINCAS -->
+
             <article class="panel-tarjeta">
+
                 <div class="panel-icono">📍</div>
-                <h2>Registro en fincas</h2>
-                <p>Asignar rosas existentes a una finca.</p>
-                <span class="panel-proximamente">
-                    Próximamente
-                </span>
+
+                <h2>Registrar finca</h2>
+
+                <p>
+                    Registra el nombre de la finca,
+                    empresa, teléfono, ubicación del cultivo
+                    y coordenadas geográficas.
+                </p>
+
+                <a
+                    href="{{ url_for('registrar_finca') }}"
+                    class="boton">
+                    Registrar finca
+                </a>
+
             </article>
 
+
+            <!-- VER FINCAS -->
+
             <article class="panel-tarjeta">
+
                 <div class="panel-icono">🏡</div>
-                <h2>Inventario de fincas</h2>
-                <p>Consultar fincas, bloques y parcelas.</p>
-                <span class="panel-proximamente">
-                    Próximamente
-                </span>
+
+                <h2>Fincas registradas</h2>
+
+                <p>
+                    Consulta las fincas registradas,
+                    sus ubicaciones y el acceso al mapa
+                    de OpenStreetMap.
+                </p>
+
+                <a
+                    href="{{ url_for('lista_fincas') }}"
+                    class="boton">
+                    Ver fincas
+                </a>
+
             </article>
+
+
+            <!-- SOLICITUDES ADMINISTRATIVAS -->
+
+            <article class="panel-tarjeta">
+
+                <div class="panel-icono">👥</div>
+
+                <h2>Solicitudes administrativas</h2>
+
+                <p>
+                    Revisa las solicitudes de acceso
+                    administrativo y aprueba
+                    a los usuarios autorizados.
+                </p>
+
+                <a
+                    href="{{ url_for('solicitudes_admin') }}"
+                    class="boton">
+                    Revisar solicitudes
+                </a>
+
+            </article>
+
+
+            <!-- INVENTARIO POR FINCAS -->
+
+            <article class="panel-tarjeta">
+
+                <div class="panel-icono">🌱</div>
+
+                <h2>Inventario por finca</h2>
+
+                <p>
+                    Gestiona el inventario de rosas
+                    de cada finca.
+
+                    Consulta las variedades registradas,
+                    sus cantidades y observaciones internas.
+                </p>
+
+                <a
+                    href="{{ url_for('inventario_admin') }}"
+                    class="boton">
+                    Gestionar inventario
+                </a>
+
+            </article>
+
+
+            <!-- ACTA DE INVENTARIO -->
+
+            <article class="panel-tarjeta">
+
+                <div class="panel-icono">📝</div>
+
+                <h2>Acta de inventario</h2>
+
+                <p>
+                    Registra actas con fecha, finca,
+                    variedades, localización del cultivo
+                    y cantidades.
+                </p>
+
+             <a href="{{ url_for('actas_inventario_admin') }}"
+            class="boton-acta-inventario">
+                Crear acta de inventario
+            </a>
+
+            </article>
+
+        </section>
+
+
+        <!-- ======================================
+             GESTION DE VARIEDADES
+        ======================================= -->
+
+        <section class="admin-listado">
+
+            <div class="admin-listado-titulo">
+
+                <div>
+
+                    <h2>🌹 Gestión de variedades</h2>
+
+                    <p>
+                        Consulta y administra las rosas
+                        registradas en NIRP International.
+                    </p>
+
+                </div>
+
+                <a
+                    href="{{ url_for('registrar_variedad') }}"
+                    class="boton">
+                    + Nueva variedad
+                </a>
+
+            </div>
+
+
+            {% if variedades %}
+
+                <div class="admin-tabla-contenedor">
+
+                    <table class="admin-tabla">
+
+                        <thead>
+
+                            <tr>
+                                <th>Nombre</th>
+                                <th>Denominación</th>
+                                <th>Código VBN</th>
+                                <th>Color</th>
+                                <th>Acciones</th>
+                            </tr>
+
+                        </thead>
+
+                        <tbody>
+
+                            {% for rosa in variedades %}
+
+                                <tr>
+
+                                    <td>
+                                        {{ rosa.nombre }}
+                                    </td>
+
+                                    <td>
+                                        {{ rosa.denominacion or 'Sin registrar' }}
+                                    </td>
+
+                                    <td>
+                                        {{ rosa.codigo_vbn or 'Sin registrar' }}
+                                    </td>
+
+                                    <td>
+                                        {{ rosa.color or 'Sin registrar' }}
+                                    </td>
+
+                                    <td>
+
+                                        <!-- VER FICHA -->
+
+                                        <a
+                                            href="{{ url_for('detalle_variedad', id=rosa.id) }}"
+                                            class="admin-ver">
+                                            👁️ Ver ficha
+                                        </a>
+
+
+                                        <!-- EDITAR VARIEDAD -->
+
+                                        <a
+                                            href="{{ url_for('editar_variedad', id=rosa.id) }}"
+                                            class="admin-ver">
+                                            ✏️ Editar
+                                        </a>
+
+
+                                        <!-- ELIMINAR VARIEDAD -->
+
+                                        <form
+                                            method="POST"
+                                            action="{{ url_for('eliminar_variedad_ruta', id=rosa.id) }}"
+                                            class="admin-form-eliminar"
+                                            onsubmit="return confirm('¿Estás seguro de eliminar esta variedad? Esta acción no se puede deshacer.');">
+
+                                            <input
+                                                type="hidden"
+                                                name="csrf_token"
+                                                value="{{ csrf_token() }}">
+
+                                            <button
+                                                type="submit"
+                                                class="admin-eliminar">
+                                                🗑️ Eliminar
+                                            </button>
+
+                                        </form>
+
+                                    </td>
+
+                                </tr>
+
+                            {% endfor %}
+
+                        </tbody>
+
+                    </table>
+
+                </div>
+
+            {% else %}
+
+                <div class="admin-sin-datos">
+
+                    <p>
+                        Todavía no hay variedades registradas.
+                    </p>
+
+                    <a
+                        href="{{ url_for('registrar_variedad') }}"
+                        class="boton">
+                        Registrar primera variedad
+                    </a>
+
+                </div>
+
+            {% endif %}
+
+        </section>
+
+
+        <!-- ======================================
+             CERRAR SESION
+        ======================================= -->
+
+        <div class="panel-cerrar-sesion">
+
+            <form
+                method="POST"
+                action="{{ url_for('logout') }}">
+
+                <input
+                    type="hidden"
+                    name="csrf_token"
+                    value="{{ csrf_token() }}">
+
+                <button
+                    type="submit"
+                    class="boton">
+                    Cerrar sesión
+                </button>
+
+            </form>
 
         </div>
 
     </main>
 
+
+    <!-- ======================================
+         PIE DE PAGINA
+    ======================================= -->
+
     <footer>
-        <p>NIRP International — Administración de inventarios</p>
+
+        <p>
+            NIRP International — Administración de inventarios
+        </p>
+
     </footer>
 
 </body>

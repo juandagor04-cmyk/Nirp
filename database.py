@@ -1,4 +1,3 @@
-
 import sqlite3
 from pathlib import Path
 
@@ -102,6 +101,59 @@ def obtener_variedad(id):
         ).fetchone()
 
         return dict(fila) if fila else None
+    
+# ==========================================
+# ACTUALIZAR VARIEDAD
+# ==========================================
+
+def actualizar_variedad(id, rosa):
+
+    with conectar() as conexion:
+
+        cursor = conexion.execute("""
+            UPDATE variedades
+            SET
+                nombre = ?,
+                denominacion = ?,
+                codigo_vbn = ?,
+                color = ?,
+                tipo = ?,
+                petalos = ?,
+                tallo = ?,
+                vida_florero = ?,
+                imagen = ?
+            WHERE id = ?
+        """, (
+            rosa["nombre"],
+            rosa["denominacion"],
+            rosa["codigo_vbn"],
+            rosa["color"],
+            rosa["tipo"],
+            rosa["petalos"],
+            rosa["tallo"],
+            rosa["vida_florero"],
+            rosa["imagen"],
+            id
+        ))
+
+        return cursor.rowcount > 0
+    
+# ==========================================
+# ELIMINAR VARIEDAD
+# ==========================================
+
+def eliminar_variedad(id):
+
+    with conectar() as conexion:
+
+        cursor = conexion.execute(
+            "DELETE FROM variedades WHERE id = ?",
+            (id,)
+        )
+
+        return cursor.rowcount > 0
+
+
 
 
 # ==========================================
@@ -507,3 +559,472 @@ if __name__ == "__main__":
     print("- perfiles")
     print("- fincas")
     print("====================================")
+
+
+# ==========================================
+# FASE: CLIENTE PUBLICO - CAMPOS PERMITIDOS
+# ==========================================
+
+def obtener_variedades_publicas():
+    with conectar() as conexion:
+        filas = conexion.execute("""
+            SELECT id, nombre, imagen
+            FROM variedades
+            ORDER BY nombre COLLATE NOCASE
+        """).fetchall()
+        return [dict(fila) for fila in filas]
+
+
+def obtener_variedad_publica(variedad_id):
+    with conectar() as conexion:
+        fila = conexion.execute("""
+            SELECT id, nombre, imagen
+            FROM variedades WHERE id = ?
+        """, (variedad_id,)).fetchone()
+        return dict(fila) if fila else None
+
+
+def obtener_ubicaciones_publicas():
+    # No publicar telefono, direccion, datos de empresa, ni observaciones.
+    with conectar() as conexion:
+        filas = conexion.execute("""
+            SELECT id, nombre, departamento, municipio, latitud, longitud
+            FROM fincas
+            ORDER BY nombre COLLATE NOCASE
+        """).fetchall()
+        return [dict(fila) for fila in filas]
+
+
+# ==========================================
+# INVENTARIOS: SOLO CONSUMIR DESDE RUTAS ADMIN
+# ==========================================
+
+# ==========================================
+# CREAR Y ACTUALIZAR TABLA DE INVENTARIO
+# ==========================================
+
+def crear_tabla_inventario():
+
+    with conectar() as conexion:
+
+        conexion.execute("""
+            CREATE TABLE IF NOT EXISTS inventarios (
+                id INTEGER PRIMARY KEY AUTOINCREMENT,
+                finca_id INTEGER NOT NULL,
+                variedad_id INTEGER NOT NULL,
+                cantidad INTEGER NOT NULL DEFAULT 0
+                    CHECK(cantidad >= 0),
+                observaciones TEXT NOT NULL DEFAULT '',
+                actualizado_en TEXT NOT NULL
+                    DEFAULT CURRENT_TIMESTAMP,
+
+                UNIQUE(finca_id, variedad_id),
+
+                FOREIGN KEY (finca_id)
+                    REFERENCES fincas(id)
+                    ON DELETE RESTRICT,
+
+                FOREIGN KEY (variedad_id)
+                    REFERENCES variedades(id)
+                    ON DELETE RESTRICT
+            )
+        """)
+
+        columnas = {
+            fila["name"]
+            for fila in conexion.execute(
+                "PRAGMA table_info(inventarios)"
+            ).fetchall()
+        }
+
+        nuevas_columnas = {
+            "casa": "TEXT NOT NULL DEFAULT ''",
+            "bloque": "TEXT NOT NULL DEFAULT ''",
+            "cama": "TEXT NOT NULL DEFAULT ''"
+        }
+
+        for nombre, tipo in nuevas_columnas.items():
+
+            if nombre not in columnas:
+
+                conexion.execute(
+                    f"ALTER TABLE inventarios "
+                    f"ADD COLUMN {nombre} {tipo}"
+                )
+
+
+# ==========================================
+# OBTENER INVENTARIOS REGISTRADOS
+# ==========================================
+
+def obtener_inventarios():
+    with conectar() as conexion:
+        filas = conexion.execute("""
+            SELECT
+                i.id,
+                i.finca_id,
+                i.variedad_id,
+                i.casa,
+                i.bloque,
+                i.cama,
+                i.cantidad,
+                i.observaciones,
+                i.actualizado_en,
+                f.nombre AS finca_nombre,
+                v.nombre AS variedad_nombre
+            FROM inventarios AS i
+            JOIN fincas AS f
+                ON f.id = i.finca_id
+            JOIN variedades AS v
+                ON v.id = i.variedad_id
+            ORDER BY
+                f.nombre COLLATE NOCASE,
+                i.casa,
+                i.bloque,
+                i.cama
+        """).fetchall()
+
+        return [dict(fila) for fila in filas]
+
+
+
+# ==========================================
+# GUARDAR INVENTARIO POR UBICACION
+# ==========================================
+
+def guardar_inventario(
+    finca_id,
+    variedad_id,
+    cantidad,
+    observaciones="",
+    casa="",
+    bloque="",
+    cama=""
+):
+    casa = str(casa).strip()
+    bloque = str(bloque).strip()
+    cama = str(cama).strip()
+    observaciones = str(observaciones).strip()
+
+    if not casa or not bloque or not cama:
+        raise ValueError(
+            "Debes indicar casa, bloque y cama."
+        )
+
+    cantidad = int(cantidad)
+
+    if cantidad < 0:
+        raise ValueError(
+            "La cantidad no puede ser negativa."
+        )
+
+    with conectar() as conexion:
+        conexion.execute("""
+            INSERT INTO inventarios (
+                finca_id,
+                variedad_id,
+                casa,
+                bloque,
+                cama,
+                cantidad,
+                observaciones
+            )
+            VALUES (?, ?, ?, ?, ?, ?, ?)
+
+            ON CONFLICT (
+                finca_id,
+                variedad_id,
+                casa,
+                bloque,
+                cama
+            )
+            DO UPDATE SET
+                cantidad = excluded.cantidad,
+                observaciones = excluded.observaciones,
+                actualizado_en = CURRENT_TIMESTAMP
+        """, (
+            finca_id,
+            variedad_id,
+            casa,
+            bloque,
+            cama,
+            cantidad,
+            observaciones
+        ))
+
+
+
+def eliminar_inventario(inventario_id):
+    with conectar() as conexion:
+        cursor = conexion.execute(
+            "DELETE FROM inventarios WHERE id = ?", (inventario_id,)
+        )
+        return cursor.rowcount > 0
+    
+# ==========================================
+# CREAR TABLAS DE ACTAS DE INVENTARIO
+# ==========================================
+
+def crear_tablas_actas():
+    with conectar() as conexion:
+
+        conexion.execute("""
+            CREATE TABLE IF NOT EXISTS actas_inventario (
+                id INTEGER PRIMARY KEY AUTOINCREMENT,
+                finca_id INTEGER NOT NULL,
+                responsable_id INTEGER NOT NULL,
+                fecha_corte TEXT NOT NULL,
+                observaciones TEXT NOT NULL DEFAULT '',
+                creada_en TEXT NOT NULL
+                    DEFAULT CURRENT_TIMESTAMP,
+
+                FOREIGN KEY (finca_id)
+                    REFERENCES fincas(id)
+                    ON DELETE RESTRICT,
+
+                FOREIGN KEY (responsable_id)
+                    REFERENCES usuarios(id)
+                    ON DELETE RESTRICT
+            )
+        """)
+
+        conexion.execute("""
+            CREATE TABLE IF NOT EXISTS actas_inventario_detalle (
+                id INTEGER PRIMARY KEY AUTOINCREMENT,
+                acta_id INTEGER NOT NULL,
+                variedad_id INTEGER,
+                variedad_nombre TEXT NOT NULL,
+                casa TEXT NOT NULL,
+                bloque TEXT NOT NULL,
+                cama TEXT NOT NULL,
+                cantidad INTEGER NOT NULL
+                    CHECK(cantidad >= 0),
+
+                FOREIGN KEY (acta_id)
+                    REFERENCES actas_inventario(id)
+                    ON DELETE RESTRICT
+            )
+        """)
+
+
+# ==========================================
+# OBTENER ACTAS REGISTRADAS
+# ==========================================
+
+def obtener_actas_inventario():
+    with conectar() as conexion:
+
+        filas = conexion.execute("""
+            SELECT
+                a.id,
+                a.finca_id,
+                a.responsable_id,
+                a.fecha_corte,
+                a.observaciones,
+                a.creada_en,
+                f.nombre AS finca_nombre,
+                u.nombre AS responsable_nombre,
+
+                (
+                    SELECT COUNT(*)
+                    FROM actas_inventario_detalle AS d
+                    WHERE d.acta_id = a.id
+                ) AS total_registros,
+
+                (
+                    SELECT COALESCE(SUM(d.cantidad), 0)
+                    FROM actas_inventario_detalle AS d
+                    WHERE d.acta_id = a.id
+                ) AS total_cantidad
+
+            FROM actas_inventario AS a
+
+            JOIN fincas AS f
+                ON f.id = a.finca_id
+
+            JOIN usuarios AS u
+                ON u.id = a.responsable_id
+
+            ORDER BY a.id DESC
+        """).fetchall()
+
+        return [dict(fila) for fila in filas]
+
+
+# ==========================================
+# GENERAR ACTA DE INVENTARIO
+# ==========================================
+
+def generar_acta_inventario(
+    finca_id,
+    responsable_id,
+    fecha_corte,
+    observaciones=""
+):
+    fecha_corte = str(fecha_corte).strip()
+    observaciones = str(observaciones).strip()
+
+    if not fecha_corte:
+        raise ValueError(
+            "Debes seleccionar una fecha de corte."
+        )
+
+    if len(observaciones) > 500:
+        raise ValueError(
+            "Las observaciones no pueden superar "
+            "500 caracteres."
+        )
+
+    with conectar() as conexion:
+
+        # Verificar finca
+        finca = conexion.execute("""
+            SELECT id
+            FROM fincas
+            WHERE id = ?
+        """, (finca_id,)).fetchone()
+
+        if finca is None:
+            raise ValueError(
+                "La finca seleccionada no existe."
+            )
+
+        # Verificar administrador
+        responsable = conexion.execute("""
+            SELECT id
+            FROM usuarios
+            WHERE id = ? AND rol = 'admin'
+        """, (responsable_id,)).fetchone()
+
+        if responsable is None:
+            raise ValueError(
+                "El responsable debe ser administrador."
+            )
+
+        # Consultar inventario actual de esa finca
+        inventarios = conexion.execute("""
+            SELECT
+                i.variedad_id,
+                v.nombre AS variedad_nombre,
+                i.casa,
+                i.bloque,
+                i.cama,
+                i.cantidad
+
+            FROM inventarios AS i
+
+            JOIN variedades AS v
+                ON v.id = i.variedad_id
+
+            WHERE i.finca_id = ?
+
+            ORDER BY
+                v.nombre COLLATE NOCASE,
+                i.casa,
+                i.bloque,
+                i.cama
+        """, (finca_id,)).fetchall()
+
+        if not inventarios:
+            raise ValueError(
+                "La finca no tiene inventarios registrados."
+            )
+
+        # Crear encabezado del acta
+        cursor = conexion.execute("""
+            INSERT INTO actas_inventario (
+                finca_id,
+                responsable_id,
+                fecha_corte,
+                observaciones
+            )
+            VALUES (?, ?, ?, ?)
+        """, (
+            finca_id,
+            responsable_id,
+            fecha_corte,
+            observaciones
+        ))
+
+        acta_id = cursor.lastrowid
+
+        # Guardar copia historica de cada registro
+        for item in inventarios:
+
+            conexion.execute("""
+                INSERT INTO actas_inventario_detalle (
+                    acta_id,
+                    variedad_id,
+                    variedad_nombre,
+                    casa,
+                    bloque,
+                    cama,
+                    cantidad
+                )
+                VALUES (?, ?, ?, ?, ?, ?, ?)
+            """, (
+                acta_id,
+                item["variedad_id"],
+                item["variedad_nombre"],
+                item["casa"],
+                item["bloque"],
+                item["cama"],
+                item["cantidad"]
+            ))
+
+        return acta_id
+    
+# ==========================================
+# FASE 8 - REPORTES Y ESTADISTICAS
+# ==========================================
+
+def obtener_reporte_inventario():
+
+    with conectar() as conexion:
+
+        # RESUMEN GENERAL
+        resumen = conexion.execute("""
+            SELECT
+                COUNT(*) AS total_registros,
+                COALESCE(SUM(cantidad), 0) AS total_rosas,
+                COUNT(DISTINCT finca_id)
+                    AS fincas_con_inventario,
+                COUNT(DISTINCT variedad_id)
+                    AS variedades_con_inventario
+            FROM inventarios
+        """).fetchone()
+
+        # INVENTARIO POR FINCA
+        fincas = conexion.execute("""
+            SELECT
+                f.id,
+                f.nombre,
+                COUNT(i.id) AS total_registros,
+                COALESCE(SUM(i.cantidad), 0) AS total_rosas
+            FROM fincas AS f
+            LEFT JOIN inventarios AS i
+                ON i.finca_id = f.id
+            GROUP BY f.id, f.nombre
+            ORDER BY total_rosas DESC, f.nombre
+        """).fetchall()
+
+        # INVENTARIO POR VARIEDAD
+        variedades = conexion.execute("""
+            SELECT
+                v.id,
+                v.nombre,
+                COUNT(i.id) AS total_registros,
+                COALESCE(SUM(i.cantidad), 0) AS total_rosas
+            FROM variedades AS v
+            LEFT JOIN inventarios AS i
+                ON i.variedad_id = v.id
+            GROUP BY v.id, v.nombre
+            ORDER BY total_rosas DESC, v.nombre
+        """).fetchall()
+
+        return {
+            "resumen": dict(resumen),
+            "fincas": [dict(fila) for fila in fincas],
+            "variedades": [dict(fila) for fila in variedades]
+        }
+

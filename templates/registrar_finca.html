@@ -1,0 +1,251 @@
+
+<!DOCTYPE html>
+<html lang="es">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport"
+          content="width=device-width, initial-scale=1.0">
+
+    <title>Registrar finca | NIRP International</title>
+
+    <link
+        rel="stylesheet"
+        href="{{ url_for('static', filename='styles.css') }}">
+</head>
+
+
+<body class="pagina-fincas">
+
+    <!-- PRUEBA TEMPORAL -->
+    <h1 style="color: red; padding: 30px; font-size: 32px;">
+        PRUEBA: REGISTRO DE FINCAS
+    </h1>
+
+    <!-- ENCABEZADO -->
+    <header class="encabezado">
+
+        <a href="{{ url_for('inicio') }}" class="marca">
+            <img
+                src="{{ url_for('static', filename='imagenes/logo-nirp.png') }}"
+                alt="NIRP International">
+        </a>
+
+        <a href="{{ url_for('panel_admin') }}" class="boton">
+            Volver al panel
+        </a>
+
+    </header>
+
+    <main class="fincas-contenedor">
+
+        <section class="fincas-tarjeta">
+
+            <span class="fincas-etiqueta">
+                NIRP INTERNATIONAL
+            </span>
+
+            <h1>Registrar finca</h1>
+
+            <p>
+                Completa la información de la finca
+                y la ubicación de su cultivo.
+                Los campos marcados con * son obligatorios.
+            </p>
+
+            <!-- MENSAJES -->
+            {% with mensajes = get_flashed_messages(with_categories=true) %}
+                {% for categoria, mensaje in mensajes %}
+                    <p class="mensaje mensaje-{{ categoria }}"
+                       role="alert">
+                        {{ mensaje }}
+                    </p>
+                {% endfor %}
+            {% endwith %}
+
+            <!-- FORMULARIO -->
+            <form
+                method="POST"
+                action="{{ url_for('registrar_finca') }}"
+                class="formulario-finca">
+
+                <input
+                    type="hidden"
+                    name="csrf_token"
+                    value="{{ csrf_token() }}">
+
+                <!-- DATOS GENERALES -->
+                <h2>Datos generales</h2>
+
+                <label for="nombre">
+                    Nombre de la finca *
+                </label>
+                <input
+                    type="text"
+                    id="nombre"
+                    name="nombre"
+                    required>
+
+                <label for="empresa">
+                    Empresa o propietario
+                </label>
+                <input
+                    type="text"
+                    id="empresa"
+                    name="empresa">
+
+                <label for="telefono">
+                    Teléfono de contacto
+                </label>
+                <input
+                    type="tel"
+                    id="telefono"
+                    name="telefono">
+
+                <!-- UBICACION -->
+                <h2>Ubicación</h2>
+
+                <label for="departamento">
+                    Departamento *
+                </label>
+                <input
+                    type="text"
+                    id="departamento"
+                    name="departamento"
+                    required>
+
+                <label for="municipio">
+                    Municipio *
+                </label>
+                <input
+                    type="text"
+                    id="municipio"
+                    name="municipio"
+                    required>
+
+                <label for="vereda">
+                    Vereda (opcional)
+                </label>
+                <input
+                    type="text"
+                    id="vereda"
+                    name="vereda"
+                    placeholder="Dejar vacío si no aplica">
+
+                <label for="direccion">
+                    Dirección o referencia
+                </label>
+                <input
+                    type="text"
+                    id="direccion"
+                    name="direccion">
+
+                <label for="ubicacion_cultivo">
+                    Ubicación del cultivo
+                </label>
+                <input
+                    type="text"
+                    id="ubicacion_cultivo"
+                    name="ubicacion_cultivo"
+                    placeholder="Ejemplo: Casa 3, bloque B">
+
+                <!-- VARIEDADES EN OTRAS CASAS -->
+                <label for="variedades_otras_casas">
+                    Variedades en otras casas (opcional)
+                </label>
+
+                <textarea
+                    id="variedades_otras_casas"
+                    name="variedades_otras_casas"
+                    rows="3"
+                    placeholder="Ejemplo: Blueberry en casa 2. Dejar vacío si no aplica."></textarea>
+
+                <!-- COORDENADAS -->
+                <h2>Coordenadas geográficas</h2>
+
+                <p>
+                    Usa OpenStreetMap para encontrar la
+                    ubicación de la finca.
+
+                    Si todavía no conoces las coordenadas,
+                    puedes dejar ambos campos vacíos.
+                </p>
+
+                <div class="fincas-dos-columnas">
+
+                    <div>
+                        <label for="latitud">
+                            Latitud
+                        </label>
+
+                        <input
+                            type="number"
+                            id="latitud"
+                            name="latitud"
+                            step="any"
+                            min="-90"
+                            max="90"
+                            placeholder="4.800000">
+                    </div>
+
+                    <div>
+                        <label for="longitud">
+                            Longitud
+                        </label>
+
+                        <input
+                            type="number"
+                            id="longitud"
+                            name="longitud"
+                            step="any"
+                            min="-180"
+                            max="180"
+                            placeholder="-74.350000">
+                    </div>
+
+                </div>
+
+                <a
+                    href="https://www.openstreetma  p.org/#map=5/4.33/-72.07"
+                    target="_blank"
+                    rel="noopener noreferrer">
+
+                    Abrir OpenStreetMap para buscar la ubicación
+                </a>
+
+                <!-- OBSERVACIONES -->
+                <h2>Observaciones</h2>
+
+                <label for="observaciones">
+                    Información adicional
+                </label>
+
+                <textarea
+                    id="observaciones"
+                    name="observaciones"
+                    rows="4"
+                    placeholder="Escribe observaciones importantes de la finca, si aplica."></textarea>
+
+                <!-- GUARDAR -->
+                <button
+                    type="submit"
+                    class="boton fincas-boton">
+
+                    Guardar finca
+                </button>
+
+            </form>
+
+            <a
+                href="{{ url_for('lista_fincas') }}"
+                class="fincas-enlace">
+
+                Ver fincas registradas
+            </a>
+
+        </section>
+
+    </main>
+
+</body>
+</html>
