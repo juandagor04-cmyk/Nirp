@@ -1,0 +1,336 @@
+
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport"
+          content="width=device-width, initial-scale=1.0">
+
+    <title>Escáner de inventarios | NIRP International</title>
+
+    <link rel="stylesheet"
+          href="{{ url_for('static', filename='styles.css') }}">
+
+    <style>
+        * {
+            box-sizing: border-box;
+        }
+
+        body {
+            margin: 0;
+            background: #f3f7f3;
+            color: #263c2c;
+            font-family: Arial, sans-serif;
+        }
+
+        .escaner-contenedor {
+            width: min(900px, 94%);
+            margin: 35px auto 70px;
+        }
+
+        .escaner-volver {
+            display: inline-block;
+            margin-bottom: 22px;
+            color: #216943;
+            text-decoration: none;
+            font-weight: bold;
+        }
+
+        .escaner-tarjeta {
+            background: white;
+            border: 1px solid #e0e9e2;
+            border-radius: 18px;
+            padding: 30px;
+            margin-bottom: 22px;
+            box-shadow: 0 8px 25px rgba(0,0,0,.05);
+        }
+
+        h1, h2 {
+            color: #194b30;
+        }
+
+        .escaner-etiqueta {
+            color: #287449;
+            font-weight: bold;
+            font-size: 13px;
+            letter-spacing: 1px;
+        }
+
+        .escaner-ayuda {
+            color: #617165;
+            line-height: 1.6;
+        }
+
+        .escaner-subida {
+            display: block;
+            padding: 28px;
+            border: 2px dashed #7caf89;
+            border-radius: 14px;
+            background: #f4faf5;
+            text-align: center;
+        }
+
+        .escaner-subida input {
+            display: block;
+            width: 100%;
+            margin-top: 18px;
+        }
+
+        #vista-previa {
+            display: none;
+            width: 100%;
+            max-height: 450px;
+            object-fit: contain;
+            margin-top: 20px;
+            border-radius: 12px;
+            border: 1px solid #dce5df;
+        }
+
+        .escaner-campos {
+            display: grid;
+            grid-template-columns: repeat(2, 1fr);
+            gap: 18px;
+            margin-top: 22px;
+        }
+
+        .escaner-campo label {
+            display: block;
+            font-weight: bold;
+            margin-bottom: 8px;
+        }
+
+        .escaner-campo input 
+        .escaner-campo select {
+            width: 100%;
+            padding: 13px;
+            border: 1px solid #c8d6cc;
+            border-radius: 9px;
+            font-size: 16px;
+        }
+
+        .escaner-boton {
+            background: #246c43;
+            color: white;
+            border: none;
+            border-radius: 10px;
+            padding: 14px 22px;
+            margin-top: 22px;
+            font-size: 16px;
+            font-weight: bold;
+        }
+
+        .escaner-boton:disabled {
+            background: #97aa9c;
+            cursor: not-allowed;
+        }
+
+        .escaner-aviso {
+            margin-top: 18px;
+            padding: 15px;
+            background: #eef5ef;
+            border-radius: 10px;
+            line-height: 1.5;
+        }
+
+        @media (max-width: 650px) {
+            .escaner-tarjeta {
+                padding: 22px 16px;
+            }
+
+            .escaner-campos {
+                grid-template-columns: 1fr;
+            }
+        }
+    </style>
+</head>
+
+<body>
+
+<main class="escaner-contenedor">
+
+    <a href="{{ url_for('panel_admin') }}"
+       class="escaner-volver">
+        ← Volver al panel administrativo
+    </a>
+
+    <section class="escaner-tarjeta">
+
+        <span class="escaner-etiqueta">
+            NIRP INTERNATIONAL
+        </span>
+
+        <h1>Escáner de inventarios</h1>
+
+        <p class="escaner-ayuda">
+            Toma una fotografía de una hoja de inventario
+            o selecciona una imagen desde tu dispositivo.
+        </p>
+
+        <label class="escaner-subida"
+               for="foto-inventario">
+
+            <strong>📷 Fotografiar o seleccionar hoja</strong>
+
+            <input
+                type="file"
+                id="foto-inventario"
+                name="foto"
+                accept="image/jpeg,image/png,image/webp"
+                capture="environment">
+
+        </label>
+
+        <img id="vista-previa"
+             alt="Vista previa de la hoja seleccionada">
+
+        <div class="escaner-aviso">
+            Esta primera versión permite seleccionar
+            la fotografía y visualizarla.
+            El reconocimiento automático se conectará
+            en el siguiente paso.
+        </div>
+
+    </section>
+
+    <section class="escaner-tarjeta">
+
+        <h2>Revisión del inventario</h2>
+
+        <p class="escaner-ayuda">
+            Comprueba los datos antes de guardarlos.
+            Por ahora puedes escribirlos manualmente.
+        </p>
+
+      
+<div class="escaner-campo">
+
+    <label for="finca">Finca</label>
+
+   <select id="finca" name="finca_id" required>
+
+    <option value="">
+        Selecciona una finca
+    </option>
+
+    {% for finca in fincas %}
+
+    <option value="{{ finca.id }}">
+        {{ finca.nombre }}
+    </option>
+
+    {% endfor %}
+
+</select>
+
+</div>
+
+           
+<div class="escaner-campo">
+
+    <label for="variedad">Variedad</label>
+
+    <select id="variedad" name="variedad_id" required>
+
+        <option value="">
+            Selecciona una variedad
+        </option>
+
+        {% for rosa in variedades %}
+
+        <option value="{{ rosa.id }}">
+            {{ rosa.nombre }}
+        </option>
+
+        {% endfor %}
+
+    </select>
+
+</div>
+
+
+            <div class="escaner-campo">
+                <label for="casa">Casa</label>
+                <input type="text"
+                       id="casa"
+                       placeholder="Ej. 1">
+            </div>
+
+            <div class="escaner-campo">
+                <label for="bloque">Bloque</label>
+                <input type="text"
+                       id="bloque"
+                       placeholder="Ej. 2">
+            </div>
+
+            <div class="escaner-campo">
+                <label for="cama">Cama</label>
+                <input type="text"
+                       id="cama"
+                       placeholder="Ej. 3">
+            </div>
+
+            <div class="escaner-campo">
+                <label for="cantidad">Cantidad</label>
+                <input type="number"
+                       id="cantidad"
+                       min="0"
+                       placeholder="Cantidad de rosas">
+            </div>
+
+        </div>
+
+        <button class="escaner-boton"
+                type="button"
+                disabled>
+            Guardar inventario
+        </button>
+
+        <p class="escaner-ayuda">
+            El guardado se habilitará cuando conectemos
+            este formulario con Flask y SQLite.
+        </p>
+
+    </section>
+
+</main>
+
+<script>
+    const entradaFoto =
+        document.getElementById("foto-inventario");
+
+    const vistaPrevia =
+        document.getElementById("vista-previa");
+
+    let urlAnterior = null;
+
+    entradaFoto.addEventListener("change", function () {
+
+        const archivo = this.files[0];
+
+        if (urlAnterior) {
+            URL.revokeObjectURL(urlAnterior);
+            urlAnterior = null;
+        }
+
+        if (!archivo) {
+            vistaPrevia.removeAttribute("src");
+            vistaPrevia.style.display = "none";
+            return;
+        }
+
+        if (!["image/jpeg", "image/png", "image/webp"]
+            .includes(archivo.type)) {
+            alert("Selecciona una imagen JPG, PNG o WebP.");
+            this.value = "";
+            vistaPrevia.style.display = "none";
+            return;
+        }
+
+        urlAnterior = URL.createObjectURL(archivo);
+        vistaPrevia.src = urlAnterior;
+        vistaPrevia.style.display = "block";
+    });
+</script>
+
+</body>
+</html>

@@ -1,0 +1,458 @@
+
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport"
+          content="width=device-width, initial-scale=1.0">
+
+    <title>Buscar inventario | NIRP International</title>
+
+    <link rel="stylesheet"
+          href="{{ url_for('static', filename='styles.css') }}">
+
+    <style>
+        .buscar-pagina {
+            margin: 0;
+            min-height: 100vh;
+            background: #f4f8f5;
+            color: #284331;
+        }
+
+        .buscar-contenedor {
+            width: min(1200px, 94%);
+            margin: 35px auto 70px;
+        }
+
+        .buscar-volver {
+            display: inline-block;
+            margin-bottom: 22px;
+            color: #246b43;
+            text-decoration: none;
+            font-weight: 700;
+        }
+
+        .buscar-encabezado {
+            padding: 40px;
+            margin-bottom: 28px;
+            border-radius: 22px;
+            background: linear-gradient(
+                135deg,
+                #153e29,
+                #317c51
+            );
+            color: #ffffff;
+        }
+
+        .buscar-encabezado h1 {
+            margin: 0 0 12px;
+            color: #ffffff;
+            font-size: clamp(27px, 4vw, 40px);
+        }
+
+        .buscar-encabezado p {
+            margin: 0;
+            color: #e4f2e8;
+            line-height: 1.7;
+        }
+
+        .buscar-seccion {
+            padding: 28px;
+            margin-bottom: 28px;
+            background: #ffffff;
+            border: 1px solid #deeadf;
+            border-radius: 20px;
+            box-shadow: 0 8px 24px rgba(0,0,0,.04);
+        }
+
+        .buscar-seccion h2 {
+            margin: 0 0 20px;
+            color: #194b30;
+        }
+
+        .buscar-formulario {
+            display: grid;
+            grid-template-columns:
+                repeat(3, minmax(0, 1fr));
+            gap: 20px;
+        }
+
+        .buscar-campo {
+            display: flex;
+            flex-direction: column;
+            gap: 9px;
+        }
+
+        .buscar-campo label {
+            color: #254b34;
+            font-weight: 700;
+            font-size: 14px;
+        }
+
+        .buscar-campo input,
+        .buscar-campo select {
+            width: 100%;
+            min-height: 46px;
+            box-sizing: border-box;
+            padding: 12px 14px;
+            border: 1px solid #c9dacd;
+            border-radius: 10px;
+            background: #ffffff;
+            color: #284331;
+            font: inherit;
+        }
+
+        .buscar-campo input:focus,
+        .buscar-campo select:focus {
+            outline: 2px solid #86bc94;
+            border-color: #287a48;
+        }
+
+        .buscar-acciones {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 12px;
+            align-items: center;
+            grid-column: 1 / -1;
+        }
+
+        .buscar-boton {
+            display: inline-block;
+            padding: 13px 23px;
+            border: none;
+            border-radius: 10px;
+            background: #246b43;
+            color: #ffffff;
+            font: inherit;
+            font-weight: 700;
+            text-decoration: none;
+            cursor: pointer;
+        }
+
+        .buscar-boton:hover {
+            background: #17482e;
+            color: #ffffff;
+        }
+
+        .buscar-limpiar {
+            background: #e8f2eb;
+            color: #194b30;
+        }
+
+        .buscar-limpiar:hover {
+            background: #d8e9dd;
+            color: #194b30;
+        }
+
+        .buscar-resumen {
+            padding: 17px;
+            margin-bottom: 22px;
+            border-radius: 12px;
+            background: #eaf4ed;
+            color: #194b30;
+        }
+
+        .buscar-tabla-contenedor {
+            width: 100%;
+            overflow-x: auto;
+        }
+
+        .buscar-tabla {
+            width: 100%;
+            min-width: 850px;
+            border-collapse: collapse;
+        }
+
+        .buscar-tabla th,
+        .buscar-tabla td {
+            padding: 15px;
+            text-align: left;
+            border-bottom: 1px solid #e5ede7;
+        }
+
+        .buscar-tabla th {
+            background: #eaf4ed;
+            color: #194b30;
+        }
+
+        .buscar-tabla tbody tr:hover {
+            background: #f4f9f5;
+        }
+
+        .buscar-tabla td {
+            overflow-wrap: anywhere;
+        }
+
+        .buscar-cantidad {
+            font-weight: 700;
+            color: #1d6a3b;
+        }
+
+        .buscar-vacio {
+            padding: 45px 20px;
+            background: #f4f9f5;
+            border-radius: 14px;
+            text-align: center;
+            color: #617266;
+        }
+
+        @media (max-width: 850px) {
+            .buscar-formulario {
+                grid-template-columns:
+                    repeat(2, minmax(0, 1fr));
+            }
+        }
+
+        @media (max-width: 600px) {
+            .buscar-contenedor {
+                margin-top: 25px;
+            }
+
+            .buscar-encabezado {
+                padding: 28px 22px;
+            }
+
+            .buscar-seccion {
+                padding: 22px 16px;
+            }
+
+            .buscar-formulario {
+                grid-template-columns: 1fr;
+            }
+
+            .buscar-acciones {
+                grid-column: auto;
+                flex-direction: column;
+                align-items: stretch;
+            }
+
+            .buscar-boton {
+                text-align: center;
+            }
+        }
+    </style>
+</head>
+
+<body class="buscar-pagina">
+
+<main class="buscar-contenedor">
+
+    <!-- VOLVER AL PANEL -->
+
+    <a
+        href="{{ url_for('panel_admin') }}"
+        class="buscar-volver">
+        ← Volver al panel de administración
+    </a>
+
+    <!-- ENCABEZADO -->
+
+    <header class="buscar-encabezado">
+
+        <h1>Buscador de inventarios</h1>
+
+        <p>
+            NIRP International · Busca y consulta
+            las variedades y cantidades registradas
+            en cada finca, casa, bloque y cama.
+        </p>
+
+    </header>
+
+    <!-- FORMULARIO DE BUSQUEDA -->
+
+    <section class="buscar-seccion">
+
+        <h2>Filtros de búsqueda</h2>
+
+        <form
+            method="GET"
+            action="{{ url_for('buscar_inventario_admin') }}"
+            class="buscar-formulario">
+
+            <div class="buscar-campo">
+                <label for="finca_id">Finca</label>
+
+                <select
+                    id="finca_id"
+                    name="finca_id">
+
+                    <option value="">Todas las fincas</option>
+
+                    {% for finca in fincas %}
+
+                    <option
+                        value="{{ finca.id }}"
+                        {% if filtros.finca_id == finca.id|string %}
+                            selected
+                        {% endif %}>
+                        {{ finca.nombre }}
+                    </option>
+
+                    {% endfor %}
+
+                </select>
+            </div>
+
+            <div class="buscar-campo">
+                <label for="variedad">Variedad</label>
+
+                <input
+                    type="text"
+                    id="variedad"
+                    name="variedad"
+                    maxlength="100"
+                    placeholder="Ej. Blueberry"
+                    value="{{ filtros.variedad }}">
+            </div>
+
+            <div class="buscar-campo">
+                <label for="casa">Casa</label>
+
+                <input
+                    type="text"
+                    id="casa"
+                    name="casa"
+                    maxlength="100"
+                    placeholder="Ej. Casa 1"
+                    value="{{ filtros.casa }}">
+            </div>
+
+            <div class="buscar-campo">
+                <label for="bloque">Bloque</label>
+
+                <input
+                    type="text"
+                    id="bloque"
+                    name="bloque"
+                    maxlength="100"
+                    placeholder="Ej. Bloque 2"
+                    value="{{ filtros.bloque }}">
+            </div>
+
+            <div class="buscar-campo">
+                <label for="cama">Cama</label>
+
+                <input
+                    type="text"
+                    id="cama"
+                    name="cama"
+                    maxlength="100"
+                    placeholder="Ej. Cama 5"
+                    value="{{ filtros.cama }}">
+            </div>
+
+            <div class="buscar-acciones">
+
+                <button
+                    type="submit"
+                    class="buscar-boton">
+                    🔍 Buscar inventario
+                </button>
+
+                <a
+                    href="{{ url_for('buscar_inventario_admin') }}"
+                    class="buscar-boton buscar-limpiar">
+                    Limpiar filtros
+                </a>
+
+            </div>
+
+        </form>
+
+    </section>
+
+    <!-- RESULTADOS -->
+
+    <section class="buscar-seccion">
+
+        <h2>Resultados de la búsqueda</h2>
+
+        {% set total = inventarios
+            | sum(attribute='cantidad') %}
+
+        <div class="buscar-resumen">
+
+            <strong>
+                Registros encontrados:
+                {{ inventarios|length }}
+            </strong>
+
+            <p>
+                Cantidad total:
+                <strong>{{ total }}</strong>
+            </p>
+
+        </div>
+
+        {% if inventarios %}
+
+        <div class="buscar-tabla-contenedor">
+
+            <table class="buscar-tabla">
+
+                <thead>
+                    <tr>
+                        <th>Finca</th>
+                        <th>Variedad</th>
+                        <th>Casa</th>
+                        <th>Bloque</th>
+                        <th>Cama</th>
+                        <th>Cantidad</th>
+                        <th>Actualizado</th>
+                    </tr>
+                </thead>
+
+                <tbody>
+
+                    {% for item in inventarios %}
+
+                    <tr>
+                        <td>{{ item.finca_nombre }}</td>
+
+                        <td>{{ item.variedad_nombre }}</td>
+
+                        <td>{{ item.casa }}</td>
+
+                        <td>{{ item.bloque }}</td>
+
+                        <td>{{ item.cama }}</td>
+
+                        <td class="buscar-cantidad">
+                            {{ item.cantidad }}
+                        </td>
+
+                        <td>
+                            {{ item.actualizado_en }}
+                        </td>
+                    </tr>
+
+                    {% endfor %}
+
+                </tbody>
+
+            </table>
+
+        </div>
+
+        {% else %}
+
+        <div class="buscar-vacio">
+
+            <h3>No se encontraron inventarios</h3>
+
+            <p>
+                Comprueba los filtros utilizados
+                o registra primero un inventario.
+            </p>
+
+        </div>
+
+        {% endif %}
+
+    </section>
+
+</main>
+
+</body>
+</html>

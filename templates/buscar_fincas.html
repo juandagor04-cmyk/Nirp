@@ -1,0 +1,219 @@
+
+<!DOCTYPE html>
+<html lang="es">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport"
+          content="width=device-width, initial-scale=1.0">
+
+    <title>Buscar fincas | NIRP International</title>
+
+    <link rel="stylesheet"
+          href="{{ url_for('static', filename='styles.css') }}">
+
+    <style>
+        .fincas-busqueda-pagina {
+            min-height: 100vh;
+            background: #f3f8f4;
+            color: #23452f;
+        }
+
+        .fincas-busqueda-contenedor {
+            width: min(1100px, 94%);
+            margin: 35px auto;
+        }
+
+        .fincas-busqueda-volver {
+            display: inline-block;
+            margin-bottom: 22px;
+            color: #246b43;
+            font-weight: 700;
+            text-decoration: none;
+        }
+
+        .fincas-busqueda-encabezado {
+            padding: 35px;
+            border-radius: 18px;
+            background: #205d3b;
+            color: white;
+        }
+
+        .fincas-busqueda-encabezado h1 {
+            color: white;
+            margin: 0 0 12px;
+        }
+
+        .fincas-busqueda-seccion {
+            margin-top: 25px;
+            padding: 25px;
+            background: white;
+            border-radius: 16px;
+        }
+
+        .fincas-busqueda-formulario {
+            display: flex;
+            gap: 12px;
+            flex-wrap: wrap;
+        }
+
+        .fincas-busqueda-formulario input {
+            flex: 1;
+            min-width: 180px;
+            padding: 14px;
+            border: 1px solid #b9d4c1;
+            border-radius: 9px;
+            font: inherit;
+        }
+
+        .fincas-busqueda-boton {
+            padding: 13px 20px;
+            border: none;
+            border-radius: 9px;
+            background: #246b43;
+            color: white;
+            font: inherit;
+            font-weight: 700;
+            cursor: pointer;
+            text-decoration: none;
+        }
+
+        .fincas-busqueda-limpiar {
+            background: #e5f1e8;
+            color: #205d3b;
+        }
+
+        .fincas-busqueda-resultados {
+            display: grid;
+            grid-template-columns:
+                repeat(auto-fit, minmax(230px, 1fr));
+            gap: 16px;
+            margin-top: 20px;
+        }
+
+        .fincas-busqueda-tarjeta {
+            padding: 20px;
+            border: 1px solid #d4e7d9;
+            border-radius: 14px;
+        }
+
+        .fincas-busqueda-tarjeta h3 {
+            margin-top: 0;
+            color: #205d3b;
+            overflow-wrap: anywhere;
+        }
+
+        @media (max-width: 600px) {
+            .fincas-busqueda-encabezado {
+                padding: 25px 20px;
+            }
+
+            .fincas-busqueda-seccion {
+                padding: 18px;
+            }
+
+            .fincas-busqueda-formulario {
+                flex-direction: column;
+            }
+        }
+    </style>
+</head>
+
+<body class="fincas-busqueda-pagina">
+
+<main class="fincas-busqueda-contenedor">
+
+    <a
+        href="{{ url_for('panel_admin') }}"
+        class="fincas-busqueda-volver">
+        ← Volver al panel administrativo
+    </a>
+
+    <header class="fincas-busqueda-encabezado">
+
+        <h1>🏡 Buscar fincas</h1>
+
+        <p>
+            Encuentra las fincas registradas
+            en NIRP International.
+        </p>
+
+    </header>
+
+    <section class="fincas-busqueda-seccion">
+
+        <h2>Buscar por nombre</h2>
+
+        <form
+            method="GET"
+            action="{{ url_for('buscar_fincas_admin') }}"
+            class="fincas-busqueda-formulario">
+
+            <input
+                type="search"
+                name="q"
+                maxlength="100"
+                placeholder="Escribe el nombre de una finca..."
+                value="{{ busqueda }}"
+                aria-label="Nombre de la finca">
+
+            <button
+                type="submit"
+                class="fincas-busqueda-boton">
+                🔍 Buscar
+            </button>
+
+            <a
+                href="{{ url_for('buscar_fincas_admin') }}"
+                class="fincas-busqueda-boton fincas-busqueda-limpiar">
+                Limpiar
+            </a>
+
+        </form>
+
+    </section>
+
+    <section class="fincas-busqueda-seccion">
+
+        <h2>Resultados</h2>
+
+        <p>
+            Fincas encontradas:
+            <strong>{{ fincas|length }}</strong>
+        </p>
+
+        {% if fincas %}
+
+        <div class="fincas-busqueda-resultados">
+
+            {% for finca in fincas %}
+
+            <article class="fincas-busqueda-tarjeta">
+
+                <h3>🏡 {{ finca.nombre }}</h3>
+
+                <p>
+                    Identificador:
+                    {{ finca.id }}
+                </p>
+
+            </article>
+
+            {% endfor %}
+
+        </div>
+
+        {% else %}
+
+        <p>
+            No se encontraron fincas con ese nombre.
+        </p>
+
+        {% endif %}
+
+    </section>
+
+</main>
+
+</body>
+</html>

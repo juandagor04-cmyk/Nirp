@@ -55,11 +55,11 @@ from database import (
     guardar_inventario,
     eliminar_inventario,
     crear_tablas_actas,
-obtener_actas_inventario,
-generar_acta_inventario,
-obtener_reporte_inventario
-
-    
+    obtener_actas_inventario,
+    generar_acta_inventario,
+    obtener_reporte_inventario,
+    buscar_inventarios,
+    obtener_detalle_acta
 )
 
 
@@ -1076,6 +1076,37 @@ def lista_fincas():
         fincas=fincas
     )
 
+# ==========================================
+# FASE 9 - BUSCADOR DE FINCAS
+# ==========================================
+
+@app.route("/admin/buscar-fincas", methods=["GET"])
+@administrador_requerido
+def buscar_fincas_admin():
+
+    busqueda = request.args.get("q", "").strip()
+
+    if len(busqueda) > 100:
+        abort(400, description="Busqueda demasiado larga.")
+
+    # Obtener las fincas registradas
+    fincas = obtener_fincas()
+
+    # Filtrar por nombre
+    if busqueda:
+        fincas = [
+            finca for finca in fincas
+            if busqueda.casefold()
+            in finca["nombre"].casefold()
+        ]
+
+    return render_template(
+        "buscar_fincas.html",
+        fincas=fincas,
+        busqueda=busqueda
+    )
+
+
 
 
 # ==========================================
@@ -1325,16 +1356,30 @@ def actas_inventario_admin():
         fincas=obtener_fincas(),
         actas=obtener_actas_inventario()
     )
+
 # ==========================================
-# VER DETALLE DE UN ACTA DE INVENTARIO
+# VER DETALLE DE ACTA DE INVENTARIO
 # ==========================================
 
 @app.route("/admin/actas/<int:acta_id>")
 @administrador_requerido
 def detalle_acta(acta_id):
-    # Aqui agregaremos la consulta del acta
-    # y su informacion historica.
-    pass
+
+    resultado = obtener_detalle_acta(acta_id)
+
+    if resultado is None:
+        abort(404)
+
+    return render_template(
+        "detalle_acta.html",
+        acta=resultado["acta"],
+        detalles=resultado["detalles"],
+        total_registros=resultado["total_registros"],
+        total_cantidad=resultado["total_cantidad"]
+    )
+
+   
+   
 
 # ==========================================
 # FASE 8 - REPORTES Y ESTADISTICAS
@@ -1356,6 +1401,84 @@ def reportes_inventario_admin():
         variedades=reporte["variedades"]
     )
 
+# ==========================================
+# FASE 9 - BUSCADOR DE INVENTARIOS
+# SOLO ADMINISTRADORES
+# ==========================================
+
+@app.route("/admin/buscar-inventario", methods=["GET"])
+@administrador_requerido
+def buscar_inventario_admin():
+
+    finca_id = request.args.get("finca_id", "").strip()
+    variedad = request.args.get("variedad", "").strip()
+    casa = request.args.get("casa", "").strip()
+    bloque = request.args.get("bloque", "").strip()
+    cama = request.args.get("cama", "").strip()
+
+    # Validar el identificador de la finca
+    if finca_id:
+        try:
+            finca_id = int(finca_id)
+
+            if finca_id <= 0:
+                raise ValueError()
+
+        except ValueError:
+            abort(400, description="Finca no valida.")
+
+    # Limitar la longitud de los filtros
+    if any(
+        len(valor) > 100
+        for valor in (variedad, casa, bloque, cama)
+    ):
+        abort(400, description="Filtro demasiado largo.")
+
+    # Consultar registros
+    inventarios = buscar_inventarios(
+        finca_id=finca_id or None,
+        variedad=variedad,
+        casa=casa,
+        bloque=bloque,
+        cama=cama
+    )
+
+    return render_template(
+        "buscar_inventario.html",
+        inventarios=inventarios,
+        fincas=obtener_fincas(),
+        filtros={
+            "finca_id": str(finca_id) if finca_id else "",
+            "variedad": variedad,
+            "casa": casa,
+            "bloque": bloque,
+            "cama": cama
+        }
+    )
+
+
+# ==========================================
+# FASE 11 - ESCANER DE INVENTARIOS
+# ==========================================
+
+@app.route("/admin/escanear-inventario", methods=["GET"])
+@administrador_requerido
+def escanear_inventario_admin():
+
+    # Obtener las fincas registradas
+    fincas = obtener_fincas()
+
+    # Obtener las variedades registradas
+    variedades = obtener_variedades()
+
+    return render_template(
+        "escanear_inventario.html",
+        fincas=fincas,
+        variedades=variedades
+    )
+
+
+
 
 # ==========================================
 # INICIAR FLASK
@@ -1364,7 +1487,7 @@ def reportes_inventario_admin():
 if __name__ == "__main__":
 
     app.run(
-        host="127.0.0.1",
+        host="0.0.0.0",
         port=5000,
         debug=True 
     )

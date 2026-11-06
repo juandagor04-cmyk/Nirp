@@ -4816,5 +4816,248 @@ footer {
     transform: translateY(-2px);
 }
 
+/* ======================================
+   FASE 9 - BUSCADOR DE VARIEDADES
+======================================= */
+
+.busqueda-variedades {
+    display: flex;
+    flex-direction: column;
+    gap: 10px;
+    margin: 22px 0;
+    padding: 20px;
+    background: #f1f8f3;
+    border: 1px solid #d5e8da;
+    border-radius: 14px;
+}
+
+.busqueda-variedades label {
+    font-weight: 700;
+    color: #22563a;
+}
+
+.busqueda-variedades input {
+    width: 100%;
+    padding: 14px 16px;
+    border: 1px solid #bfd8c7;
+    border-radius: 10px;
+    background: white;
+    font: inherit;
+    color: #244632;
+    box-sizing: border-box;
+}
+
+.busqueda-variedades input:focus {
+    outline: 2px solid #79b98a;
+    border-color: #287e49;
+}
+
+#contadorVariedades {
+    margin: 0;
+    font-size: 14px;
+    color: #52715c;
+}
+
+@media (max-width: 600px) {
+    .busqueda-variedades {
+        padding: 15px;
+    }
+}
+
+/* ==========================================
+   FASE 11 - DISEÑO PROFESIONAL DEL ESCÁNER
+========================================== */
+
+body {
+    background: #f1f6f2;
+}
+
+.escaner-contenedor {
+    width: min(1050px, 94%);
+    margin: 35px auto 70px;
+}
+
+.escaner-volver {
+    display: inline-flex;
+    align-items: center;
+    margin-bottom: 25px;
+    padding: 12px 20px;
+    background: #e4f1e8;
+    border-radius: 10px;
+    color: #185c36;
+    text-decoration: none;
+    font-weight: 700;
+}
+
+.escaner-volver:hover {
+    background: #d2e7d8;
+}
+
+.escaner-tarjeta {
+    background: #ffffff;
+    border: 1px solid #dce9df;
+    border-radius: 22px;
+    padding: 38px;
+    margin-bottom: 28px;
+    box-shadow: 0 10px 30px rgba(20, 65, 40, 0.07);
+}
+
+.escaner-tarjeta h1 {
+    font-size: clamp(30px, 4vw, 43px);
+    margin: 12px 0 15px;
+}
+
+.escaner-tarjeta h2 {
+    font-size: clamp(25px, 3vw, 32px);
+    margin-bottom: 14px;
+}
+
+.escaner-ayuda {
+    color: #5c7061;
+    font-size: 15px;
+    line-height: 1.7;
+    margin-bottom: 22px;
+}
+
+.escaner-subida {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    min-height: 180px;
+    padding: 35px 25px;
+    background: #f1f9f3;
+    border: 2px dashed #83b794;
+    border-radius: 18px;
+    text-align: center;
+}
+
+.escaner-subida strong {
+    font-size: 20px;
+    color: #1a6039;
+}
+
+.escaner-subida input {
+    width: 100%;
+    max-width: 420px;
+    margin-top: 22px;
+    padding: 12px;
+    background: #ffffff;
+    border: 1px solid #d2e2d6;
+    border-radius: 10px;
+    font-size: 14px;
+}
+
+.escaner-aviso {
+    margin-top: 22px;
+    padding: 18px 22px;
+    background: #edf6ef;
+    border-left: 4px solid #27834b;
+    border-radius: 12px;
+    color: #42614b;
+    font-size: 14px;
+    line-height: 1.7;
+}
+
+.escaner-campos {
+    display: grid !important;
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+    gap: 22px;
+    width: 100%;
+    margin-top: 25px;
+}
+
+.escaner-campo {
+    min-width: 0;
+    display: flex;
+    flex-direction: column;
+    gap: 9px;
+}
+
+.escaner-campo label {
+    display: block;
+    margin: 0;
+    color: #204e32;
+    font-size: 15px;
+    font-weight: 700;
+}
+
+.escaner-campo input,
+.escaner-campo select {
+    display: block;
+    width: 100%;
+    min-width: 0;
+    height: 50px;
+    padding: 12px 15px;
+    border: 1px solid #cbdccf;
+    border-radius: 11px;
+    background: #fbfdfb;
+    color: #244532;
+    font-family: inherit;
+    font-size: 15px;
+    box-sizing: border-box;
+}
+
+.escaner-campo input:focus,
+.escaner-campo select:focus {
+    outline: 2px solid #72b48a;
+    outline-offset: 1px;
+    border-color: #27834b;
+}
+
+.escaner-boton {
+    display: block;
+    width: 100%;
+    min-height: 52px;
+    padding: 15px 25px;
+    margin-top: 30px;
+    background: #246c43;
+    border: 0;
+    border-radius: 12px;
+    color: white;
+    font-size: 16px;
+    font-weight: 700;
+    cursor: pointer;
+}
+
+.escaner-boton:disabled {
+    background: #9bac9e;
+    cursor: not-allowed;
+}
+
+#vista-previa {
+    max-height: 450px;
+    margin: 24px auto 0;
+    border-radius: 14px;
+}
+
+/* CELULARES */
+
+@media (max-width: 650px) {
+    .escaner-contenedor {
+        width: 94%;
+        margin: 20px auto 45px;
+    }
+
+    .escaner-tarjeta {
+        padding: 24px 18px;
+        border-radius: 16px;
+    }
+
+    .escaner-campos {
+        grid-template-columns: 1fr;
+        gap: 18px;
+    }
+
+    .escaner-subida {
+        padding: 25px 15px;
+    }
+
+    .escaner-subida strong {
+        font-size: 17px;
+    }
+}
+
+
 
 

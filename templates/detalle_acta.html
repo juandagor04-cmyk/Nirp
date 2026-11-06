@@ -287,8 +287,9 @@
                         </tr>
                     </thead>
 
+                 
                     <tbody>
-                        {% for item in acta.detalles %}
+                        {% for item in detalles %}
                         <tr>
                             <td>{{ item.variedad_nombre }}</td>
                             <td>{{ item.casa }}</td>
@@ -299,14 +300,22 @@
                         {% endfor %}
                     </tbody>
 
+
                 </table>
 
             </div>
+            
+            <p>
+                <strong>
+                    Total de registros: {{ total_registros }}
+                </strong>
+            </p>
 
             <div class="detalle-acta-total">
-                Total registrado:
-                {{ acta.total_cantidad }}
+                Total registrado: {{ total_cantidad }} rosas
             </div>
+
+
 
             <section class="detalle-acta-observaciones">
                 <h2>Observaciones</h2>

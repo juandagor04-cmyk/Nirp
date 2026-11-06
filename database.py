@@ -603,6 +603,7 @@ def obtener_ubicaciones_publicas():
 # CREAR Y ACTUALIZAR TABLA DE INVENTARIO
 # ==========================================
 
+
 def crear_tabla_inventario():
 
     with conectar() as conexion:
@@ -610,15 +611,29 @@ def crear_tabla_inventario():
         conexion.execute("""
             CREATE TABLE IF NOT EXISTS inventarios (
                 id INTEGER PRIMARY KEY AUTOINCREMENT,
+
                 finca_id INTEGER NOT NULL,
                 variedad_id INTEGER NOT NULL,
+
+                casa TEXT NOT NULL DEFAULT '',
+                bloque TEXT NOT NULL DEFAULT '',
+                cama TEXT NOT NULL DEFAULT '',
+
                 cantidad INTEGER NOT NULL DEFAULT 0
                     CHECK(cantidad >= 0),
+
                 observaciones TEXT NOT NULL DEFAULT '',
+
                 actualizado_en TEXT NOT NULL
                     DEFAULT CURRENT_TIMESTAMP,
 
-                UNIQUE(finca_id, variedad_id),
+                UNIQUE (
+                    finca_id,
+                    variedad_id,
+                    casa,
+                    bloque,
+                    cama
+                ),
 
                 FOREIGN KEY (finca_id)
                     REFERENCES fincas(id)
@@ -651,6 +666,7 @@ def crear_tabla_inventario():
                     f"ALTER TABLE inventarios "
                     f"ADD COLUMN {nombre} {tipo}"
                 )
+
 
 
 # ==========================================
@@ -948,7 +964,7 @@ def generar_acta_inventario(
 
         acta_id = cursor.lastrowid
 
-        # Guardar copia historica de cada registro
+        # Guardar copia historic11a de cada registro
         for item in inventarios:
 
             conexion.execute("""
@@ -1026,5 +1042,163 @@ def obtener_reporte_inventario():
             "resumen": dict(resumen),
             "fincas": [dict(fila) for fila in fincas],
             "variedades": [dict(fila) for fila in variedades]
+        }
+
+# ==========================================
+# FASE 9 - BUSQUEDA DE INVENTARIOS
+# ==========================================
+
+def buscar_inventarios(
+    finca_id=None,
+    variedad="",
+    casa="",
+    bloque="",
+    cama=""
+):
+
+    consulta = """
+        SELECT
+            i.id,
+            i.finca_id,
+            i.variedad_id,
+            i.casa,
+            i.bloque,
+            i.cama,
+            i.cantidad,
+            i.observaciones,
+            i.actualizado_en,
+
+            f.nombre AS finca_nombre,
+            v.nombre AS variedad_nombre
+
+        FROM inventarios AS i
+
+        JOIN fincas AS f
+            ON f.id = i.finca_id
+
+        JOIN variedades AS v
+            ON v.id = i.variedad_id
+
+        WHERE 1 = 1
+    """
+
+    parametros = []
+
+    # Filtrar por finca
+    if finca_id not in (None, ""):
+        consulta += " AND i.finca_id = ?"
+        parametros.append(int(finca_id))
+
+    # Buscar variedad por nombre
+    if variedad and variedad.strip():
+        consulta += """
+            AND LOWER(v.nombre) LIKE ?
+        """
+        parametros.append(
+            "%" + variedad.strip().lower() + "%"
+        )
+
+    # Filtrar por casa
+    if casa and casa.strip():
+        consulta += " AND i.casa = ?"
+        parametros.append(casa.strip())
+
+    # Filtrar por bloque
+    if bloque and bloque.strip():
+        consulta += " AND i.bloque = ?"
+        parametros.append(bloque.strip())
+
+    # Filtrar por cama
+    if cama and cama.strip():
+        consulta += " AND i.cama = ?"
+        parametros.append(cama.strip())
+
+    consulta += """
+        ORDER BY
+            f.nombre COLLATE NOCASE,
+            v.nombre COLLATE NOCASE,
+            i.casa,
+            i.bloque,
+            i.cama
+    """
+
+    with conectar() as conexion:
+
+        filas = conexion.execute(
+            consulta,
+            parametros
+        ).fetchall()
+
+        return [dict(fila) for fila in filas]
+
+# ==========================================
+# FASE 10 - OBTENER DETALLE DE ACTA
+# ==========================================
+
+def obtener_detalle_acta(acta_id):
+
+    with conectar() as conexion:
+
+        # Consultar encabezado del acta
+        acta = conexion.execute("""
+            SELECT
+                a.id,
+                a.finca_id,
+                a.responsable_id,
+                a.fecha_corte,
+                a.observaciones,
+                a.creada_en,
+                
+                f.nombre AS finca_nombre,
+                f.empresa AS finca_empresa,
+                f.departamento AS departamento,
+                f.municipio AS municipio,
+                u.nombre AS responsable_nombre
+
+
+
+            FROM actas_inventario AS a
+
+            JOIN fincas AS f
+                ON f.id = a.finca_id
+
+            JOIN usuarios AS u
+                ON u.id = a.responsable_id
+
+            WHERE a.id = ?
+        """, (acta_id,)).fetchone()
+
+        if acta is None:
+            return None
+
+        # Consultar copia historica de las variedades
+        detalles = conexion.execute("""
+            SELECT
+                variedad_nombre,
+                casa,
+                bloque,
+                cama,
+                cantidad
+
+            FROM actas_inventario_detalle
+
+            WHERE acta_id = ?
+
+            ORDER BY
+                variedad_nombre COLLATE NOCASE,
+                casa,
+                bloque,
+                cama
+        """, (acta_id,)).fetchall()
+
+        detalles = [dict(fila) for fila in detalles]
+
+        return {
+            "acta": dict(acta),
+            "detalles": detalles,
+            "total_registros": len(detalles),
+            "total_cantidad": sum(
+                item["cantidad"] for item in detalles
+            )
         }
 
