@@ -575,12 +575,31 @@ def obtener_variedades_publicas():
         return [dict(fila) for fila in filas]
 
 
+
+# ==========================================
+# OBTENER DETALLE PUBLICO DE UNA VARIEDAD
+# ==========================================
+
 def obtener_variedad_publica(variedad_id):
+
     with conectar() as conexion:
+
         fila = conexion.execute("""
-            SELECT id, nombre, imagen
-            FROM variedades WHERE id = ?
+            SELECT
+                id,
+                nombre,
+                denominacion,
+                codigo_vbn,
+                color,
+                tipo,
+                petalos,
+                tallo,
+                vida_florero,
+                imagen
+            FROM variedades
+            WHERE id = ?
         """, (variedad_id,)).fetchone()
+
         return dict(fila) if fila else None
 
 
@@ -667,6 +686,204 @@ def crear_tabla_inventario():
                     f"ADD COLUMN {nombre} {tipo}"
                 )
 
+    agregar_campos_tecnicos_inventario()
+    revisar_y_migrar_unicidad_inventario()
+
+
+
+# ==========================================
+# COMPATIBILIDAD CON BASES DE DATOS ANTIGUAS
+# ==========================================
+
+def revisar_y_migrar_unicidad_inventario():
+    """
+    En versiones anteriores, un indice UNIQUE sobre (finca_id,
+    variedad_id) impedia registrar distintas camas de la misma variedad.
+    Si detecta ese esquema, crea un respaldo antes de reconstruir la tabla.
+    Conserva todos los ids y registros. No borra ni combina inventarios.
+    """
+    from datetime import datetime
+    from uuid import uuid4
+
+    indice_correcto = [
+        "finca_id", "variedad_id", "casa", "bloque", "cama"
+    ]
+    indice_antiguo = ["finca_id", "variedad_id"]
+    columnas_esperadas = {
+        "id", "finca_id", "variedad_id", "casa", "bloque",
+        "cama", "cantidad", "observaciones", "actualizado_en",
+        "fecha_siembra", "propagador", "numero_camas",
+        "densidad_cama", "fecha_primera_cosecha"
+    }
+
+    conexion = conectar()
+    try:
+        indices = []
+        for indice in conexion.execute(
+            "PRAGMA index_list(inventarios)"
+        ).fetchall():
+            if not indice["unique"]:
+                continue
+            nombre = indice["name"]
+            # name proviene exclusivamente de SQLite, no del usuario.
+            nombres = [
+                columna["name"]
+                for columna in conexion.execute(
+                    f'PRAGMA index_info("{nombre}")'
+                ).fetchall()
+            ]
+            indices.append(nombres)
+
+        if indice_correcto in indices and indice_antiguo not in indices:
+            return
+
+        if indice_antiguo not in indices:
+            raise RuntimeError(
+                "El inventario no tiene la restriccion UNIQUE esperada. "
+                "No se modificaron sus registros. Revisa la estructura "
+                "antes de continuar."
+            )
+
+        columnas_actuales = {
+            fila["name"] for fila in conexion.execute(
+                "PRAGMA table_info(inventarios)"
+            ).fetchall()
+        }
+        if columnas_actuales != columnas_esperadas:
+            raise RuntimeError(
+                "La tabla inventarios tiene campos diferentes a los "
+                "previstos. Por seguridad, no se ha migrado."
+            )
+
+        # No reconstruir si existen relaciones, indices o triggers
+        # adicionales que podrian verse afectados.
+        tablas = conexion.execute(
+            "SELECT name FROM sqlite_master "
+            "WHERE type='table' AND name NOT LIKE 'sqlite_%'"
+        ).fetchall()
+        for tabla in tablas:
+            nombre_tabla = tabla["name"]
+            nombre_escapado = nombre_tabla.replace('"', '""')
+            for relacion in conexion.execute(
+                f'PRAGMA foreign_key_list("{nombre_escapado}")'
+            ).fetchall():
+                if relacion["table"] == "inventarios":
+                    raise RuntimeError(
+                        "Otra tabla depende de inventarios. "
+                        "La migracion automatica se detuvo por seguridad."
+                    )
+
+        personalizaciones = conexion.execute(
+            "SELECT name FROM sqlite_master "
+            "WHERE tbl_name='inventarios' "
+            "AND type IN ('index','trigger') AND sql IS NOT NULL"
+        ).fetchall()
+        if personalizaciones:
+            raise RuntimeError(
+                "Hay indices o disparadores personalizados en "
+                "inventarios. La migracion requiere revision manual."
+            )
+
+        repetidos = conexion.execute(
+            "SELECT 1 FROM inventarios "
+            "GROUP BY finca_id, variedad_id, casa, bloque, cama "
+            "HAVING COUNT(*) > 1 LIMIT 1"
+        ).fetchone()
+        if repetidos:
+            raise RuntimeError(
+                "Hay ubicaciones duplicadas en inventarios. "
+                "No se migro para evitar perdida de registros."
+            )
+
+        # Respaldo consistente de SQLite, con nombre unico.
+        fecha = datetime.now().strftime("%Y%m%d_%H%M%S")
+        copia = DATABASE.with_name(
+            f"nirp_antes_de_migrar_{fecha}_{uuid4().hex[:6]}.db"
+        )
+        destino = sqlite3.connect(copia)
+        try:
+            conexion.backup(destino)
+        finally:
+            destino.close()
+
+        try:
+            conexion.execute("BEGIN IMMEDIATE")
+            conexion.execute("""
+                CREATE TABLE inventarios_esquema_nuevo (
+                    id INTEGER PRIMARY KEY AUTOINCREMENT,
+                    finca_id INTEGER NOT NULL,
+                    variedad_id INTEGER NOT NULL,
+                    casa TEXT NOT NULL DEFAULT '',
+                    bloque TEXT NOT NULL DEFAULT '',
+                    cama TEXT NOT NULL DEFAULT '',
+                    cantidad INTEGER NOT NULL DEFAULT 0
+                        CHECK (cantidad >= 0),
+                    observaciones TEXT NOT NULL DEFAULT '',
+                    actualizado_en TEXT NOT NULL
+                        DEFAULT CURRENT_TIMESTAMP,
+                    fecha_siembra TEXT,
+                    propagador TEXT,
+                    numero_camas INTEGER,
+                    densidad_cama REAL,
+                    fecha_primera_cosecha TEXT,
+                    UNIQUE (finca_id, variedad_id, casa, bloque, cama),
+                    FOREIGN KEY (finca_id) REFERENCES fincas(id)
+                        ON DELETE RESTRICT,
+                    FOREIGN KEY (variedad_id) REFERENCES variedades(id)
+                        ON DELETE RESTRICT
+                )
+            """)
+            conexion.execute("""
+                INSERT INTO inventarios_esquema_nuevo (
+                    id, finca_id, variedad_id, casa, bloque, cama,
+                    cantidad, observaciones, actualizado_en, fecha_siembra,
+                    propagador, numero_camas, densidad_cama,
+                    fecha_primera_cosecha
+                )
+                SELECT
+                    id, finca_id, variedad_id, casa, bloque, cama,
+                    cantidad, observaciones, actualizado_en, fecha_siembra,
+                    propagador, numero_camas, densidad_cama,
+                    fecha_primera_cosecha
+                FROM inventarios
+            """)
+            antes = conexion.execute(
+                "SELECT COUNT(*), COALESCE(SUM(cantidad), 0) "
+                "FROM inventarios"
+            ).fetchone()
+            despues = conexion.execute(
+                "SELECT COUNT(*), COALESCE(SUM(cantidad), 0) "
+                "FROM inventarios_esquema_nuevo"
+            ).fetchone()
+            if tuple(antes) != tuple(despues):
+                raise RuntimeError(
+                    "No coincide la cantidad de inventarios. "
+                    "La migracion ha sido cancelada."
+                )
+            conexion.execute("DROP TABLE inventarios")
+            conexion.execute(
+                "ALTER TABLE inventarios_esquema_nuevo "
+                "RENAME TO inventarios"
+            )
+            errores_fk = conexion.execute(
+                "PRAGMA foreign_key_check"
+            ).fetchall()
+            if errores_fk:
+                raise RuntimeError(
+                    "Se encontraron referencias invalidas. "
+                    "La migracion ha sido cancelada."
+                )
+            conexion.commit()
+        except Exception:
+            conexion.rollback()
+            raise
+
+        print(
+            "NIRP: inventarios migrados al formato por cama. "
+            f"Respaldo: {copia.name}"
+        )
+    finally:
+        conexion.close()
 
 
 # ==========================================
@@ -686,6 +903,11 @@ def obtener_inventarios():
                 i.cantidad,
                 i.observaciones,
                 i.actualizado_en,
+                i.fecha_siembra,
+                i.propagador,
+                i.numero_camas,
+                i.densidad_cama,
+                i.fecha_primera_cosecha,
                 f.nombre AS finca_nombre,
                 v.nombre AS variedad_nombre
             FROM inventarios AS i
@@ -701,6 +923,44 @@ def obtener_inventarios():
         """).fetchall()
 
         return [dict(fila) for fila in filas]
+    
+# ==========================================
+# AGREGAR DATOS TECNICOS AL INVENTARIO
+# ==========================================
+
+def agregar_campos_tecnicos_inventario():
+
+    campos = {
+        "fecha_siembra": "TEXT",
+        "propagador": "TEXT",
+        "numero_camas": "INTEGER",
+        "densidad_cama": "REAL",
+        "fecha_primera_cosecha": "TEXT"
+    }
+
+    with conectar() as conexion:
+
+        columnas = {
+            fila[1]
+            for fila in conexion.execute(
+                "PRAGMA table_info(inventarios)"
+            ).fetchall()
+        }
+
+        if not columnas:
+            raise RuntimeError(
+                "No existe la tabla inventarios."
+            )
+
+        for nombre, tipo in campos.items():
+
+            if nombre not in columnas:
+
+                conexion.execute(
+                    f"ALTER TABLE inventarios "
+                    f"ADD COLUMN {nombre} {tipo}"
+                )
+
 
 
 
@@ -715,57 +975,96 @@ def guardar_inventario(
     observaciones="",
     casa="",
     bloque="",
-    cama=""
+    cama="",
+    fecha_siembra=None,
+    propagador="",
+    numero_camas=None,
+    densidad_cama=None,
+    fecha_primera_cosecha=None
 ):
-    casa = str(casa).strip()
-    bloque = str(bloque).strip()
-    cama = str(cama).strip()
-    observaciones = str(observaciones).strip()
+    """Guarda inventario y datos tecnicos sin borrar campos historicos vacios."""
+    from datetime import date
+    import math
+
+    casa = str(casa or "").strip()
+    bloque = str(bloque or "").strip()
+    cama = str(cama or "").strip()
+    observaciones = str(observaciones or "").strip()
+    propagador = str(propagador or "").strip()
 
     if not casa or not bloque or not cama:
-        raise ValueError(
-            "Debes indicar casa, bloque y cama."
-        )
+        raise ValueError("Debes indicar casa, bloque y cama.")
 
-    cantidad = int(cantidad)
-
+    try:
+        cantidad = int(cantidad)
+    except (TypeError, ValueError) as error:
+        raise ValueError("Debes indicar una cantidad entera valida.") from error
     if cantidad < 0:
-        raise ValueError(
-            "La cantidad no puede ser negativa."
-        )
+        raise ValueError("La cantidad no puede ser negativa.")
+
+    def fecha_opcional(valor, nombre):
+        valor = str(valor or "").strip()
+        if not valor:
+            return None
+        try:
+            fecha = date.fromisoformat(valor)
+        except ValueError as error:
+            raise ValueError(f"{nombre} no es una fecha valida (AAAA-MM-DD).") from error
+        if fecha > date.today():
+            raise ValueError(f"{nombre} no puede ser futura.")
+        return fecha.isoformat()
+
+    fecha_siembra = fecha_opcional(fecha_siembra, "La fecha de siembra")
+    fecha_primera_cosecha = fecha_opcional(
+        fecha_primera_cosecha, "La fecha de primera cosecha"
+    )
+    if fecha_siembra and fecha_primera_cosecha and fecha_primera_cosecha < fecha_siembra:
+        raise ValueError("La primera cosecha no puede ser anterior a la siembra.")
+
+    if numero_camas is None or str(numero_camas).strip() == "":
+        numero_camas = None
+    else:
+        try:
+            numero_camas = int(numero_camas)
+        except (TypeError, ValueError) as error:
+            raise ValueError("El numero de camas debe ser un entero.") from error
+        if numero_camas <= 0:
+            raise ValueError("El numero de camas debe ser mayor que cero.")
+
+    if densidad_cama is None or str(densidad_cama).strip() == "":
+        densidad_cama = None
+    else:
+        try:
+            densidad_cama = float(str(densidad_cama).replace(",", "."))
+        except (TypeError, ValueError) as error:
+            raise ValueError("La densidad debe ser numerica.") from error
+        if not math.isfinite(densidad_cama) or densidad_cama <= 0:
+            raise ValueError("La densidad debe ser mayor que cero.")
 
     with conectar() as conexion:
         conexion.execute("""
             INSERT INTO inventarios (
-                finca_id,
-                variedad_id,
-                casa,
-                bloque,
-                cama,
-                cantidad,
-                observaciones
+                finca_id, variedad_id, casa, bloque, cama, cantidad,
+                observaciones, fecha_siembra, propagador, numero_camas,
+                densidad_cama, fecha_primera_cosecha
             )
-            VALUES (?, ?, ?, ?, ?, ?, ?)
-
-            ON CONFLICT (
-                finca_id,
-                variedad_id,
-                casa,
-                bloque,
-                cama
-            )
+            VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)
+            ON CONFLICT (finca_id, variedad_id, casa, bloque, cama)
             DO UPDATE SET
                 cantidad = excluded.cantidad,
                 observaciones = excluded.observaciones,
+                fecha_siembra = COALESCE(excluded.fecha_siembra, inventarios.fecha_siembra),
+                propagador = COALESCE(NULLIF(excluded.propagador, ''), inventarios.propagador),
+                numero_camas = COALESCE(excluded.numero_camas, inventarios.numero_camas),
+                densidad_cama = COALESCE(excluded.densidad_cama, inventarios.densidad_cama),
+                fecha_primera_cosecha = COALESCE(
+                    excluded.fecha_primera_cosecha, inventarios.fecha_primera_cosecha
+                ),
                 actualizado_en = CURRENT_TIMESTAMP
         """, (
-            finca_id,
-            variedad_id,
-            casa,
-            bloque,
-            cama,
-            cantidad,
-            observaciones
+            finca_id, variedad_id, casa, bloque, cama, cantidad,
+            observaciones, fecha_siembra, propagador, numero_camas,
+            densidad_cama, fecha_primera_cosecha
         ))
 
 

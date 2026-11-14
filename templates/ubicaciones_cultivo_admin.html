@@ -1,0 +1,265 @@
+
+<!DOCTYPE html>
+<html lang="es">
+
+<head>
+    <meta charset="UTF-8">
+
+    <meta name="viewport"
+          content="width=device-width, initial-scale=1.0">
+
+    <title>
+        Ubicaciones de cultivo | NIRP International
+    </title>
+
+    <link rel="stylesheet"
+          href="{{ url_for('static', filename='styles.css') }}">
+
+    <style>
+        .cultivo-contenedor {
+            width: min(1200px, 94%);
+            margin: 40px auto 70px;
+        }
+
+        .cultivo-encabezado {
+            background: #194b30;
+            color: white;
+            padding: 35px;
+            border-radius: 18px;
+            margin-bottom: 25px;
+        }
+
+        .cultivo-encabezado h1 {
+            color: white;
+            margin-bottom: 12px;
+        }
+
+        .cultivo-encabezado p {
+            color: #e1f1e5;
+            line-height: 1.6;
+        }
+
+        .cultivo-tarjeta {
+            padding: 25px;
+            background: white;
+            border: 1px solid #dce9df;
+            border-radius: 15px;
+            margin-bottom: 25px;
+        }
+
+        .cultivo-buscador {
+            display: flex;
+            gap: 12px;
+            flex-wrap: wrap;
+            margin-top: 20px;
+        }
+
+        .cultivo-buscador input {
+            flex: 1;
+            min-width: 200px;
+            padding: 13px;
+            border: 1px solid #bcd7c3;
+            border-radius: 9px;
+        }
+
+        .cultivo-tabla-contenedor {
+            overflow-x: auto;
+        }
+
+        .cultivo-tabla {
+            width: 100%;
+            min-width: 800px;
+            border-collapse: collapse;
+        }
+
+        .cultivo-tabla th,
+        .cultivo-tabla td {
+            padding: 14px;
+            text-align: left;
+            border-bottom: 1px solid #e0e9e2;
+        }
+
+        .cultivo-tabla th {
+            background: #e7f3ea;
+            color: #194b30;
+        }
+
+        .cultivo-total {
+            color: #194b30;
+            margin-top: 20px;
+            font-size: 20px;
+        }
+
+        .cultivo-acciones {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 12px;
+            margin-bottom: 20px;
+        }
+
+        @media (max-width: 650px) {
+            .cultivo-encabezado {
+                padding: 25px 18px;
+            }
+
+            .cultivo-tarjeta {
+                padding: 20px 15px;
+            }
+        }
+    </style>
+</head>
+
+<body>
+
+    <main class="cultivo-contenedor">
+
+        <!-- NAVEGACION -->
+        <div class="cultivo-acciones">
+
+            <a href="{{ url_for('panel_admin') }}"
+               class="boton">
+                ← Volver al panel
+            </a>
+
+            <a href="{{ url_for('inventario_admin') }}"
+               class="boton">
+                🌱 Gestionar inventario
+            </a>
+
+        </div>
+
+        <!-- ENCABEZADO -->
+        <header class="cultivo-encabezado">
+
+            <h1>🌱 Ubicaciones de cultivo</h1>
+
+            <p>
+                Consulta las variedades registradas
+                en cada finca, sus casas, bloques,
+                camas y cantidades de plantas.
+            </p>
+
+        </header>
+
+        <!-- BUSCADOR -->
+        <section class="cultivo-tarjeta">
+
+            <h2>Buscar ubicaciones</h2>
+
+            <form method="GET"
+                  action="{{ url_for('ubicaciones_cultivo_admin') }}"
+                  class="cultivo-buscador">
+
+                <input
+                    type="search"
+                    name="q"
+                    maxlength="100"
+                    value="{{ busqueda }}"
+                    placeholder="Finca, variedad, casa, bloque o cama">
+
+                <button type="submit" class="boton">
+                    🔎 Buscar
+                </button>
+
+                <a href="{{ url_for('ubicaciones_cultivo_admin') }}"
+                   class="boton">
+                    Limpiar
+                </a>
+
+            </form>
+
+        </section>
+
+        <!-- REGISTROS -->
+        <section class="cultivo-tarjeta">
+
+            <h2>Inventario por ubicación</h2>
+
+            <p>
+                Registros encontrados:
+                <strong>{{ ubicaciones|length }}</strong>
+            </p>
+
+            {% if ubicaciones %}
+
+                <div class="cultivo-tabla-contenedor">
+
+                    <table class="cultivo-tabla">
+
+                        <thead>
+                            <tr>
+                                <th>Finca</th>
+                                <th>Variedad</th>
+                                <th>Casa</th>
+                                <th>Bloque</th>
+                                <th>Cama</th>
+                                <th>Cantidad</th>
+                            </tr>
+                        </thead>
+
+                        <tbody>
+
+                            {% for item in ubicaciones %}
+
+                                <tr>
+                                    <td>
+                                        {{ item.finca_nombre }}
+                                    </td>
+
+                                    <td>
+                                        {{ item.variedad_nombre }}
+                                    </td>
+
+                                    <td>
+                                        {{ item.casa or 'Sin registrar' }}
+                                    </td>
+
+                                    <td>
+                                        {{ item.bloque or 'Sin registrar' }}
+                                    </td>
+
+                                    <td>
+                                        {{ item.cama or 'Sin registrar' }}
+                                    </td>
+
+                                    <td>
+                                        {{ item.cantidad }}
+                                    </td>
+                                </tr>
+
+                            {% endfor %}
+
+                        </tbody>
+
+                    </table>
+
+                </div>
+
+            {% else %}
+
+                <p>
+                    No se encontraron ubicaciones
+                    de cultivo registradas.
+                </p>
+
+            {% endif %}
+
+            <div class="cultivo-total">
+                <strong>
+                    Total de plantas:
+                    {{ total_plantas }}
+                </strong>
+            </div>
+
+        </section>
+
+    </main>
+
+    <footer>
+        <p>
+            NIRP International — Inventario de rosas
+        </p>
+    </footer>
+
+</body>
+</html>

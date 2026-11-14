@@ -1,8 +1,10 @@
 
 <!DOCTYPE html>
 <html lang="es">
+
 <head>
     <meta charset="UTF-8">
+
     <meta name="viewport"
           content="width=device-width, initial-scale=1.0">
 
@@ -10,6 +12,7 @@
 
     <link rel="stylesheet"
           href="{{ url_for('static', filename='styles.css') }}">
+
 </head>
 
 <body>
@@ -17,10 +20,13 @@
     <!-- ENCABEZADO -->
     <header class="encabezado">
 
-        <a href="{{ url_for('inicio') }}" class="marca">
+        <a href="{{ url_for('inicio') }}"
+           class="marca">
+
             <img
                 src="{{ url_for('static', filename='imagenes/logo-nirp.png') }}"
                 alt="NIRP International">
+
         </a>
 
         <a href="{{ url_for('inicio') }}#variedades"
@@ -30,39 +36,60 @@
 
     </header>
 
-    <!-- MENSAJES DE CONFIRMACION Y ADVERTENCIA -->
+    <!-- MENSAJES -->
     {% with mensajes = get_flashed_messages(with_categories=true) %}
+
         {% if mensajes %}
+
             <div class="contenedor-mensajes">
+
                 {% for categoria, mensaje in mensajes %}
+
                     <div
                         class="mensaje mensaje-{{ categoria }}"
                         role="{{ 'alert' if categoria == 'error' else 'status' }}">
+
                         {{ mensaje }}
+
                     </div>
+
                 {% endfor %}
+
             </div>
+
         {% endif %}
+
     {% endwith %}
+
 
     <!-- FICHA TECNICA -->
     <main class="detalle-variedad">
 
+        <!-- FOTOGRAFIA -->
         <div class="detalle-imagen">
 
             {% if rosa.imagen %}
+
                 <img
                     src="{{ url_for('static', filename=rosa.imagen) }}"
                     alt="Rosa {{ rosa.nombre }}">
+
             {% else %}
+
                 <div class="sin-fotografia">
+
                     <span>🌹</span>
+
                     <p>Fotografía pendiente</p>
+
                 </div>
+
             {% endif %}
 
         </div>
 
+
+        <!-- INFORMACION DE LA VARIEDAD -->
         <div class="detalle-info">
 
             <span class="etiqueta-detalle">
@@ -76,6 +103,8 @@
                 en nuestro catálogo.
             </p>
 
+
+            <!-- CARACTERISTICAS -->
             <div class="caracteristicas">
 
                 <p>
@@ -115,19 +144,96 @@
 
             </div>
 
+
+            <!-- ==================================
+                 UBICACIONES DE CULTIVO
+                 FASE 3 - NIRP INTERNATIONAL
+                 ================================== -->
+
             <h2>Ubicaciones de cultivo</h2>
 
+            <a
+                href="{{ url_for('inventario_por_variedad_admin', variedad_id=rosa.id) }}"
+                class="boton">
+
+                📋 Ver inventario completo de esta variedad
+
+            </a>
+
+
             <p>
-                Próximamente podrás consultar las fincas
-                donde se encuentra esta variedad.
+                Consulta las fincas y ubicaciones
+                donde se encuentra registrada
+                esta variedad.
             </p>
+
+
+            {% if ubicaciones %}
+
+                <div class="variedad-ubicaciones">
+
+                    {% for ubicacion in ubicaciones %}
+
+                        <article class="variedad-ubicacion">
+
+                            <h3>
+                                🌱 {{ ubicacion.finca_nombre }}
+                            </h3>
+
+                            <p>
+                                <strong>Casa:</strong>
+                                {{ ubicacion.casa }}
+                            </p>
+
+                            <p>
+                                <strong>Bloque:</strong>
+                                {{ ubicacion.bloque }}
+                            </p>
+
+                            <p>
+                                <strong>Cama:</strong>
+                                {{ ubicacion.cama }}
+                            </p>
+
+                            <p>
+                                <strong>Cantidad de plantas:</strong>
+                                {{ ubicacion.cantidad }}
+                            </p>
+
+                            <p>
+                                <strong>Última actualización:</strong>
+                                {{ ubicacion.actualizado_en or 'Sin registrar' }}
+                            </p>
+
+                        </article>
+
+                    {% endfor %}
+
+                </div>
+
+            {% else %}
+
+                <p class="ubicacion-no-disponible">
+
+                    Esta variedad todavía no tiene
+                    ubicaciones de cultivo registradas.
+
+                </p>
+
+            {% endif %}
 
         </div>
 
     </main>
 
+
+    <!-- PIE DE PAGINA -->
     <footer>
-        <p>NIRP International — Inventario de rosas</p>
+
+        <p>
+            NIRP International — Inventario de rosas
+        </p>
+
     </footer>
 
 </body>

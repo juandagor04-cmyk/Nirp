@@ -3537,6 +3537,12 @@ footer {
     font-weight: 600;
 }
 
+
+
+.panel-tarjeta .boton + .boton {
+    margin-top: 12px;
+}
+
 .panel-tarjeta .boton:hover {
     background: #17492f;
 }
@@ -4084,22 +4090,25 @@ footer {
         rgba(20, 65, 40, 0.09);
 }
 
+/* Imagen de la ficha del cliente: completa, centrada y sin recortes */
 .cliente-detalle-imagen {
-    min-height: 480px;
-
-    background: #eef4ef;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    min-height: 420px;
+    padding: 24px;
+    background: #f5f8f5;
 }
 
 .cliente-detalle-imagen img {
-    width: 100%;
-
-    height: 100%;
-
-    min-height: 480px;
-
     display: block;
-
-    object-fit: cover;
+    width: 100%;
+    max-width: 350px;
+    height: auto;
+    max-height: 360px;
+    min-height: 0;
+    object-fit: contain;
+    margin: 0 auto;
 }
 
 .cliente-detalle-sin-imagen {
@@ -4407,13 +4416,18 @@ footer {
     }
 
     .cliente-detalle-imagen,
-    .cliente-detalle-imagen img,
     .cliente-detalle-sin-imagen {
-        min-height: 320px;
+        min-height: 300px;
+    }
+
+    .cliente-detalle-imagen {
+        padding: 18px;
     }
 
     .cliente-detalle-imagen img {
-        max-height: 420px;
+        max-width: 290px;
+        max-height: 280px;
+        min-height: 0;
     }
 
     .cliente-detalle-info {
@@ -5058,6 +5072,131 @@ body {
     }
 }
 
+/* ==========================================
+   FASE 2 - MAPAS DE NUESTRAS FINCAS
+   ========================================== */
 
+.ubicacion-mapa {
+    width: 100%;
+    margin-top: 18px;
+    margin-bottom: 18px;
+    border-radius: 14px;
+    overflow: hidden;
+    border: 1px solid #dce9df;
+}
 
+.ubicacion-mapa iframe {
+    display: block;
+    width: 100%;
+    height: 250px;
+    border: none;
+}
+
+.ubicacion-cliente-tarjeta {
+    min-width: 0;
+}
+
+@media (max-width: 600px) {
+    .ubicacion-mapa iframe {
+        height: 220px;
+    }
+}
+
+/* ==========================================
+   FASE 3 - UBICACIONES POR VARIEDAD
+   ========================================== */
+
+.variedad-ubicaciones {
+    display: grid;
+    grid-template-columns: repeat(
+        auto-fit,
+        minmax(min(100%, 260px), 1fr)
+    );
+    gap: 20px;
+    margin-top: 20px;
+}
+
+.variedad-ubicacion {
+    background: #f0f6f1;
+    border: 1px solid #dce9df;
+    border-radius: 15px;
+    padding: 20px;
+}
+
+.variedad-ubicacion h3 {
+    color: #174b2b;
+    margin-bottom: 15px;
+}
+
+.variedad-ubicacion p {
+    margin-bottom: 10px;
+    line-height: 1.5;
+}
+
+/* FIRMAS OPCIONALES */
+
+.detalle-acta-opcion-firmas {
+    margin-top: 35px;
+    padding: 15px;
+    background: #f0f7f1;
+    border-radius: 10px;
+}
+
+.detalle-acta-opcion-firmas label {
+    cursor: pointer;
+    font-weight: 600;
+}
+
+.detalle-acta-firmas[hidden] {
+    display: none !important;
+}
+@media print {
+.detalle-acta-opcion-firmas {
+    display: none;
+}
+}
+
+/* FIRMAS DIGITALES DEL ACTA */
+
+#firmasActa {
+    margin-top: 25px;
+}
+
+#firmasActa[hidden] {
+    display: none !important;
+}
+
+.firma-digital-bloque {
+    margin-bottom: 25px;
+    padding: 20px;
+    background: #f0f7f1;
+    border-radius: 14px;
+}
+
+.firma-digital-bloque canvas {
+    display: block;
+    width: 100%;
+    max-width: 440px;
+    height: 130px;
+    background: white;
+    border: 2px solid #c6d9ca;
+    border-radius: 10px;
+    touch-action: none;
+    cursor: crosshair;
+    margin: 15px 0;
+}
+
+.firma-digital-bloque button {
+    padding: 10px 18px;
+    background: #e5eee7;
+    border: 1px solid #a9c5b0;
+    border-radius: 8px;
+    cursor: pointer;
+}
+
+@media print {
+    #formExcel {
+        display: none;
+    }
+}
 

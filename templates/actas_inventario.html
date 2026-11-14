@@ -239,11 +239,24 @@
         <section class="actas-seccion">
             <h2>Generar nueva acta</h2>
 
-            <p class="actas-descripcion">
-                Selecciona la finca y la fecha del acta.
-                El sistema guardará una copia de las
-                cantidades actuales de su inventario.
-            </p>
+         
+        <p class="actas-descripcion">
+            El acta de inventario general reúne los registros
+            de las variedades encontradas en una finca,
+            incluyendo casas, bloques, camas y cantidades.
+        </p>
+
+        <p class="actas-descripcion">
+            Antes de generar el acta, comprueba que los
+            inventarios de la finca estén actualizados.
+            El documento conservará una copia de las
+            cantidades existentes al momento de generarlo.
+        </p>
+
+        <a href="{{ url_for('inventario_admin') }}"
+        class="actas-boton">
+            🌱 Revisar inventario actual
+        </a>
 
             <form
                 method="POST"
@@ -344,36 +357,70 @@
                                 <th>Responsable</th>
                                 <th>Registros</th>
                                 <th>Cantidad total</th>
+                                <th>Acciones</th>
                             </tr>
                         </thead>
 
-                        <tbody>
-                            {% for acta in actas %}
-                                <tr>
-                                    <td>
-                                       <a href="{{ url_for('detalle_acta', acta_id=acta.id) }}">
-                                         <strong>{{ "%04d"|format(acta.id) }}</strong>
-                                      </a>
-                                    </td>
+                       
+<tbody>
 
-                                    <td>{{ acta.finca_nombre }}</td>
+    {% for acta in actas %}
 
-                                    <td>{{ acta.fecha_corte }}</td>
+        <tr>
 
-                                    <td>
-                                        {{ acta.responsable_nombre }}
-                                    </td>
+            <!-- NUMERO DEL ACTA -->
+            <td>
+                <a href="{{ url_for('detalle_acta', acta_id=acta.id) }}">
+                    <strong>
+                        {{ "%04d"|format(acta.id) }}
+                    </strong>
+                </a>
+            </td>
 
-                                    <td>{{ acta.total_registros }}</td>
+            <!-- FINCA -->
+            <td>
+                {{ acta.finca_nombre }}
+            </td>
 
-                                    <td>
-                                        <strong>
-                                            {{ acta.total_cantidad }}
-                                        </strong>
-                                    </td>
-                                </tr>
-                            {% endfor %}
-                        </tbody>
+            <!-- FECHA -->
+            <td>
+                {{ acta.fecha_corte }}
+            </td>
+
+            <!-- RESPONSABLE -->
+            <td>
+                {{ acta.responsable_nombre }}
+            </td>
+
+            <!-- REGISTROS -->
+            <td>
+                {{ acta.total_registros }}
+            </td>
+
+            <!-- CANTIDAD TOTAL -->
+            <td>
+                <strong>
+                    {{ acta.total_cantidad }}
+                </strong>
+            </td>
+
+            <!-- ACCIONES -->
+            <td>
+                <a
+                    href="{{ url_for('detalle_acta', acta_id=acta.id) }}"
+                    class="actas-boton">
+
+                    👁️ Ver acta
+
+                </a>
+            </td>
+
+        </tr>
+
+    {% endfor %}
+
+</tbody>
+
                     </table>
                 </div>
 

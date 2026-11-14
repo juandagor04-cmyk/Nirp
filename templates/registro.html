@@ -4,6 +4,7 @@
 
 <head>
     <meta charset="UTF-8">
+
     <meta name="viewport"
           content="width=device-width, initial-scale=1.0">
 
@@ -11,23 +12,86 @@
 
     <link rel="stylesheet"
           href="{{ url_for('static', filename='styles.css') }}">
+
+    <style>
+        /* ==========================================
+           HOJA DE VIDA DEL ADMINISTRADOR
+           ========================================== */
+
+        .campo-hoja-vida {
+            margin: 22px 0;
+            padding: 22px;
+            background: #f0f7f1;
+            border: 1px solid #d4e6d8;
+            border-radius: 14px;
+        }
+
+        .campo-hoja-vida label {
+            display: block;
+            margin-bottom: 12px;
+            color: #194b30;
+            font-weight: 700;
+        }
+
+        .campo-hoja-vida input[type="file"] {
+            display: block;
+            width: 100%;
+            padding: 14px;
+            border: 2px dashed #8dbb99;
+            border-radius: 10px;
+            background: white;
+            box-sizing: border-box;
+            font: inherit;
+        }
+
+        .campo-hoja-vida small {
+            display: block;
+            margin-top: 12px;
+            color: #607466;
+            line-height: 1.6;
+        }
+
+        .campo-hoja-vida p {
+            margin-bottom: 12px;
+            color: #466451;
+            line-height: 1.6;
+        }
+
+        #camposAdmin[hidden] {
+            display: none !important;
+        }
+    </style>
+
 </head>
 
 <body class="pagina-registro">
 
+    <!-- ==========================================
+         ENCABEZADO
+         ========================================== -->
+
     <header class="encabezado">
 
-        <a href="{{ url_for('inicio') }}" class="marca">
+        <a href="{{ url_for('inicio') }}"
+           class="marca">
+
             <img
                 src="{{ url_for('static', filename='imagenes/logo-nirp.png') }}"
                 alt="NIRP International">
+
         </a>
 
-        <a href="{{ url_for('login') }}" class="boton">
+        <a href="{{ url_for('login') }}"
+           class="boton">
             Iniciar sesión
         </a>
 
     </header>
+
+
+    <!-- ==========================================
+         CONTENIDO PRINCIPAL
+         ========================================== -->
 
     <main class="registro-contenedor">
 
@@ -45,182 +109,383 @@
                 Completa tus datos para registrarte.
             </p>
 
+
+            <!-- MENSAJES DEL SISTEMA -->
+
             {% with mensajes = get_flashed_messages(with_categories=true) %}
+
                 {% for categoria, mensaje in mensajes %}
-                    <div class="mensaje mensaje-{{ categoria }}"
-                         role="alert">
+
+                    <div
+                        class="mensaje mensaje-{{ categoria }}"
+                        role="alert">
+
                         {{ mensaje }}
+
                     </div>
+
                 {% endfor %}
+
             {% endwith %}
 
-            <!-- ELEGIR EL TIPO DE REGISTRO -->
+
+            <!-- ==========================================
+                 ELEGIR TIPO DE REGISTRO
+                 ========================================== -->
 
             <div class="registro-tipos">
 
-                <button type="button"
-                        id="botonCliente"
-                        class="registro-tipo">
+                <button
+                    type="button"
+                    id="botonCliente"
+                    class="registro-tipo">
+
                     Soy cliente
+
                 </button>
 
-                <button type="button"
-                        id="botonAdmin"
-                        class="registro-tipo">
+                <button
+                    type="button"
+                    id="botonAdmin"
+                    class="registro-tipo">
+
                     Solicitar acceso administrativo
+
                 </button>
 
             </div>
 
-            <!-- FORMULARIO -->
 
-            <form method="POST"
-                  action="{{ url_for('registro') }}"
-                  class="formulario-registro">
+            <!-- ==========================================
+                 FORMULARIO DE REGISTRO
+                 ========================================== -->
 
-                <input type="hidden"
-                       name="csrf_token"
-                       value="{{ csrf_token() }}">
+            <form
+                method="POST"
+                action="{{ url_for('registro') }}"
+                class="formulario-registro"
+                enctype="multipart/form-data">
 
-                <input type="hidden"
-                       name="tipo"
-                       id="tipo"
-                       value="{{ tipo|default('cliente') }}">
+                <!-- SEGURIDAD -->
 
-                <label for="nombre">Nombre completo *</label>
-                <input type="text"
-                       id="nombre"
-                       name="nombre"
-                       autocomplete="name"
-                       required>
+                <input
+                    type="hidden"
+                    name="csrf_token"
+                    value="{{ csrf_token() }}">
 
-                <label for="correo">Correo electrónico *</label>
-                <input type="email"
-                       id="correo"
-                       name="correo"
-                       autocomplete="email"
-                       required>
+                <!-- TIPO DE USUARIO -->
 
-                <label for="telefono">Teléfono *</label>
-                <input type="tel"
-                       id="telefono"
-                       name="telefono"
-                       autocomplete="tel"
-                       required>
+                <input
+                    type="hidden"
+                    name="tipo"
+                    id="tipo"
+                    value="{{ tipo|default('cliente') }}">
 
-                <!-- SOLO ADMINISTRADORES -->
+
+                <!-- ==================================
+                     INFORMACION PERSONAL
+                     ================================== -->
+
+                <label for="nombre">
+                    Nombre completo *
+                </label>
+
+                <input
+                    type="text"
+                    id="nombre"
+                    name="nombre"
+                    autocomplete="name"
+                    required>
+
+
+                <label for="correo">
+                    Correo electrónico *
+                </label>
+
+                <input
+                    type="email"
+                    id="correo"
+                    name="correo"
+                    autocomplete="email"
+                    required>
+
+
+                <label for="telefono">
+                    Teléfono *
+                </label>
+
+                <input
+                    type="tel"
+                    id="telefono"
+                    name="telefono"
+                    autocomplete="tel"
+                    required>
+
+
+                <!-- ==================================
+                     SOLO ADMINISTRADORES
+                     ================================== -->
 
                 <div id="camposAdmin" hidden>
 
                     <h2>Datos administrativos</h2>
 
+                    <p class="registro-descripcion">
+                        Completa la información para solicitar
+                        acceso al panel administrativo de
+                        NIRP International.
+                    </p>
+
+
+                    <!-- EMPRESA -->
+
                     <label for="empresa_finca">
                         Empresa o finca *
                     </label>
-                    <input type="text"
-                           id="empresa_finca"
-                           name="empresa_finca">
 
-                    <label for="cargo">Cargo *</label>
-                    <input type="text"
-                           id="cargo"
-                           name="cargo">
+                    <input
+                        type="text"
+                        id="empresa_finca"
+                        name="empresa_finca">
+
+
+                    <!-- CARGO -->
+
+                    <label for="cargo">
+                        Cargo *
+                    </label>
+
+                    <input
+                        type="text"
+                        id="cargo"
+                        name="cargo">
+
+
+                    <!-- MOTIVO -->
 
                     <label for="motivo">
                         Motivo de solicitud *
                     </label>
-                    <textarea id="motivo"
-                              name="motivo"
-                              rows="4"></textarea>
+
+                    <textarea
+                        id="motivo"
+                        name="motivo"
+                        rows="4"></textarea>
+
+
+                    <!-- ==================================
+                         HOJA DE VIDA OPCIONAL
+                         ================================== -->
+
+                    <div class="campo-hoja-vida">
+
+                        <label for="hoja_vida">
+                            📄 Adjuntar hoja de vida
+                            (opcional)
+                        </label>
+
+                        <p>
+                            Puedes adjuntar tu hoja de vida
+                            para que NIRP International
+                            revise tu solicitud administrativa.
+                        </p>
+
+                        <input
+                            type="file"
+                            id="hoja_vida"
+                            name="hoja_vida"
+                            accept=".pdf,.docx">
+
+                        <small>
+                            Formatos permitidos:
+                            PDF o Word (.docx).
+                            Tamaño máximo: 5 MB.
+                        </small>
+
+                    </div>
+
+
+                    <!-- AVISO ADMINISTRATIVO -->
 
                     <p class="registro-aviso">
                         Tu solicitud administrativa será
                         revisada antes de conceder permisos.
+
+                        Adjuntar una hoja de vida
+                        no garantiza la aprobación
+                        de la solicitud.
                     </p>
 
                 </div>
 
-                <label for="password">Contraseña *</label>
-                <input type="password"
-                       id="password"
-                       name="password"
-                       minlength="12"
-                       autocomplete="new-password"
-                       required>
 
-                <small>Utiliza al menos 12 caracteres.</small>
+                <!-- ==================================
+                     CONTRASEÑA
+                     ================================== -->
+
+                <label for="password">
+                    Contraseña *
+                </label>
+
+                <input
+                    type="password"
+                    id="password"
+                    name="password"
+                    minlength="12"
+                    autocomplete="new-password"
+                    required>
+
+                <small>
+                    Utiliza al menos 12 caracteres.
+                </small>
+
 
                 <label for="confirmar">
                     Confirmar contraseña *
                 </label>
-                <input type="password"
-                       id="confirmar"
-                       name="confirmar"
-                       minlength="12"
-                       autocomplete="new-password"
-                       required>
 
-                <button type="submit"
-                        class="boton registro-boton">
+                <input
+                    type="password"
+                    id="confirmar"
+                    name="confirmar"
+                    minlength="12"
+                    autocomplete="new-password"
+                    required>
+
+
+                <!-- BOTON DE REGISTRO -->
+
+                <button
+                    type="submit"
+                    class="boton registro-boton">
+
                     Crear mi cuenta
+
                 </button>
 
             </form>
 
+
+            <!-- INICIAR SESION -->
+
             <p class="registro-pie">
+
                 ¿Ya tienes una cuenta?
+
                 <a href="{{ url_for('login') }}">
                     Iniciar sesión
                 </a>
+
             </p>
 
         </section>
 
     </main>
 
+
+    <!-- ==========================================
+         JAVASCRIPT - TIPOS DE USUARIO
+         ========================================== -->
+
     <script>
+
     document.addEventListener("DOMContentLoaded", function () {
 
         const tipo = document.getElementById("tipo");
-        const camposAdmin = document.getElementById("camposAdmin");
-        const botonCliente = document.getElementById("botonCliente");
-        const botonAdmin = document.getElementById("botonAdmin");
 
-        const camposObligatorios = camposAdmin.querySelectorAll(
-            "input, textarea"
-        );
+        const camposAdmin =
+            document.getElementById("camposAdmin");
+
+        const botonCliente =
+            document.getElementById("botonCliente");
+
+        const botonAdmin =
+            document.getElementById("botonAdmin");
+
+        const hojaVida =
+            document.getElementById("hoja_vida");
+
+
+        // Solo campos administrativos obligatorios
+        // La hoja de vida es opcional
+
+        const camposObligatorios =
+            camposAdmin.querySelectorAll(
+                'input:not([type="file"]), textarea'
+            );
+
 
         function cambiarTipo(valor) {
 
             const esAdmin = valor === "admin";
 
+            // Guardar tipo de usuario
             tipo.value = valor;
+
+            // Mostrar u ocultar administracion
             camposAdmin.hidden = !esAdmin;
 
+            // Cambiar estilo de los botones
             botonCliente.classList.toggle(
-                "activo", !esAdmin
+                "activo",
+                !esAdmin
             );
 
             botonAdmin.classList.toggle(
-                "activo", esAdmin
+                "activo",
+                esAdmin
             );
 
+            botonCliente.setAttribute(
+                "aria-pressed",
+                String(!esAdmin)
+            );
+
+            botonAdmin.setAttribute(
+                "aria-pressed",
+                String(esAdmin)
+            );
+
+            // Campos obligatorios solo para admin
             camposObligatorios.forEach(function (campo) {
                 campo.required = esAdmin;
             });
+
+            // Hoja de vida solamente para admin
+            hojaVida.disabled = !esAdmin;
+
+            // Evitar conservar un archivo
+            // si cambia al registro de cliente
+            if (!esAdmin) {
+                hojaVida.value = "";
+            }
+
         }
 
-        botonCliente.addEventListener("click", function () {
-            cambiarTipo("cliente");
-        });
 
-        botonAdmin.addEventListener("click", function () {
-            cambiarTipo("admin");
-        });
+        // REGISTRO DE CLIENTE
+        botonCliente.addEventListener(
+            "click",
+            function () {
+                cambiarTipo("cliente");
+            }
+        );
 
+
+        // SOLICITUD DE ADMINISTRADOR
+        botonAdmin.addEventListener(
+            "click",
+            function () {
+                cambiarTipo("admin");
+            }
+        );
+
+
+        // Cargar el tipo inicial
         cambiarTipo(tipo.value);
 
     });
+
     </script>
 
 </body>

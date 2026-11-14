@@ -94,7 +94,7 @@
         .detalle-acta-tabla {
             width: 100%;
             border-collapse: collapse;
-            min-width: 650px;
+            min-width: 1450px;
         }
 
         .detalle-acta-tabla th,
@@ -151,6 +151,37 @@
             cursor: pointer;
         }
 
+
+        /* Dibujar firmas con mouse o pantalla tactil */
+        #firmasActa[hidden] {
+            display: none !important;
+        }
+        .firma-digital-bloque {
+            padding: 20px;
+            margin-top: 22px;
+            background: #f0f7f1;
+            border-radius: 14px;
+        }
+        .firma-digital-bloque canvas {
+            display: block;
+            width: 100%;
+            max-width: 440px;
+            height: 130px;
+            margin: 12px 0;
+            background: #ffffff;
+            border: 2px solid #c6d9ca;
+            border-radius: 10px;
+            touch-action: none;
+            cursor: crosshair;
+        }
+        .firma-digital-bloque button {
+            padding: 10px 16px;
+            border-radius: 8px;
+            border: 1px solid #a9c5b0;
+            background: #e5eee7;
+            cursor: pointer;
+        }
+
         @media (max-width: 650px) {
             .detalle-acta-documento {
                 padding: 22px 16px;
@@ -177,8 +208,19 @@
 
         @media print {
             @page {
-                size: A4;
-                margin: 15mm;
+                size: A4 landscape;
+                margin: 10mm;
+            }
+
+            .detalle-acta-tabla {
+                min-width: 0;
+                font-size: 8px;
+            }
+
+            .detalle-acta-tabla th,
+            .detalle-acta-tabla td {
+                padding: 5px 3px;
+                overflow-wrap: anywhere;
             }
 
             .detalle-acta-pagina {
@@ -272,6 +314,9 @@
             </section>
 
             <h2>Detalle del inventario registrado</h2>
+            <p>Los datos técnicos corresponden al momento de generar el acta.
+               El guion (—) indica información no registrada, especialmente
+               en las actas anteriores a esta actualización.</p>
 
             <div class="detalle-acta-tabla-contenedor">
 
@@ -284,6 +329,11 @@
                             <th>Bloque</th>
                             <th>Cama</th>
                             <th>Cantidad</th>
+                            <th>Fecha de siembra</th>
+                            <th>Propagador</th>
+                            <th>N.º camas</th>
+                            <th>Densidad / cama</th>
+                            <th>Primera cosecha</th>
                         </tr>
                     </thead>
 
@@ -296,6 +346,11 @@
                             <td>{{ item.bloque }}</td>
                             <td>{{ item.cama }}</td>
                             <td>{{ item.cantidad }}</td>
+                            <td>{{ item.fecha_siembra or '—' }}</td>
+                            <td>{{ item.propagador or '—' }}</td>
+                            <td>{{ item.numero_camas if item.numero_camas is not none else '—' }}</td>
+                            <td>{{ item.densidad_cama if item.densidad_cama is not none else '—' }}</td>
+                            <td>{{ item.fecha_primera_cosecha or '—' }}</td>
                         </tr>
                         {% endfor %}
                     </tbody>
@@ -312,7 +367,8 @@
             </p>
 
             <div class="detalle-acta-total">
-                Total registrado: {{ total_cantidad }} rosas
+                 Total de plantas inventariadas:
+                {{ total_cantidad }}
             </div>
 
 
@@ -325,30 +381,189 @@
                 </p>
             </section>
 
-            <section class="detalle-acta-firmas">
 
-                <div class="detalle-acta-firma">
-                    Firma del responsable
-                    <br>
-                    {{ acta.responsable_nombre }}
-                </div>
+<!-- FIRMAS DIGITALES OPCIONALES -->
 
-                <div class="detalle-acta-firma">
-                    Firma de quien verifica
-                </div>
+<form
+    id="formExcel"
+    method="POST"
+    action="{{ url_for('exportar_acta_excel', acta_id=acta.id) }}">
 
-            </section>
+    <input
+        type="hidden"
+        name="csrf_token"
+        value="{{ csrf_token() }}">
 
-        </article>
+    <div class="detalle-acta-opcion-firmas">
+        <label>
+            <input
+                type="checkbox"
+                id="mostrarFirmas">
 
-        <button
-            type="button"
-            class="detalle-acta-imprimir"
-            onclick="window.print()">
-            Imprimir o guardar como PDF
-        </button>
+            Incluir firmas digitales (opcional)
+        </label>
+    </div>
 
-    </main>
+    <div id="firmasActa" hidden>
+
+        <div class="firma-digital-bloque">
+            <h3>Firma del responsable</h3>
+            <p>{{ acta.responsable_nombre }}</p>
+
+            <canvas
+                id="canvasResponsable"
+                width="440"
+                height="130">
+            </canvas>
+
+            <button type="button"
+                    id="limpiarResponsable">
+                Borrar firma
+            </button>
+        </div>
+
+        <div class="firma-digital-bloque">
+            <h3>Firma de quien verifica</h3>
+
+            <canvas
+                id="canvasVerificador"
+                width="440"
+                height="130">
+            </canvas>
+
+            <button type="button"
+                    id="limpiarVerificador">
+                Borrar firma
+            </button>
+        </div>
+
+    </div>
+
+    <input
+        type="hidden"
+        name="firma_responsable"
+        id="firmaResponsableBase64">
+
+    <input
+        type="hidden"
+        name="firma_verificador"
+        id="firmaVerificadorBase64">
+
+    <button type="submit"
+            class="detalle-acta-imprimir">
+        📊 Descargar acta en Excel
+    </button>
+
+</form>
+
+</article>
+</main>
+
+<script>
+document.addEventListener("DOMContentLoaded", function () {
+
+    const opcion = document.getElementById("mostrarFirmas");
+    const contenedor = document.getElementById("firmasActa");
+
+    opcion.addEventListener("change", function () {
+        contenedor.hidden = !opcion.checked;
+    });
+
+    function prepararFirma(canvasId, limpiarId) {
+
+        const canvas = document.getElementById(canvasId);
+        const ctx = canvas.getContext("2d");
+
+        let dibujando = false;
+        let tieneFirma = false;
+
+        ctx.strokeStyle = "#173d27";
+        ctx.lineWidth = 2.5;
+        ctx.lineCap = "round";
+        ctx.lineJoin = "round";
+
+        function posicion(evento) {
+            const rect = canvas.getBoundingClientRect();
+
+            return {
+                x: (evento.clientX - rect.left) *
+                   canvas.width / rect.width,
+                y: (evento.clientY - rect.top) *
+                   canvas.height / rect.height
+            };
+        }
+
+        canvas.addEventListener("pointerdown", function (e) {
+            e.preventDefault();
+
+            dibujando = true;
+            tieneFirma = true;
+
+            canvas.setPointerCapture(e.pointerId);
+
+            const p = posicion(e);
+
+            ctx.beginPath();
+            ctx.moveTo(p.x, p.y);
+            ctx.lineTo(p.x + 0.1, p.y + 0.1);
+            ctx.stroke();
+        });
+
+        canvas.addEventListener("pointermove", function (e) {
+            if (!dibujando) return;
+
+            e.preventDefault();
+
+            const p = posicion(e);
+
+            ctx.lineTo(p.x, p.y);
+            ctx.stroke();
+        });
+
+        function terminar() {
+            dibujando = false;
+        }
+
+        canvas.addEventListener("pointerup", terminar);
+        canvas.addEventListener("pointercancel", terminar);
+
+        document.getElementById(limpiarId)
+            .addEventListener("click", function () {
+                ctx.clearRect(
+                    0, 0, canvas.width, canvas.height
+                );
+                tieneFirma = false;
+            });
+
+        return function obtenerFirma() {
+            return tieneFirma
+                ? canvas.toDataURL("image/png")
+                : "";
+        };
+    }
+
+    const firmaResponsable = prepararFirma(
+        "canvasResponsable",
+        "limpiarResponsable"
+    );
+
+    const firmaVerificador = prepararFirma(
+        "canvasVerificador",
+        "limpiarVerificador"
+    );
+
+    document.getElementById("formExcel")
+        .addEventListener("submit", function () {
+
+            document.getElementById("firmaResponsableBase64").value =
+                opcion.checked ? firmaResponsable() : "";
+
+            document.getElementById("firmaVerificadorBase64").value =
+                opcion.checked ? firmaVerificador() : "";
+        });
+
+});
+</script>
 
 </body>
 </html>

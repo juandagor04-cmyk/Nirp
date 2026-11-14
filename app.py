@@ -6,7 +6,8 @@ from flask import (
     redirect,
     url_for,
     flash,
-    session
+    session,
+    send_file
 )
 
 from pathlib import Path
@@ -517,17 +518,44 @@ def aprobar_admin(usuario_id):
 @app.route("/variedad/<int:id>")
 def detalle_variedad(id):
 
-    usuario = obtener_usuario_id(session["usuario_id"]) if session.get("usuario_id") else None
+    usuario = (
+        obtener_usuario_id(session["usuario_id"])
+        if session.get("usuario_id")
+        else None
+    )
+
+    # VISTA DEL ADMINISTRADOR
     if usuario and usuario["rol"] == "admin":
+
         rosa = obtener_variedad(id)
+
         if rosa is None:
             abort(404)
-        return render_template("detalle_variedad.html", rosa=rosa)
 
+        # Buscar las ubicaciones de esta variedad
+        ubicaciones = [
+            registro
+            for registro in obtener_inventarios()
+            if registro["variedad_id"] == id
+        ]
+
+        return render_template(
+            "detalle_variedad.html",
+            rosa=rosa,
+            ubicaciones=ubicaciones
+        )
+
+    # VISTA PUBLICA DEL CLIENTE
     rosa = obtener_variedad_publica(id)
+
     if rosa is None:
         abort(404)
-    return render_template("detalle_cliente.html", rosa=rosa)
+
+    return render_template(
+        "detalle_cliente.html",
+        rosa=rosa
+    )
+
 
 
 # ==========================================
@@ -1121,6 +1149,55 @@ def ubicaciones_publicas():
 
 
 # ==========================================
+# FASE 3 - UBICACIONES DE CULTIVO
+# SOLO ADMINISTRADORES
+# ==========================================
+
+@app.route("/admin/ubicaciones-cultivo", methods=["GET"])
+@administrador_requerido
+def ubicaciones_cultivo_admin():
+
+    ubicaciones = obtener_inventarios()
+
+    busqueda = request.args.get("q", "").strip()
+
+    if len(busqueda) > 100:
+        abort(400, description="Búsqueda demasiado larga.")
+
+    if busqueda:
+
+        texto = busqueda.casefold()
+
+        campos = (
+            "finca_nombre",
+            "variedad_nombre",
+            "casa",
+            "bloque",
+            "cama"
+        )
+
+        ubicaciones = [
+            ubicacion for ubicacion in ubicaciones
+            if any(
+                texto in str(ubicacion.get(campo) or "").casefold()
+                for campo in campos
+            )
+        ]
+
+    total_plantas = sum(
+        ubicacion["cantidad"]
+        for ubicacion in ubicaciones
+    )
+
+    return render_template(
+        "ubicaciones_cultivo_admin.html",
+        ubicaciones=ubicaciones,
+        busqueda=busqueda,
+        total_plantas=total_plantas
+    )
+
+
+# ==========================================
 # PANEL DE INVENTARIO: ADMINISTRADORES
 # ==========================================
 
@@ -1135,15 +1212,13 @@ def inventario_admin():
 
     if request.method == "POST":
 
-        # Seguridad del formulario
+        # Seguridad del formulario.
         validar_csrf()
 
-        # Validar finca, variedad y cantidad
         try:
             finca_id = int(request.form.get("finca_id", ""))
             variedad_id = int(request.form.get("variedad_id", ""))
             cantidad = int(request.form.get("cantidad", ""))
-
         except (ValueError, TypeError):
             flash(
                 "Selecciona una finca, variedad y cantidad valida.",
@@ -1151,63 +1226,64 @@ def inventario_admin():
             )
             return redirect(url_for("inventario_admin"))
 
-        # Validar cantidad
         if cantidad < 0:
-            flash(
-                "La cantidad no puede ser negativa.",
-                "error"
-            )
+            flash("La cantidad no puede ser negativa.", "error")
             return redirect(url_for("inventario_admin"))
 
-        # Obtener ubicacion del cultivo
         casa = request.form.get("casa", "").strip()
         bloque = request.form.get("bloque", "").strip()
         cama = request.form.get("cama", "").strip()
 
-        # Todos los campos de ubicacion son obligatorios
         if not casa or not bloque or not cama:
+            flash("Debes indicar casa, bloque y cama.", "error")
+            return redirect(url_for("inventario_admin"))
+
+        if any(len(valor) > 50 for valor in (casa, bloque, cama)):
             flash(
-                "Debes indicar casa, bloque y cama.",
+                "Casa, bloque y cama no pueden superar 50 caracteres cada uno.",
                 "error"
             )
             return redirect(url_for("inventario_admin"))
 
-        # Limitar longitud de los campos
-        if (
-            len(casa) > 50
-            or len(bloque) > 50
-            or len(cama) > 50
-        ):
-            flash(
-                "Casa, bloque y cama no pueden superar "
-                "50 caracteres cada uno.",
-                "error"
-            )
-            return redirect(url_for("inventario_admin"))
-
-        # Observaciones
-        observaciones = request.form.get(
-            "observaciones", ""
-        ).strip()
-
+        observaciones = request.form.get("observaciones", "").strip()
         if len(observaciones) > 500:
             flash(
-                "Las observaciones no pueden superar "
-                "500 caracteres.",
+                "Las observaciones no pueden superar 500 caracteres.",
                 "error"
             )
             return redirect(url_for("inventario_admin"))
 
-        # Guardar inventario en SQLite
+        # Datos tecnicos opcionales de la fecha historica del cultivo.
+        # Las fechas tienen el formato AAAA-MM-DD; database.py las valida.
+        fecha_siembra = request.form.get("fecha_siembra", "").strip() or None
+        propagador = request.form.get("propagador", "").strip()
+        numero_camas = request.form.get("numero_camas", "").strip() or None
+        densidad_cama = request.form.get("densidad_cama", "").strip() or None
+        fecha_primera_cosecha = (
+            request.form.get("fecha_primera_cosecha", "").strip() or None
+        )
+
+        if len(propagador) > 120:
+            flash(
+                "El propagador no puede superar 120 caracteres.",
+                "error"
+            )
+            return redirect(url_for("inventario_admin"))
+
         try:
             guardar_inventario(
-                finca_id,
-                variedad_id,
-                cantidad,
-                observaciones,
+                finca_id=finca_id,
+                variedad_id=variedad_id,
+                cantidad=cantidad,
+                observaciones=observaciones,
                 casa=casa,
                 bloque=bloque,
-                cama=cama
+                cama=cama,
+                fecha_siembra=fecha_siembra,
+                propagador=propagador,
+                numero_camas=numero_camas,
+                densidad_cama=densidad_cama,
+                fecha_primera_cosecha=fecha_primera_cosecha
             )
 
         except sqlite3.IntegrityError:
@@ -1215,19 +1291,15 @@ def inventario_admin():
                 "La finca o la variedad seleccionada no existe.",
                 "error"
             )
-
         except ValueError as error:
+            # Las fechas y campos numericos invalidos se notifican aqui.
             flash(str(error), "error")
-
         else:
-            flash(
-                "Inventario guardado correctamente.",
-                "success"
-            )
+            flash("Inventario guardado correctamente.", "success")
 
         return redirect(url_for("inventario_admin"))
 
-    # Mostrar formulario y registros
+    # Mostrar formulario y registros historicos.
     return render_template(
         "inventario_admin.html",
         fincas=obtener_fincas(),
@@ -1476,6 +1548,421 @@ def escanear_inventario_admin():
         fincas=fincas,
         variedades=variedades
     )
+
+# ==========================================
+# FASE 5 - INVENTARIO POR VARIEDAD
+# SOLO ADMINISTRADORES
+# ==========================================
+
+@app.route(
+    "/admin/inventario-por-variedad/<int:variedad_id>",
+    methods=["GET"]
+)
+@administrador_requerido
+def inventario_por_variedad_admin(variedad_id):
+
+    # Buscar la variedad
+    rosa = obtener_variedad(variedad_id)
+
+    if rosa is None:
+        abort(404)
+
+    # Obtener los inventarios de esta variedad
+    inventarios = [
+        registro
+        for registro in obtener_inventarios()
+        if registro["variedad_id"] == variedad_id
+    ]
+
+    # Calcular el total de plantas
+    total_plantas = sum(
+        registro["cantidad"]
+        for registro in inventarios
+    )
+
+    return render_template(
+        "inventario_por_variedad.html",
+        rosa=rosa,
+        inventarios=inventarios,
+        total_plantas=total_plantas
+    )
+
+# ==========================================
+# EXPORTAR ACTA A EXCEL
+# ==========================================
+
+@app.route(
+    "/admin/actas/<int:acta_id>/excel",
+    methods=["POST"]
+)
+@administrador_requerido
+def exportar_acta_excel(acta_id):
+
+    import base64
+    import binascii
+    from io import BytesIO
+
+    from PIL import Image as PILImage
+    from openpyxl import Workbook
+    from openpyxl.styles import (
+        Font, PatternFill, Alignment
+    )
+    from openpyxl.drawing.image import Image as XLImage
+
+    validar_csrf()
+
+    resultado = obtener_detalle_acta(acta_id)
+
+    if resultado is None:
+        abort(404)
+
+    acta = resultado["acta"]
+    detalles = resultado["detalles"]
+
+    # Evitar que textos se interpreten
+    # como formulas de Excel
+    def texto_seguro(valor):
+        texto = str(valor) if valor is not None else ""
+        if texto.lstrip().startswith(("=", "+", "-", "@")):
+            return "'" + texto
+        return texto
+
+    libro = Workbook()
+    hoja = libro.active
+    hoja.title = "Acta de inventario"
+
+    hoja.sheet_view.showGridLines = False
+
+    # ENCABEZADO
+    hoja.merge_cells("A1:E1")
+    hoja["A1"] = "NIRP INTERNATIONAL - ACTA DE INVENTARIO"
+    hoja["A1"].font = Font(
+        bold=True, color="FFFFFF", size=15
+    )
+    hoja["A1"].fill = PatternFill(
+        "solid", fgColor="194B30"
+    )
+    hoja["A1"].alignment = Alignment(
+        horizontal="center"
+    )
+    hoja.row_dimensions[1].height = 35
+
+    # INFORMACION GENERAL
+    hoja.append([
+        "N.º acta", acta_id,
+        "Fecha de corte", texto_seguro(acta["fecha_corte"])
+    ])
+    hoja.append([
+        "Finca", texto_seguro(acta["finca_nombre"]),
+        "Empresa", texto_seguro(acta["finca_empresa"])
+    ])
+    hoja.append([
+        "Departamento", texto_seguro(acta["departamento"]),
+        "Municipio", texto_seguro(acta["municipio"])
+    ])
+    hoja.append([
+        "Responsable",
+        texto_seguro(acta["responsable_nombre"])
+    ])
+
+    hoja.append([])
+
+    # TITULOS DE LA TABLA
+    encabezados = [
+        "Variedad", "Casa", "Bloque",
+        "Cama", "Cantidad"
+    ]
+    hoja.append(encabezados)
+
+    fila_encabezado = hoja.max_row
+
+    for celda in hoja[fila_encabezado]:
+        celda.fill = PatternFill(
+            "solid", fgColor="E6F2E9"
+        )
+        celda.font = Font(
+            bold=True, color="194B30"
+        )
+
+    # INVENTARIO
+    inicio = hoja.max_row + 1
+
+    for item in detalles:
+        hoja.append([
+            texto_seguro(item["variedad_nombre"]),
+            texto_seguro(item["casa"]),
+            texto_seguro(item["bloque"]),
+            texto_seguro(item["cama"]),
+            int(item["cantidad"])
+        ])
+
+    fin = hoja.max_row
+
+    # TOTAL
+    fila_total = hoja.max_row + 1
+
+    hoja.cell(fila_total, 1, "TOTAL DE PLANTAS")
+
+    hoja.cell(
+        fila_total, 5,
+        f"=SUM(E{inicio}:E{fin})"
+        if detalles else 0
+    )
+
+    for celda in hoja[fila_total]:
+        celda.font = Font(bold=True, color="194B30")
+        celda.fill = PatternFill(
+            "solid", fgColor="E6F2E9"
+        )
+
+    # OBSERVACIONES
+    fila_obs = fila_total + 2
+
+    hoja.cell(fila_obs, 1, "OBSERVACIONES")
+    hoja.merge_cells(
+        start_row=fila_obs + 1,
+        start_column=1,
+        end_row=fila_obs + 2,
+        end_column=5
+    )
+
+    hoja.cell(
+        fila_obs + 1,
+        1,
+        texto_seguro(acta["observaciones"] or "Sin observaciones")
+    )
+    hoja.cell(fila_obs + 1, 1).alignment = Alignment(
+        wrap_text=True,
+        vertical="top"
+    )
+
+    # FIRMAS OPCIONALES
+    fila_firmas = fila_obs + 5
+
+    hoja.cell(
+        fila_firmas, 1, "Firma del responsable"
+    )
+    hoja.cell(
+        fila_firmas, 4, "Firma de quien verifica"
+    )
+
+    hoja.cell(
+        fila_firmas + 1,
+        1,
+        texto_seguro(acta["responsable_nombre"])
+    )
+
+    for campo, columna in [
+        ("firma_responsable", "A"),
+        ("firma_verificador", "D")
+    ]:
+        contenido = request.form.get(campo, "")
+
+        if not contenido:
+            continue
+
+        prefijo = "data:image/png;base64,"
+
+        if (
+            not contenido.startswith(prefijo)
+            or len(contenido) > 1000000
+        ):
+            abort(400, description="Firma inválida.")
+
+        try:
+            datos = base64.b64decode(
+                contenido[len(prefijo):],
+                validate=True
+            )
+
+            with PILImage.open(BytesIO(datos)) as imagen:
+                if (
+                    imagen.format != "PNG"
+                    or imagen.width > 2000
+                    or imagen.height > 2000
+                ):
+                    abort(400)
+                imagen.verify()
+
+            firma = XLImage(BytesIO(datos))
+            firma.width = 210
+            firma.height = 65
+
+            hoja.add_image(
+                firma,
+                f"{columna}{fila_firmas + 2}"
+            )
+
+        except (
+            ValueError, OSError,
+            binascii.Error
+        ):
+            abort(400, description="Firma inválida.")
+
+    # ANCHOS DE COLUMNAS
+    anchos = {
+        "A": 30,
+        "B": 24,
+        "C": 22,
+        "D": 24,
+        "E": 17
+    }
+
+    for columna, ancho in anchos.items():
+        hoja.column_dimensions[columna].width = ancho
+
+    hoja.freeze_panes = f"A{inicio}"
+    hoja.page_setup.orientation = "landscape"
+    hoja.sheet_properties.pageSetUpPr.fitToPage = True
+    hoja.page_setup.fitToWidth = 1
+
+    # GENERAR EXCEL
+    archivo = BytesIO()
+    libro.save(archivo)
+    archivo.seek(0)
+
+    return send_file(
+        archivo,
+        as_attachment=True,
+        download_name=f"NIRP_Acta_{acta_id:04d}.xlsx",
+        mimetype=(
+            "application/vnd.openxmlformats-officedocument."
+            "spreadsheetml.sheet"
+        )
+    )
+
+# ==========================================
+# EXPORTAR INVENTARIO POR VARIEDAD A EXCEL
+# INCLUYE FECHAS HISTORICAS Y DATOS TECNICOS
+# ==========================================
+
+@app.route(
+    "/admin/inventario-por-variedad/<int:variedad_id>/excel",
+    methods=["GET"]
+)
+@administrador_requerido
+def inventario_por_variedad_excel(variedad_id):
+    from datetime import date
+    from io import BytesIO
+    from openpyxl import Workbook
+    from openpyxl.styles import Alignment, Font, PatternFill
+
+    rosa = obtener_variedad(variedad_id)
+    if rosa is None:
+        abort(404)
+
+    inventarios = [
+        registro for registro in obtener_inventarios()
+        if registro["variedad_id"] == variedad_id
+    ]
+
+    def texto_seguro(valor):
+        texto = str(valor) if valor is not None else ""
+        if texto.lstrip().startswith(("=", "+", "-", "@")):
+            return "'" + texto
+        return texto
+
+    def fecha_excel(valor):
+        if not valor:
+            return None
+        try:
+            return date.fromisoformat(str(valor))
+        except ValueError:
+            return texto_seguro(valor)
+
+    libro = Workbook()
+    hoja = libro.active
+    hoja.title = "Inventario por variedad"
+    hoja.sheet_view.showGridLines = False
+
+    verde = "194B30"
+    verde_claro = "E6F2E9"
+    hoja.merge_cells("A1:J1")
+    hoja["A1"] = "NIRP INTERNATIONAL"
+    hoja["A1"].font = Font(bold=True, color="FFFFFF", size=16)
+    hoja["A1"].fill = PatternFill("solid", fgColor=verde)
+    hoja["A1"].alignment = Alignment(horizontal="center", vertical="center")
+    hoja.row_dimensions[1].height = 32
+
+    hoja.merge_cells("A2:J2")
+    hoja["A2"] = "INVENTARIO TECNICO POR VARIEDAD"
+    hoja["A2"].font = Font(bold=True, color=verde, size=13)
+    hoja["A2"].alignment = Alignment(horizontal="center")
+
+    hoja["A4"] = "Variedad"
+    hoja["B4"] = texto_seguro(rosa["nombre"])
+    hoja["D4"] = "Codigo VBN"
+    hoja["E4"] = texto_seguro(rosa.get("codigo_vbn"))
+    hoja["G4"] = "Denominacion"
+    hoja["H4"] = texto_seguro(rosa.get("denominacion"))
+
+    encabezados = [
+        "Finca", "Casa", "Bloque", "Cama", "Plantas",
+        "Fecha de siembra", "Propagador", "N.o de camas",
+        "Densidad por cama", "Primera cosecha"
+    ]
+    for columna, titulo in enumerate(encabezados, 1):
+        celda = hoja.cell(6, columna, titulo)
+        celda.fill = PatternFill("solid", fgColor=verde_claro)
+        celda.font = Font(bold=True, color=verde)
+        celda.alignment = Alignment(wrap_text=True, vertical="center")
+    hoja.row_dimensions[6].height = 35
+
+    fila = 7
+    for item in inventarios:
+        hoja.append([
+            texto_seguro(item.get("finca_nombre")),
+            texto_seguro(item.get("casa")),
+            texto_seguro(item.get("bloque")),
+            texto_seguro(item.get("cama")),
+            int(item["cantidad"]),
+            fecha_excel(item.get("fecha_siembra")),
+            texto_seguro(item.get("propagador")),
+            item.get("numero_camas"),
+            item.get("densidad_cama"),
+            fecha_excel(item.get("fecha_primera_cosecha")),
+        ])
+        for columna in (6, 10):
+            hoja.cell(fila, columna).number_format = "DD/MM/YYYY"
+        hoja.cell(fila, 5).number_format = "#,##0"
+        fila += 1
+
+    if inventarios:
+        hoja.auto_filter.ref = f"A6:J{fila - 1}"
+
+    hoja.cell(fila, 1, "TOTAL DE PLANTAS")
+    hoja.cell(fila, 5, f"=SUM(E7:E{fila - 1})" if inventarios else 0)
+    hoja.cell(fila, 5).number_format = "#,##0"
+    for celda in hoja[fila]:
+        celda.font = Font(bold=True, color=verde)
+        celda.fill = PatternFill("solid", fgColor=verde_claro)
+
+    anchos = {
+        "A": 28, "B": 19, "C": 19, "D": 19, "E": 13,
+        "F": 20, "G": 27, "H": 16, "I": 20, "J": 20
+    }
+    for columna, ancho in anchos.items():
+        hoja.column_dimensions[columna].width = ancho
+
+    hoja.freeze_panes = "A7"
+    hoja.page_setup.orientation = "landscape"
+    hoja.sheet_properties.pageSetUpPr.fitToPage = True
+    hoja.page_setup.fitToWidth = 1
+
+    archivo = BytesIO()
+    libro.save(archivo)
+    archivo.seek(0)
+    return send_file(
+        archivo,
+        as_attachment=True,
+        download_name=f"NIRP_Inventario_Variedad_{variedad_id}.xlsx",
+        mimetype=(
+            "application/vnd.openxmlformats-officedocument."
+            "spreadsheetml.sheet"
+        )
+    )
+
+
 
 
 

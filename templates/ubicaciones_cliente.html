@@ -91,24 +91,42 @@
                             {{ finca.municipio }}
                         </p>
 
-                        {% if finca.latitud is not none
-                              and finca.longitud is not none %}
+                        
+{% if finca.latitud is not none
+      and finca.longitud is not none %}
 
-                            <a
-                                href="https://www.openstreetmap.org/?mlat={{ finca.latitud }}&mlon={{ finca.longitud }}#map=15/{{ finca.latitud }}/{{ finca.longitud }}"
-                                target="_blank"
-                                rel="noopener noreferrer"
-                                class="boton">
-                                Ver en OpenStreetMap
-                            </a>
+    <!-- MAPA INTERACTIVO DE LA FINCA -->
+    <div class="ubicacion-mapa">
 
-                        {% else %}
+        <iframe
+            title="Mapa de {{ finca.nombre }}"
+            loading="lazy"
+            referrerpolicy="no-referrer"
+            src="https://www.openstreetmap.org/export/embed.html?bbox={{ finca.longitud - 0.01 }}%2C{{ finca.latitud - 0.006 }}%2C{{ finca.longitud + 0.01 }}%2C{{ finca.latitud + 0.006 }}&amp;layer=mapnik&amp;marker={{ finca.latitud }}%2C{{ finca.longitud }}">
+        </iframe>
 
-                            <p class="ubicacion-no-disponible">
-                                Mapa no disponible
-                            </p>
+    </div>
 
-                        {% endif %}
+    <!-- ABRIR EN OPENSTREETMAP -->
+    <a
+        href="https://www.openstreetmap.org/?mlat={{ finca.latitud }}&amp;mlon={{ finca.longitud }}#map=15/{{ finca.latitud }}/{{ finca.longitud }}"
+        target="_blank"
+        rel="noopener noreferrer"
+        class="boton">
+
+        Ver mapa completo
+
+    </a>
+
+{% else %}
+
+    <p class="ubicacion-no-disponible">
+        Mapa no disponible.
+        Esta finca no tiene coordenadas registradas.
+    </p>
+
+{% endif %}
+
 
                     </article>
 

@@ -13,6 +13,60 @@
     <link rel="stylesheet"
           href="{{ url_for('static', filename='styles.css') }}">
 
+    <style>
+        .cliente-ficha-datos {
+            margin-top: 25px;
+        }
+
+        .cliente-ficha-datos h2 {
+            color: #174b2b;
+            font-size: 1.5rem;
+            margin-bottom: 16px;
+        }
+
+        .cliente-ficha-lista {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 12px;
+        }
+
+        .cliente-ficha-campo {
+            background: #f0f6f1;
+            padding: 15px;
+            border-radius: 12px;
+            border: 1px solid #dce9df;
+        }
+
+        .cliente-ficha-campo strong {
+            display: block;
+            color: #174b2b;
+            margin-bottom: 5px;
+        }
+
+        .cliente-ficha-campo span {
+            color: #333;
+            overflow-wrap: anywhere;
+        }
+
+        .cliente-ubicacion-aviso {
+            margin-top: 25px;
+            padding: 20px;
+            border-radius: 12px;
+            background: #f0f6f1;
+        }
+
+        .cliente-ubicacion-aviso h2 {
+            color: #174b2b;
+            margin-bottom: 10px;
+        }
+
+        @media (max-width: 650px) {
+            .cliente-ficha-lista {
+                grid-template-columns: 1fr;
+            }
+        }
+    </style>
+
 </head>
 
 <body>
@@ -35,7 +89,6 @@
         </a>
 
     </header>
-
 
     <!-- DETALLE PUBLICO DE LA ROSA -->
     <main class="cliente-detalle">
@@ -61,7 +114,6 @@
 
             </div>
 
-
             <!-- INFORMACION PUBLICA -->
             <div class="cliente-detalle-info">
 
@@ -72,11 +124,110 @@
                 <h1>{{ rosa.nombre }}</h1>
 
                 <p>
-                    Descubre esta variedad de rosa
-                    de nuestro catálogo
-                    NIRP International.
+                    Conoce las características
+                    de esta variedad de rosa
+                    de NIRP International.
                 </p>
 
+                <!-- CARACTERISTICAS -->
+                <div class="cliente-ficha-datos">
+
+                    <h2>Características de la variedad</h2>
+
+                    <div class="cliente-ficha-lista">
+
+                        <div class="cliente-ficha-campo">
+                            <strong>Nombre comercial</strong>
+                            <span>{{ rosa.nombre }}</span>
+                        </div>
+
+                        <div class="cliente-ficha-campo">
+                            <strong>Denominación varietal</strong>
+                            <span>
+                                {{ rosa.denominacion
+                                   if rosa.denominacion is defined
+                                      and rosa.denominacion
+                                   else 'Sin registrar' }}
+                            </span>
+                        </div>
+
+                        <div class="cliente-ficha-campo">
+                            <strong>Código VBN</strong>
+                            <span>
+                                {{ rosa.codigo_vbn
+                                   if rosa.codigo_vbn is defined
+                                      and rosa.codigo_vbn
+                                   else 'Sin registrar' }}
+                            </span>
+                        </div>
+
+                        <div class="cliente-ficha-campo">
+                            <strong>Color de la flor</strong>
+                            <span>
+                                {{ rosa.color
+                                   if rosa.color is defined
+                                      and rosa.color
+                                   else 'Sin registrar' }}
+                            </span>
+                        </div>
+
+                        <div class="cliente-ficha-campo">
+                            <strong>Tipo de flor</strong>
+                            <span>
+                                {{ rosa.tipo_flor
+                                   if rosa.tipo_flor is defined
+                                      and rosa.tipo_flor
+                                   else 'Sin registrar' }}
+                            </span>
+                        </div>
+
+                        <div class="cliente-ficha-campo">
+                            <strong>Número de pétalos</strong>
+                            <span>
+                                {{ rosa.petalos
+                                   if rosa.petalos is defined
+                                      and rosa.petalos is not none
+                                   else 'Sin registrar' }}
+                            </span>
+                        </div>
+
+                        <div class="cliente-ficha-campo">
+                            <strong>Largo del tallo</strong>
+                            <span>
+                                {{ rosa.largo_tallo
+                                   if rosa.largo_tallo is defined
+                                      and rosa.largo_tallo
+                                   else 'Sin registrar' }}
+                            </span>
+                        </div>
+
+                        <div class="cliente-ficha-campo">
+                            <strong>Vida en florero</strong>
+                            <span>
+                                {{ rosa.vida_florero
+                                   if rosa.vida_florero is defined
+                                      and rosa.vida_florero
+                                   else 'Sin registrar' }}
+                            </span>
+                        </div>
+
+                    </div>
+
+                </div>
+
+                <!-- UBICACIONES DE CULTIVO -->
+                <div class="cliente-ubicacion-aviso">
+
+                    <h2>Ubicaciones de cultivo</h2>
+
+                    <p>
+                        Consulta las fincas donde
+                        se cultivan nuestras variedades.
+                    </p>
+
+                </div>
+
+                <!-- BOTONES -->
                 <div class="cliente-detalle-botones">
 
                     <a
@@ -98,7 +249,6 @@
         </section>
 
     </main>
-
 
     <!-- PIE DE PAGINA -->
     <footer>
