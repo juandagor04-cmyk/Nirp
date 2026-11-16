@@ -1,0 +1,109 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Particionamiento de actas | NIRP International</title>
+    <link rel="stylesheet" href="{{ url_for('static', filename='styles.css') }}">
+    <style>
+        body { margin:0; background:#f5f8f5; color:#243e2c; font-family:Arial,sans-serif; }
+        .part-contenedor { width:min(1120px,94%); margin:36px auto 80px; }
+        .part-cabecera { background:linear-gradient(135deg,#163f2a,#2e7750); border-radius:20px;
+                         padding:30px 34px; color:white; }
+        .part-cabecera h1 { color:white; margin:0 0 12px; }
+        .part-cabecera p { line-height:1.7; margin:0; }
+        .part-volver { display:inline-block; color:#206640; font-weight:700; margin-bottom:20px; }
+        .part-panel { background:white; border:1px solid #dce8df; border-radius:16px;
+                      padding:25px; margin-top:24px; }
+        .part-panel h2 { color:#194b30; margin-top:0; }
+        .part-boton { display:inline-block; background:#246b43; color:white; padding:12px 20px;
+                      border:0; border-radius:9px; text-decoration:none; font-weight:700; cursor:pointer; }
+        .part-boton:hover { background:#19472c; }
+        .part-tabla-wrap { width:100%; overflow-x:auto; }
+        .part-tabla { width:100%; min-width:850px; border-collapse:collapse; }
+        .part-tabla th,.part-tabla td { padding:13px 10px; border-bottom:1px solid #e3ebe5;
+                                        text-align:left; }
+        .part-tabla th { background:#eaf4ed; color:#194b30; }
+        .part-ok { color:#176332; font-weight:700; }
+        .part-pendiente { color:#9a5d1c; font-weight:700; }
+        .part-mensaje { padding:13px 15px; margin:18px 0; border-radius:10px;
+                        background:#e8f4ea; }
+        .part-mensaje.error { background:#ffeaea; color:#92252d; }
+        .part-aviso { color:#596d60; line-height:1.65; }
+        @media (max-width:620px) { .part-cabecera,.part-panel { padding:20px; } }
+    </style>
+</head>
+<body>
+    <main class="part-contenedor">
+        <a class="part-volver" href="{{ url_for('actas_inventario_admin') }}">← Volver a las actas</a>
+        <header class="part-cabecera">
+            <h1>Particionamiento anual de actas</h1>
+            <p>NIRP International · Consulta de copias físicas de las actas, separadas por año de corte.</p>
+        </header>
+        {% with mensajes = get_flashed_messages(with_categories=true) %}
+            {% for categoria, mensaje in mensajes %}
+                <div class="part-mensaje {{ 'error' if categoria == 'error' else '' }}" role="alert">{{ mensaje }}</div>
+            {% endfor %}
+        {% endwith %}
+        <section class="part-panel">
+            <h2>Sincronizar particiones</h2>
+            <p class="part-aviso">Esta herramienta crea tablas anuales en SQLite, por ejemplo
+                <code>actas_part_2026</code> y <code>actas_detalle_part_2026</code>.
+                Las tablas originales <code>actas_inventario</code> y
+                <code>actas_inventario_detalle</code> permanecen como fuente oficial.
+                Las nuevas actas aparecen en las copias tras pulsar Sincronizar.</p>
+            <form method="POST" action="{{ url_for('sincronizar_particionamiento_actas_admin') }}"
+                  onsubmit="return confirm('¿Sincronizar las copias anuales desde las actas originales?');">
+                <input type="hidden" name="csrf_token" value="{{ csrf_token() }}">
+                <button class="part-boton" type="submit">Sincronizar particiones</button>
+            </form>
+        </section>
+        <section class="part-panel">
+            <h2>Comparación con las tablas originales</h2>
+            <p class="part-aviso">Si los recuentos no coinciden, vuelve a sincronizar. La comparación no es una
+            prueba de velocidad: para medir rendimiento hace falta una prueba aparte con más registros.</p>
+            {% if resumen %}
+                <div class="part-tabla-wrap">
+                    <table class="part-tabla">
+                        <thead><tr><th>Año</th><th>Tabla física</th><th>Actas originales</th><th>Actas partición</th>
+                            <th>Plantas originales</th><th>Plantas partición</th><th>Estado</th><th>Consulta</th></tr></thead>
+                        <tbody>
+                        {% for item in resumen %}
+                            <tr>
+                                <td>{{ item.anio }}</td><td><code>{{ item.tabla }}</code></td>
+                                <td>{{ item.actas_origen }}</td><td>{{ item.actas_particion }}</td>
+                                <td>{{ item.plantas_origen }}</td><td>{{ item.plantas_particion }}</td>
+                                <td>{% if item.sincronizada %}<span class="part-ok">Coincide</span>
+                                    {% else %}<span class="part-pendiente">Revisar / sincronizar</span>{% endif %}</td>
+                                <td><a href="{{ url_for('particionamiento_actas_admin', anio=item.anio) }}">Ver año</a></td>
+                            </tr>
+                        {% endfor %}
+                        </tbody>
+                    </table>
+                </div>
+            {% else %}
+                <p class="part-aviso">Todavía no hay actas con fecha de corte para dividir por año.</p>
+            {% endif %}
+        </section>
+        {% if anio_seleccionado is not none %}
+        <section class="part-panel" id="consulta-anual">
+            <h2>Actas consultadas desde la partición {{ anio_seleccionado }}</h2>
+            {% if actas_anio %}
+                <div class="part-tabla-wrap"><table class="part-tabla">
+                    <thead><tr><th>Acta</th><th>Finca</th><th>Fecha de corte</th><th>Responsable</th>
+                        <th>Registros</th><th>Plantas</th><th>Detalle oficial</th></tr></thead>
+                    <tbody>{% for acta in actas_anio %}<tr>
+                        <td>{{ '%04d'|format(acta.id) }}</td><td>{{ acta.finca_nombre }}</td>
+                        <td>{{ acta.fecha_corte }}</td><td>{{ acta.responsable_nombre }}</td>
+                        <td>{{ acta.total_registros }}</td><td>{{ acta.total_plantas }}</td>
+                        <td><a href="{{ url_for('detalle_acta', acta_id=acta.id) }}">Abrir acta</a></td>
+                    </tr>{% endfor %}</tbody>
+                </table></div>
+            {% else %}
+                <p class="part-aviso">No hay actas en esta partición. Usa el botón Sincronizar.</p>
+            {% endif %}
+        </section>
+        {% endif %}
+    </main>
+</body>
+</html>

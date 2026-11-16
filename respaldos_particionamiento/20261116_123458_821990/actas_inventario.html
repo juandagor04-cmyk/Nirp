@@ -1,0 +1,443 @@
+
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport"
+          content="width=device-width, initial-scale=1.0">
+
+    <title>Actas de inventario | NIRP International</title>
+
+    <link rel="stylesheet"
+          href="{{ url_for('static', filename='styles.css') }}">
+
+    <style>
+        .actas-pagina {
+            background: #f5f8f5;
+            min-height: 100vh;
+            color: #243e2c;
+        }
+
+        .actas-contenedor {
+            width: min(1150px, 94%);
+            margin: 35px auto 70px;
+        }
+
+        .actas-encabezado {
+            background: linear-gradient(
+                135deg, #163f2a, #2e7750
+            );
+            padding: 40px;
+            border-radius: 22px;
+            color: white;
+            margin-bottom: 28px;
+        }
+
+        .actas-encabezado h1 {
+            color: white;
+            font-size: clamp(27px, 4vw, 40px);
+            margin: 0 0 12px;
+        }
+
+        .actas-encabezado p {
+            color: #e2f2e7;
+            line-height: 1.7;
+        }
+
+        .actas-volver {
+            display: inline-block;
+            margin-bottom: 20px;
+            color: #206640;
+            font-weight: 700;
+            text-decoration: none;
+        }
+
+        .actas-seccion {
+            background: white;
+            border: 1px solid #e0eae2;
+            border-radius: 20px;
+            padding: 30px;
+            margin-bottom: 28px;
+            box-shadow: 0 8px 25px rgba(0, 0, 0, .04);
+        }
+
+        .actas-seccion h2 {
+            font-size: 23px;
+            color: #194b30;
+            margin: 0 0 12px;
+        }
+
+        .actas-descripcion {
+            color: #617266;
+            line-height: 1.7;
+            margin-bottom: 24px;
+        }
+
+        .actas-formulario {
+            display: grid;
+            grid-template-columns: repeat(2, minmax(0, 1fr));
+            gap: 20px;
+        }
+
+        .actas-campo {
+            display: flex;
+            flex-direction: column;
+            gap: 9px;
+        }
+
+        .actas-campo label {
+            color: #264b35;
+            font-weight: 700;
+        }
+
+        .actas-campo select,
+        .actas-campo input,
+        .actas-campo textarea {
+            width: 100%;
+            box-sizing: border-box;
+            padding: 13px 14px;
+            background: white;
+            color: #243e2c;
+            border: 1px solid #cbdccf;
+            border-radius: 10px;
+            font: inherit;
+        }
+
+        .actas-campo select:focus,
+        .actas-campo input:focus,
+        .actas-campo textarea:focus {
+            outline: 2px solid #86bc94;
+            border-color: #277647;
+        }
+
+        .actas-campo-completo {
+            grid-column: 1 / -1;
+        }
+
+        .actas-boton {
+            display: inline-block;
+            padding: 14px 24px;
+            background: #246b43;
+            color: white;
+            border: none;
+            border-radius: 11px;
+            font: inherit;
+            font-weight: 700;
+            cursor: pointer;
+            text-decoration: none;
+        }
+
+        .actas-boton:hover {
+            background: #17482e;
+        }
+
+        .actas-boton:disabled {
+            background: #8a9d90;
+            cursor: not-allowed;
+        }
+
+        .actas-tabla-contenedor {
+            overflow-x: auto;
+        }
+
+        .actas-tabla {
+            width: 100%;
+            min-width: 760px;
+            border-collapse: collapse;
+        }
+
+        .actas-tabla th,
+        .actas-tabla td {
+            text-align: left;
+            padding: 15px;
+            border-bottom: 1px solid #e3ebe5;
+        }
+
+        .actas-tabla th {
+            background: #eaf4ed;
+            color: #194b30;
+        }
+
+        .actas-tabla tbody tr:hover {
+            background: #f5f9f5;
+        }
+
+        .actas-vacio {
+            background: #f1f8f2;
+            border-radius: 14px;
+            padding: 35px 20px;
+            text-align: center;
+            color: #526d5a;
+        }
+
+        .actas-mensaje {
+            padding: 15px 18px;
+            border-radius: 10px;
+            margin-bottom: 20px;
+            background: #e7f6eb;
+            border: 1px solid #afd7ba;
+            color: #195d32;
+        }
+
+        .actas-mensaje.error {
+            background: #ffefef;
+            border-color: #f2bbbb;
+            color: #9b2828;
+        }
+
+        @media (max-width: 650px) {
+            .actas-encabezado {
+                padding: 28px 22px;
+            }
+
+            .actas-seccion {
+                padding: 22px 17px;
+            }
+
+            .actas-formulario {
+                grid-template-columns: 1fr;
+            }
+
+            .actas-campo-completo {
+                grid-column: auto;
+            }
+
+            .actas-boton {
+                width: 100%;
+            }
+        }
+    </style>
+</head>
+
+<body class="actas-pagina">
+
+    <main class="actas-contenedor">
+
+        <a href="{{ url_for('panel_admin') }}"
+           class="actas-volver">
+            ← Volver al panel de administración
+        </a>
+
+        <header class="actas-encabezado">
+            <h1>Actas de inventario</h1>
+            <p>
+                NIRP International · Registro y control
+                histórico de inventarios por finca.
+            </p>
+        </header>
+
+        {% with mensajes = get_flashed_messages(with_categories=true) %}
+            {% for categoria, mensaje in mensajes %}
+                <div
+                    class="actas-mensaje {{ 'error' if categoria == 'error' else '' }}"
+                    role="alert">
+                    {{ mensaje }}
+                </div>
+            {% endfor %}
+        {% endwith %}
+
+        <section class="actas-seccion">
+            <h2>Generar nueva acta</h2>
+
+         
+        <p class="actas-descripcion">
+            El acta de inventario general reúne los registros
+            de las variedades encontradas en una finca,
+            incluyendo casas, bloques, camas y cantidades.
+        </p>
+
+        <p class="actas-descripcion">
+            Antes de generar el acta, comprueba que los
+            inventarios de la finca estén actualizados.
+            El documento conservará una copia de las
+            cantidades existentes al momento de generarlo.
+        </p>
+
+        <a href="{{ url_for('inventario_admin') }}"
+        class="actas-boton">
+            🌱 Revisar inventario actual
+        </a>
+
+            <form
+                method="POST"
+                action="{{ url_for('actas_inventario_admin') }}"
+                class="actas-formulario">
+
+                <input
+                    type="hidden"
+                    name="csrf_token"
+                    value="{{ csrf_token() }}">
+
+                <div class="actas-campo">
+                    <label for="finca_id">
+                        Seleccionar finca *
+                    </label>
+
+                    <select
+                        id="finca_id"
+                        name="finca_id"
+                        required>
+
+                        <option value="">
+                            Selecciona una finca
+                        </option>
+
+                        {% for finca in fincas %}
+                            <option value="{{ finca.id }}">
+                                {{ finca.nombre }}
+                            </option>
+                        {% endfor %}
+                    </select>
+                </div>
+
+                <div class="actas-campo">
+                    <label for="fecha_corte">
+                        Fecha de corte *
+                    </label>
+
+                    <input
+                        type="date"
+                        id="fecha_corte"
+                        name="fecha_corte"
+                        required>
+                </div>
+
+                <div class="actas-campo actas-campo-completo">
+                    <label for="observaciones">
+                        Observaciones
+                    </label>
+
+                    <textarea
+                        id="observaciones"
+                        name="observaciones"
+                        rows="4"
+                        maxlength="500"
+                        placeholder="Escribe aquí observaciones del acta..."></textarea>
+                </div>
+
+                <div class="actas-campo-completo">
+                    <button
+                        type="submit"
+                        class="actas-boton"
+                        {% if not fincas %}disabled{% endif %}
+                        onclick="return confirm('¿Deseas generar esta acta con los datos actuales del inventario?');">
+
+                        Generar acta de inventario
+                    </button>
+                </div>
+
+            </form>
+
+            {% if not fincas %}
+                <p class="actas-descripcion">
+                    Debes registrar una finca antes
+                    de generar un acta.
+                </p>
+            {% endif %}
+        </section>
+
+        <section class="actas-seccion">
+            <h2>Historial de actas</h2>
+
+            <p class="actas-descripcion">
+                Consulta las actas que han sido generadas.
+                Cada una conserva la información
+                registrada cuando fue creada.
+            </p>
+
+            {% if actas %}
+
+                <div class="actas-tabla-contenedor">
+                    <table class="actas-tabla">
+                        <thead>
+                            <tr>
+                                <th>N.º de acta</th>
+                                <th>Finca</th>
+                                <th>Fecha de corte</th>
+                                <th>Responsable</th>
+                                <th>Registros</th>
+                                <th>Cantidad total</th>
+                                <th>Acciones</th>
+                            </tr>
+                        </thead>
+
+                       
+<tbody>
+
+    {% for acta in actas %}
+
+        <tr>
+
+            <!-- NUMERO DEL ACTA -->
+            <td>
+                <a href="{{ url_for('detalle_acta', acta_id=acta.id) }}">
+                    <strong>
+                        {{ "%04d"|format(acta.id) }}
+                    </strong>
+                </a>
+            </td>
+
+            <!-- FINCA -->
+            <td>
+                {{ acta.finca_nombre }}
+            </td>
+
+            <!-- FECHA -->
+            <td>
+                {{ acta.fecha_corte }}
+            </td>
+
+            <!-- RESPONSABLE -->
+            <td>
+                {{ acta.responsable_nombre }}
+            </td>
+
+            <!-- REGISTROS -->
+            <td>
+                {{ acta.total_registros }}
+            </td>
+
+            <!-- CANTIDAD TOTAL -->
+            <td>
+                <strong>
+                    {{ acta.total_cantidad }}
+                </strong>
+            </td>
+
+            <!-- ACCIONES -->
+            <td>
+                <a
+                    href="{{ url_for('detalle_acta', acta_id=acta.id) }}"
+                    class="actas-boton">
+
+                    👁️ Ver acta
+
+                </a>
+            </td>
+
+        </tr>
+
+    {% endfor %}
+
+</tbody>
+
+                    </table>
+                </div>
+
+            {% else %}
+
+                <div class="actas-vacio">
+                    <h3>Sin actas registradas</h3>
+                    <p>
+                        Cuando generes la primera acta,
+                        aparecerá en este historial.
+                    </p>
+                </div>
+
+            {% endif %}
+        </section>
+
+    </main>
+
+</body>
+</html>

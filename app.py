@@ -1971,6 +1971,49 @@ def inventario_por_variedad_excel(variedad_id):
 # INICIAR FLASK
 # ==========================================
 
+
+# ==========================================
+# PARTICIONAMIENTO MANUAL ANUAL DE ACTAS
+# ==========================================
+
+@app.route("/admin/particionamiento-actas", methods=["GET"])
+@administrador_requerido
+def particionamiento_actas_admin():
+    from particiones_actas import (
+        obtener_resumen_particiones_actas,
+        consultar_actas_particionadas,
+    )
+    anio_texto = request.args.get("anio", "").strip()
+    if anio_texto and (len(anio_texto) != 4 or not anio_texto.isdecimal()):
+        abort(400, description="Anio no valido.")
+    anio = int(anio_texto) if anio_texto else None
+    resumen = obtener_resumen_particiones_actas()
+    actas_anio = consultar_actas_particionadas(anio) if anio else []
+    return render_template(
+        "particionamiento_actas.html",
+        resumen=resumen,
+        anio_seleccionado=anio,
+        actas_anio=actas_anio,
+    )
+
+
+@app.route("/admin/particionamiento-actas/sincronizar", methods=["POST"])
+@administrador_requerido
+def sincronizar_particionamiento_actas_admin():
+    from particiones_actas import sincronizar_particiones_actas
+    validar_csrf()
+    try:
+        resultado = sincronizar_particiones_actas()
+    except (ValueError, RuntimeError, sqlite3.DatabaseError) as error:
+        flash(f"No se pudieron sincronizar las particiones: {error}", "error")
+    else:
+        flash(
+            f"Sincronizacion completada: {resultado['actas']} actas "
+            f"en {resultado['anios']} anios.", "success"
+        )
+    return redirect(url_for("particionamiento_actas_admin"))
+
+
 if __name__ == "__main__":
 
     app.run(
